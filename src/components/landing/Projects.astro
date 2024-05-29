@@ -2,24 +2,24 @@
 // Define the array of projects directly in the frontmatter script.
 const otherprojects = [
   {
-    "url": "https://www.lexingtonthemes.com/",
-    "title": "Lexington Themes",
-    "description": "Premium themes and UI Kits For designers, developers, businesses, and personal use — Beautifully crafted with Astro.js, and Tailwind CSS — Simple & easy to customize."
+    "url": "https://www.baggu.com/",
+    "title": "BAGGU",
+    "description": "Manages a team of three, overseeing product setup and software development across all sales channels,  focusing on operational efficiency and streamlined workflows."
   },
   {
-    "url": "https://www.windstatic.com/",
-    "title": "Windstatic",
-    "description": "A set of 161 elements & layouts made with Tailwind CSS and Alpine.js. Skillfully designed with an eye for aesthetics, offering an excellent starting point for your upcoming project."
+    "url": "https://shiphawk.com/",
+    "title": "ShipHawk",
+    "description": "Built a Looker dashboard with streamlined data from Fivetran that visualizes daily and weekly performance target metrics for the ShipHawk Product Team."
   },
   {
-    "url": "https://www.colorsandfonts.com/",
-    "title": "Colors & Fonts",
-    "description": "Color and typography resources and inspiration for Web Developers and Digital Designers."
+    "url": "https://www.youtube.com/watch?v=v0yrY72n3tY",
+    "title": "TEDx Co-Director",
+    "description": "Coordinated a 10 team organization to host 2 virtual TEDx conferences with 80,000+ views featuring prominent speakers like Mayuko Inoue."
   },
   {
-    "url": "https://www.svgdoodles.com/",
-    "title": "SVG Doodles",
-    "description": "A free collection of 208 super duper SVG doodles for your creative projects."
+    
+    "title": "Netflix Watch Party Project",
+    "description": "Conducted 25+ Netflix user interviews to identify key pain points; analyzed market trends and organizational needs to inform the implementation of a social integration feature."
   }
   // Add more projects as needed...
 ];
@@ -45,8 +45,8 @@ function calculateAosDuration(index) {
         data-aos="fade-up"
         data-aos-duration="1500"
       >
-        <span>Main</span>
-        <span class="font-bold">projects</span>
+        <span>main</span>
+        <span class="font-bold">experience + projects</span>
       </h3>
     </div>
 
@@ -60,25 +60,30 @@ function calculateAosDuration(index) {
             class="flow-root h-full"
             data-aos="fade-up"
             data-aos-duration={calculateAosDuration(index)}
+            key={index}
           >
-            <a href={project.url}>
-              <div class="h-full flex flex-col justify-between">
-                <div>
-                  <p class="group-hover:text-secondary/70 text-secondary text-9xl font-black lg:rotate-90 xl:-translate-x-28 lg:-translate-x-16 lg:mb-8 xl:mb-0">
-                    0{index + 1}.
-                  </p>
-                  <p class="italic shrink-0">{project.title}</p>
-                  <p class="text-base mt-3 leading-relaxed">
-                    {project.description}
-                  </p>
-                </div>
-                <div>
-                  <p class="mt-3 text-base font-semibold">
-                    Learn more &nbsp; ↗
-                  </p>
-                </div>
+            <div class="h-full flex flex-col justify-between">
+              <div>
+                <p class="group-hover:text-secondary/70 text-secondary text-9xl font-black lg:rotate-90 xl:-translate-x-28 lg:-translate-x-16 lg:mb-8 xl:mb-0">
+                  0{index + 1}.
+                </p>
+                <p class="font-bold shrink-0">{project.title}</p>
+                <p class="text-base mt-3 leading-relaxed">
+                  {project.description}
+                </p>
               </div>
-            </a>
+              {
+                project.url && (
+                  <a href={project.url}>
+                    <div>
+                      <p class="mt-3 text-base font-semibold">
+                        Learn more &nbsp; ↗
+                      </p>
+                    </div>
+                  </a>
+                )
+              }
+            </div>
           </li>
         ))
       }
