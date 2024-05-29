@@ -16,6 +16,9 @@ module.exports = {
   },
 }
 
+
+
+
 // /** @type {import('tailwindcss').Config} */
 // const defaultTheme = require('tailwindcss/defaultTheme');
 

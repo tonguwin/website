@@ -3,6 +3,8 @@
 @tailwind utilities;
 /* CSS */
 :root {
+  --color-secondary: #131313;
+  --color-primary: #ebebeb;
   font-family: Inter, sans-serif;
   font-feature-settings:
   "liga" 1,
