@@ -216,16 +216,15 @@
 
         function updateDateTime() {
             const now = new Date();
-            const formattedDate = formatDate(now);
+            let formattedDate = formatDate(now);
 
             // Split the formatted date to insert the ordinal suffix
-            const [monthDay, timeWithPeriod] = formattedDate.split(', ');
+            const [monthDay, yearTime] = formattedDate.split(', ');
             const [month, day] = monthDay.split(' ');
             const dayNumber = parseInt(day);
             const ordinalDay = `${dayNumber}${getOrdinalSuffix(dayNumber)}`;
 
-            const year = now.getFullYear();
-            const formattedDateTime = `${month} ${ordinalDay}, ${year} ${timeWithPeriod} PT`;
+            const formattedDateTime = `${month} ${ordinalDay}, ${yearTime} PT`;
 
             document.getElementById('currentDateTime').textContent = formattedDateTime;
         }
@@ -237,6 +236,7 @@
         setInterval(updateDateTime, 60000);
     </script>
 </body>
+
 
       </div>
     </div>
