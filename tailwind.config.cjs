@@ -16,8 +16,11 @@ module.exports = {
   },
 }
 
-
-
+// Main colors
+// colors: {
+//  secondary: "#131313",
+//  primary: "#ebebeb",
+// },
 
 // /** @type {import('tailwindcss').Config} */
 // const defaultTheme = require('tailwindcss/defaultTheme');

@@ -82,38 +82,95 @@ const features = [
     </div>
 
 
- <style>
-    .marquee-container {
-      overflow: hidden;
-      white-space: nowrap;
-      position: relative;
-      width: 100%; /* Adjust width as needed */
-
-    }
+    <style>
+      .marquee-container {
+        overflow: hidden;
+        white-space: nowrap;
+        position: relative;
+        width: 100%;
+      }
     
-    .marquee {
-      display: inline-block;
-      white-space: nowrap;
-      animation: marquee-bounce 28s linear infinite;
-    }
-
-    .marquee svg {
-      display: inline-block; /* Ensure SVGs are displayed inline */
-      margin-right: 10px; /* Optional: space between SVGs */
-    }
-
-    @keyframes marquee-bounce {
-      0% {
-        transform: translateX(0);
+      .marquee {
+        display: inline-block;
+        white-space: nowrap;
+        animation: marquee-bounce 28s linear infinite;
       }
-      50% {
-        transform: translateX(calc(-100% + 100vw));
+    
+      .marquee svg {
+        display: inline-block;
+        margin-right: 10px;
+        transition: transform 0.3s ease-in-out, filter 0.5s ease-in-out, stroke 0.5s ease-in-out;
       }
-      100% {
-        transform: translateX(0);
+    
+      /* Subtle shake animation */
+      @keyframes subtle-shake {
+        0%, 100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+          transform: translate(-2px, -2px) rotate(-2deg);
+        }
+        50% {
+          transform: translate(2px, 2px) rotate(2deg);
+        }
+        75% {
+          transform: translate(-1px, 1px) rotate(-1deg);
+        }
       }
-    }
-  </style>
+    
+      /* Hover effects with gradual transition */
+      .marquee svg:hover path {
+        filter: brightness(1.02);
+        stroke: #FF9236;
+        stroke-width: 0.5;
+      }
+    
+      .marquee svg:hover {
+        animation: subtle-shake 0.5s infinite ease-in-out;
+        transform: scale(1.1); /* Slightly enlarge on hover */
+      }
+    
+      /* Main marquee scrolling animation */
+      @keyframes marquee-bounce {
+        0% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(calc(-100% + 100vw));
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+    
+      /* Dissipation effect on click */
+      .marquee svg.clicked {
+        animation: dissipate 2s forwards; /* Dissipation on click */
+      }
+    
+      @keyframes dissipate {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0);
+          opacity: 0;
+        }
+      }
+    </style>
+    
+    
+    <script>
+      const svgElement = document.querySelector('.marquee svg');
+    
+      svgElement.addEventListener('click', function() {
+        svgElement.classList.add('clicked');
+      });
+    </script>
+    
+    
+    
 
 <div class="marquee-container">
   <div class="marquee">
