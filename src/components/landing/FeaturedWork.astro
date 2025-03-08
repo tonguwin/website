@@ -145,27 +145,49 @@ const features = [
     
       /* Dissipation effect on click */
       .marquee svg.clicked {
-        animation: dissipate 2s forwards; /* Dissipation on click */
+        animation: dissipate 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
       }
     
       @keyframes dissipate {
         0% {
-          transform: scale(1);
+          transform: scale(1) translateY(0);
           opacity: 1;
+          filter: brightness(1);
+        }
+        50% {
+          transform: scale(1.2) translateY(-20px);
+          opacity: 0.7;
+          filter: brightness(1.2);
         }
         100% {
-          transform: scale(0);
+          transform: scale(0) translateY(-40px);
           opacity: 0;
+          filter: brightness(0);
         }
       }
     </style>
     
     
     <script>
-      const svgElement = document.querySelector('.marquee svg');
-    
-      svgElement.addEventListener('click', function() {
-        svgElement.classList.add('clicked');
+      // Declare the function type globally
+      declare global {
+        interface Window {
+          handleCharmander: (event: Event) => void;
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        window.handleCharmander = (event) => {
+          event.preventDefault();
+          const svg = document.getElementById('charmander');
+          if (!svg.classList.contains('clicked')) {
+            svg.classList.add('clicked');
+            setTimeout(() => {
+              window.location.href = '/secret-blog';
+            }, 1200); // Match animation duration
+          }
+        };
       });
     </script>
     
@@ -185,16 +207,23 @@ const features = [
     </svg>*/}
     
 
-<svg
+<a href="/secret-blog" class="inline-block transform transition-transform hover:scale-110" onclick="handleCharmander(event)">
+  <svg
             version="1.1"
-            id="Layer_1"
+            id="charmander"
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
             viewBox="0 0 64 64"
             xml:space="preserve"
             width="150"
             height="150"
+            class="cursor-pointer transition-colors duration-300 hover:fill-[#FF5722]"
         >
+            <!-- Tail (moved to back) -->
+            <path d="M40,44 h10 v4 h-10 z" fill="#FFA726" />
+            <path d="M50,44 h2 v4 h-2 z" fill="#FFEB3B" />
+            <path d="M52,44 h2 v4 h-2 z" fill="#FF5722" />
+
             <!-- Charmander's Body -->
             <path d="M20,30 h24 v24 h-24 z" fill="#FFA726" />
 
@@ -217,60 +246,8 @@ const features = [
             <path d="M16,34 h4 v10 h-4 z" fill="#FFA726" />
             <path d="M44,34 h4 v10 h-4 z" fill="#FFA726" />
 
-            <!-- Tail -->
-            <path d="M40,44 h10 v4 h-10 z" fill="#FFA726" />
-            <path d="M50,44 h2 v4 h-2 z" fill="#FFEB3B" />
-            <path d="M52,44 h2 v4 h-2 z" fill="#FF5722" />
-
         </svg>
-{/*
-    <svg
-    version="1.1"
-    id="Layer_1"
-    xmlns="http://www.w3.org/2000/svg"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    viewBox="0 0 100 100"
-    xml:space="preserve"
-    width="300"
-    height="300"
->
-    <!-- Cabin Body -->
-    <rect x="25" y="50" width="50" height="30" fill="#8B5E3C" stroke="#4A3422" stroke-width="2" />
-    
-    <!-- Wood Details -->
-    <line x1="25" y1="55" x2="75" y2="55" stroke="#4A3422" stroke-width="0.5" />
-    <line x1="25" y1="60" x2="75" y2="60" stroke="#4A3422" stroke-width="0.5" />
-    <line x1="25" y1="65" x2="75" y2="65" stroke="#4A3422" stroke-width="0.5" />
-    <line x1="25" y1="70" x2="75" y2="70" stroke="#4A3422" stroke-width="0.5" />
-    <line x1="25" y1="75" x2="75" y2="75" stroke="#4A3422" stroke-width="0.5" />
-
-    <!-- Cabin Roof -->
-    <polygon points="25,50 50,30 75,50" fill="#654321" stroke="#4A3422" stroke-width="2" />
-
-    <!-- Roof Details -->
-    <line x1="35" y1="40" x2="65" y2="40" stroke="#4A3422" stroke-width="0.5" />
-    <line x1="30" y1="45" x2="70" y2="45" stroke="#4A3422" stroke-width="0.5" />
-
-    <!-- Windows -->
-    <rect x="30" y="55" width="10" height="10" fill="#FFFFA5" stroke="#4A3422" stroke-width="1" />
-    <rect x="60" y="55" width="10" height="10" fill="#FFFFA5" stroke="#4A3422" stroke-width="1" />
-
-    <!-- Window Crossbars -->
-    <line x1="35" y1="55" x2="35" y2="65" stroke="#4A3422" stroke-width="1" />
-    <line x1="30" y1="60" x2="40" y2="60" stroke="#4A3422" stroke-width="1" />
-    <line x1="65" y1="55" x2="65" y2="65" stroke="#4A3422" stroke-width="1" />
-    <line x1="60" y1="60" x2="70" y2="60" stroke="#4A3422" stroke-width="1" />
-
-    <!-- Door -->
-    <rect x="45" y="65" width="10" height="15" fill="#5C3C20" stroke="#4A3422" stroke-width="2" />
-    <circle cx="53" cy="72" r="1" fill="#4A3422" />
-
-    <!-- Creepy Details -->
-    <!-- Broken Window -->
-    <line x1="35" y1="60" x2="40" y2="55" stroke="#4A3422" stroke-width="1" />
-    <line x1="40" y1="60" x2="35" y2="55" stroke="#4A3422" stroke-width="1" />
-</svg> */}
-
+</a>
 
     <!-- Repeat or add more SVGs if necessary -->
   </div>

@@ -187,57 +187,62 @@
         data-aos-duration="3000"
         data-aos-delay="150">
       </div>
-      <div class="flex w-full">
-        {/*<span class="text-xs font-medium text-secondary flex"
-          >My favorite book right now is &nbsp;<a
-            class="hover:text-black duration-200 font-bold"
-            >Dark Matter &nbsp;</a
-          >by Blake Crouch</span
-        >*/}
+      <div class="flex w-full"
+           data-aos="fade-up"
+           data-aos-duration="3000"
+           data-aos-delay="300">
+        <div class="w-full flex justify-between">
+          <span class="text-xs font-medium text-secondary" id="currentDate"></span>
+          <span class="text-xs font-medium text-secondary" id="currentTime"></span>
+        </div>
 
-<body>
-    <span class="text-xs font-medium text-secondary flex" id="currentDateTime"></span>
-
-    <script>
-        function formatDate(date) {
-            const options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Los_Angeles' };
-            return new Intl.DateTimeFormat('en-US', options).format(date);
-        }
-
-        function getOrdinalSuffix(day) {
-            if (day > 3 && day < 21) return 'th';
-            switch (day % 10) {
-                case 1: return 'st';
-                case 2: return 'nd';
-                case 3: return 'rd';
-                default: return 'th';
+        <script>
+            function formatDate(date) {
+                const options = { month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true, timeZone: 'America/Los_Angeles' };
+                return new Intl.DateTimeFormat('en-US', options).format(date);
             }
-        }
 
-        function updateDateTime() {
-            const now = new Date();
-            let formattedDate = formatDate(now);
+            function getOrdinalSuffix(day) {
+                if (day > 3 && day < 21) return 'th';
+                switch (day % 10) {
+                    case 1: return 'st';
+                    case 2: return 'nd';
+                    case 3: return 'rd';
+                    default: return 'th';
+                }
+            }
 
-            // Split the formatted date to insert the ordinal suffix
-            const [monthDay, yearTime] = formattedDate.split(', ');
-            const [month, day] = monthDay.split(' ');
-            const dayNumber = parseInt(day);
-            const ordinalDay = `${dayNumber}${getOrdinalSuffix(dayNumber)}`;
+            function updateDateTime() {
+                const now = new Date();
+                let formattedDate = formatDate(now);
 
-            const formattedDateTime = `${month} ${ordinalDay}, ${yearTime} PT`;
+                // Split the formatted date to insert the ordinal suffix
+                const [monthDay, yearTime] = formattedDate.split(', ');
+                const [month, day] = monthDay.split(' ');
+                const dayNumber = parseInt(day);
+                const ordinalDay = `${dayNumber}${getOrdinalSuffix(dayNumber)}`;
 
-            document.getElementById('currentDateTime').textContent = formattedDateTime;
-        }
+                const dateElement = document.getElementById('currentDate');
+                const timeElement = document.getElementById('currentTime');
+                
+                const dateText = `${month} ${ordinalDay}, ${now.getFullYear()}`;
+                // Extract just the time portion (removing year and "at")
+                const timeText = `${yearTime.split(' at ')[1]} PT`;
 
-        // Update the date and time when the page loads
-        updateDateTime();
+                if (dateElement.textContent !== dateText) {
+                    dateElement.textContent = dateText;
+                }
+                if (timeElement.textContent !== timeText) {
+                    timeElement.textContent = timeText;
+                }
+            }
 
-        // Update the date and time every minute
-        setInterval(updateDateTime, 60000);
-    </script>
-</body>
+            // Update the date and time when the page loads
+            updateDateTime();
 
-
+            // Update every second
+            setInterval(updateDateTime, 1000);
+        </script>
       </div>
     </div>
   </div>
