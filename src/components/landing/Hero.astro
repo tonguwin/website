@@ -21,10 +21,10 @@
   <title>Todd Nguyen - Product Manager</title>
   <style>
     @keyframes wiggle {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      50% { transform: translate(0px, -2px) rotate(0deg); }
-      70% { transform: translate(0px, 3px) rotate(0deg) ; }
-      100% { transform: translate(0, 0) rotate(0deg); }
+      0% { transform: translate3d(0, 0, 0); }
+      50% { transform: translate3d(0, -2px, 0); }
+      70% { transform: translate3d(0, 3px, 0); }
+      100% { transform: translate3d(0, 0, 0); }
     }
 
     text {
@@ -32,18 +32,21 @@
       font-size: 42px;
       fill: var(--color-secondary);
       font-weight: bold;
+      will-change: transform;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
     }
 
-    #letter1 { animation: wiggle 7s infinite 0.5s; }
-    #letter2 { animation: wiggle 7s infinite 0.8s; }
-    #letter3 { animation: wiggle 7s infinite 0.2s; }
-    #letter4 { animation: wiggle 7s infinite 0.7s; }
-    #letter5 { animation: wiggle 7s infinite 0.3s; }
-    #letter6 { animation: wiggle 7s infinite 0.4s; }
-    #letter7 { animation: wiggle 7s infinite 0.1s; }
-    #letter8 { animation: wiggle 7s infinite 0.9s; }
-    #letter9 { animation: wiggle 7s infinite 0.6s; }
-    #letter10 { animation: wiggle 7s infinite 0.8s; }
+    #letter1 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.5s; }
+    #letter2 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.8s; }
+    #letter3 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.2s; }
+    #letter4 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.7s; }
+    #letter5 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.3s; }
+    #letter6 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.4s; }
+    #letter7 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.1s; }
+    #letter8 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.9s; }
+    #letter9 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.6s; }
+    #letter10 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.8s; }
   </style>
 </head>
 
