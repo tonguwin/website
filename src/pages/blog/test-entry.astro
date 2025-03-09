@@ -1,66 +1,64 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import BlogPost from "../components/BlogPost.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
 
-// Blog posts with explicit dates for easy management
-const posts = [
-  {
-    title: "Calcifer",
-    date: "March 10, 2025",
-    preview: "I love Howl's Moving Castle!",
-    slug: "calcifer"
-  },
-  {
-    title: "Welcome to the Secret Blog",
-    date: "March 8, 2025",
-    preview: "Welcome to my secret blog! This is where I share my thoughts on e-commerce product management, recipes, and maybe some Pokémon references.",
-    slug: "welcome"
-  },
-  {
-    title: "Test Entry",
-    date: "March 9, 2025",
-    preview: "This is a test entry with expandable content. Click to read the full story...",
-    slug: "test-entry"
-  }
-];
+const post = {
+  title: "Test Entry",
+  date: "March 9, 2025",
+  content: `
+    This is a test entry with expandable content. Welcome to the full story!
 
-// Sort posts by date (most recent first)
-const sortedPosts = [...posts].sort((a, b) => {
-  const dateA = new Date(a.date);
-  const dateB = new Date(b.date);
-  return dateB.getTime() - dateA.getTime();
-});
+    In this space, I'll be sharing various thoughts and experiences about technology,
+    development, and maybe even some Pokémon-related content. The dark theme of this blog
+    creates a perfect atmosphere for deep diving into interesting topics.
+
+    Here's what you might find in future entries:
+    - Technical deep dives into web development
+    - Thoughts on user experience and design
+    - Stories about building and growing products
+    - Easter eggs and hidden features (like this blog!)
+
+    This test entry serves as a template for future posts, demonstrating the layout
+    and styling that will be used throughout the blog. The floating Gastly at the
+    bottom adds a touch of whimsy and personality to the space.
+
+    Remember to check back often for new content. Each post will be crafted with
+    the same attention to detail and sprinkled with interesting insights and
+    observations.
+
+    Thanks for reading this test entry. Feel free to explore the rest of the blog
+    and keep an eye out for new posts coming soon!
+  `
+};
 ---
 
 <BaseLayout>
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
-    <div class="max-w-3xl mx-auto">
-      <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
-        <h1 class="text-3xl sm:text-4xl font-bold text-primary hover:text-white transition-colors duration-300">
-          Workshop Space
-        </h1>
-        <div class="flex items-center gap-4">
-          <button
-            id="sort-toggle"
-            class="text-sm text-primary/60 hover:text-white transition-colors duration-300 flex items-center gap-2"
+    <div class="max-w-4xl lg:max-w-5xl mx-auto">
+      <article class="prose prose-invert max-w-none" data-aos="fade-up" data-aos-duration="1000">
+        <div class="bg-primary/5 p-6 sm:p-8 rounded-lg border border-primary/10">
+          <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4">{post.title}</h1>
+          <div class="text-sm text-primary/60 mb-6">Posted on {post.date}</div>
+          
+          <div class="text-primary/80 space-y-4">
+            {post.content.split('\n\n').map((paragraph) => (
+              <p class="text-base sm:text-lg leading-relaxed">
+                {paragraph.trim()}
+              </p>
+            ))}
+          </div>
+
+          <a 
+            href="/secret-blog" 
+            class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
           >
-            <span id="sort-text">Newest First</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transform transition-transform duration-300">
-              <path d="M6 9l6 6 6-6"/>
-            </svg>
-          </button>
+            ← Back to Blog
+          </a>
         </div>
-      </div>
-      
-      <div id="posts-container" class="space-y-8 sm:space-y-12 mb-32 sm:mb-40">
-        {sortedPosts.map(post => (
-          <BlogPost {...post} />
-        ))}
-      </div>
+      </article>
     </div>
 
     <!-- Floating Gastly -->
-    <div class="fixed bottom-0 left-0 w-full h-32 sm:h-40 flex items-center justify-center pointer-events-none bg-gradient-to-t from-secondary via-secondary to-transparent">
+    <div id="gastly-container" class="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 pointer-events-none">
       <a href="/" class="pointer-events-auto">
         <svg
           id="gastly"
@@ -178,7 +176,6 @@ const sortedPosts = [...posts].sort((a, b) => {
     #gastly {
       filter: drop-shadow(0 0 12px rgba(45, 31, 61, 0.2));
       transition: transform 0.3s ease;
-      z-index: 50;
     }
 
     #gastly:hover {
@@ -219,7 +216,7 @@ const sortedPosts = [...posts].sort((a, b) => {
     }
 
     /* Update hover effects to use white */
-    :is(a, button):hover {
+    .prose :is(a, button):hover {
       color: white !important;
     }
 
@@ -227,29 +224,14 @@ const sortedPosts = [...posts].sort((a, b) => {
       background-color: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.2);
     }
+
+    /* Update Gastly container positioning */
+    #gastly-container {
+      z-index: 50;
+    }
   </style>
 
   <script>
-    let isNewestFirst = true;
-    const postsContainer = document.getElementById('posts-container');
-    const sortToggle = document.getElementById('sort-toggle');
-    const sortText = document.getElementById('sort-text');
-    const posts = Array.from(postsContainer.children);
-    const arrow = sortToggle.querySelector('svg');
-
-    sortToggle.addEventListener('click', () => {
-      isNewestFirst = !isNewestFirst;
-      
-      // Update UI
-      sortText.textContent = isNewestFirst ? 'Newest First' : 'Oldest First';
-      arrow.style.transform = isNewestFirst ? 'rotate(0deg)' : 'rotate(180deg)';
-      
-      // Sort posts
-      posts.reverse().forEach(post => {
-        postsContainer.appendChild(post);
-      });
-    });
-
     // Gastly click handler
     const gastly = document.getElementById('gastly');
     if (gastly && gastly.parentElement) {
@@ -262,4 +244,4 @@ const sortedPosts = [...posts].sort((a, b) => {
       });
     }
   </script>
-</BaseLayout>
+</BaseLayout> 

@@ -1,0 +1,253 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const post = {
+  title: "Calcifer",
+  date: "March 10, 2025",
+  content: `
+    I love Howl's Moving Castle!
+  `
+};
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
+    <div class="max-w-4xl lg:max-w-5xl mx-auto">
+      <article class="prose prose-invert max-w-none" data-aos="fade-up" data-aos-duration="1000">
+        <div class="bg-primary/5 p-6 sm:p-8 rounded-lg border border-primary/10">
+          <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4">{post.title}</h1>
+          <div class="text-sm text-primary/60 mb-6">Posted on {post.date}</div>
+          
+          <div class="text-primary/80 space-y-4">
+            {post.content.split('\n\n').map((paragraph) => (
+              <p class="text-base sm:text-lg leading-relaxed">
+                {paragraph.trim()}
+              </p>
+            ))}
+          </div>
+
+          <a 
+            href="/secret-blog" 
+            class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
+          >
+            ← Back to Blog
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Floating Calcifer -->
+    <div id="calcifer-container" class="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 pointer-events-none">
+      <a href="/" class="pointer-events-auto">
+        <svg
+          id="calcifer"
+          class="cursor-pointer w-[100px] h-[100px] sm:w-[150px] sm:h-[150px]"
+          viewBox="-8 0 80 80"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Wood grain pattern -->
+          <defs>
+            <pattern id="woodgrain" patternUnits="userSpaceOnUse" width="8" height="8">
+              <path d="M0,0 Q4,4 8,0 Q4,4 0,8" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+              <path d="M0,4 Q4,8 8,4" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+            </pattern>
+          </defs>
+
+          <!-- Fire glow effect -->
+          <circle cx="32" cy="40" r="38" fill="#FF6B00" opacity="0.2">
+            <animate attributeName="r" values="38;40;38" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.2;0.3;0.2" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- Logs with wood texture -->
+          <!-- Bottom log -->
+          <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="#4A2F1B" />
+          <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="url(#woodgrain)" />
+          
+          <!-- Top log with curve -->
+          <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="#6B4423" />
+          <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="url(#woodgrain)" />
+          
+          <!-- Log details -->
+          <path d="M8,72 C8,72 10,68 12,68 C14,68 16,70 18,70" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          <path d="M24,72 C24,72 26,66 28,66 C30,66 32,69 34,69" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          <path d="M40,72 C40,72 42,67 44,67 C46,67 48,70 50,70" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          
+          <!-- Main flame body -->
+          <path d="M8,72 C8,8 32,-8 56,72 C44,68 20,68 8,72" fill="#FF4D00">
+            <animate attributeName="d" 
+              values="M8,72 C8,8 32,-8 56,72 C44,68 20,68 8,72;
+                     M8,72 C8,6 32,-6 56,72 C44,66 20,66 8,72;
+                     M8,72 C8,8 32,-8 56,72 C44,68 20,68 8,72"
+              dur="3s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Inner flame -->
+          <path d="M12,72 C12,12 32,-2 52,72 C42,69 22,69 12,72" fill="#FFA500">
+            <animate attributeName="d"
+              values="M12,72 C12,12 32,-2 52,72 C42,69 22,69 12,72;
+                     M12,72 C12,10 32,0 52,72 C42,67 22,67 12,72;
+                     M12,72 C12,12 32,-2 52,72 C42,69 22,69 12,72"
+              dur="2.5s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Core flame -->
+          <path d="M16,72 C16,16 32,4 48,72 C40,70 24,70 16,72" fill="#FFF700">
+            <animate attributeName="d"
+              values="M16,72 C16,16 32,4 48,72 C40,70 24,70 16,72;
+                     M16,72 C16,14 32,6 48,72 C40,68 24,68 16,72;
+                     M16,72 C16,16 32,4 48,72 C40,70 24,70 16,72"
+              dur="2s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Eyes (Gastly style) -->
+          <g transform="translate(22,52)">
+            <!-- Left eye -->
+            <circle cx="0" cy="0" r="5" fill="white" opacity="0.9" />
+            <circle cx="0" cy="0" r="2.5" fill="#2D1F3D">
+              <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+            </circle>
+
+            <!-- Right eye -->
+            <circle cx="20" cy="0" r="5" fill="white" opacity="0.9" />
+            <circle cx="20" cy="0" r="2.5" fill="#2D1F3D">
+              <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+            </circle>
+          </g>
+
+          <!-- Mouth -->
+          <path
+            d="M30,58 Q32,60 34,58"
+            fill="none"
+            stroke="#2D1F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <animate attributeName="d"
+              values="M30,58 Q32,60 34,58;
+                     M30,57 Q32,59 34,57;
+                     M30,58 Q32,60 34,58"
+              dur="3s" repeatCount="indefinite" />
+          </path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <style>
+    /* Add stars in the background */
+    .min-h-screen {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .min-h-screen::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #ffffff10 100%, transparent),
+        radial-gradient(2px 2px at 40px 70px, #ffffff15 100%, transparent),
+        radial-gradient(2px 2px at 50px 160px, #ffffff10 100%, transparent),
+        radial-gradient(2px 2px at 90px 40px, #ffffff15 100%, transparent),
+        radial-gradient(2px 2px at 130px 80px, #ffffff10 100%, transparent),
+        radial-gradient(2px 2px at 160px 120px, #ffffff15 100%, transparent);
+      background-repeat: repeat;
+      background-size: 200px 200px;
+      animation: stars 4s linear infinite;
+      opacity: 0.4;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes stars {
+      0% {
+        transform: translateY(0);
+      }
+      100% {
+        transform: translateY(-200px);
+      }
+    }
+
+    /* Ensure content stays above the stars */
+    .max-w-3xl {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Update Calcifer container positioning */
+    #calcifer-container {
+      z-index: 50;
+    }
+
+    /* Calcifer animations */
+    #calcifer {
+      filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      transition: transform 0.3s ease;
+    }
+
+    #calcifer:hover {
+      animation: flicker 3s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      }
+      50% { 
+        transform: translateY(-5px) scale(1.1);
+        filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.6));
+      }
+    }
+
+    #calcifer.clicked {
+      animation: extinguish 1.5s forwards;
+    }
+
+    @keyframes extinguish {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      }
+      50% {
+        transform: translateY(-10px) scale(1.2);
+        opacity: 0.6;
+        filter: drop-shadow(0 0 24px rgba(255, 107, 0, 0.8));
+      }
+      100% {
+        transform: translateY(-20px) scale(0);
+        opacity: 0;
+        filter: blur(12px) drop-shadow(0 0 24px rgba(255, 107, 0, 0));
+      }
+    }
+
+    /* Update hover effects to use white */
+    .prose :is(a, button):hover {
+      color: white !important;
+    }
+
+    .bg-primary\/5:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+  </style>
+
+  <script>
+    // Calcifer click handler
+    const calcifer = document.getElementById('calcifer');
+    if (calcifer && calcifer.parentElement) {
+      calcifer.parentElement.addEventListener('click', (e) => {
+        e.preventDefault();
+        calcifer.classList.add('clicked');
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1000);
+      });
+    }
+  </script>
+</BaseLayout> 
