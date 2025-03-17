@@ -2,31 +2,12 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 const post = {
-  title: "Test Entry",
+  title: "Exapandable Test Entry",
   date: "March 9, 2025",
   content: `
-    This is a test entry with expandable content. Welcome to the full story!
+    This is a test entry with expandable content. 
 
-    In this space, I'll be sharing various thoughts and experiences about technology,
-    development, and maybe even some Pokémon-related content. The dark theme of this blog
-    creates a perfect atmosphere for deep diving into interesting topics.
-
-    Here's what you might find in future entries:
-    - Technical deep dives into web development
-    - Thoughts on user experience and design
-    - Stories about building and growing products
-    - Easter eggs and hidden features (like this blog!)
-
-    This test entry serves as a template for future posts, demonstrating the layout
-    and styling that will be used throughout the blog. The floating Gastly at the
-    bottom adds a touch of whimsy and personality to the space.
-
-    Remember to check back often for new content. Each post will be crafted with
-    the same attention to detail and sprinkled with interesting insights and
-    observations.
-
-    Thanks for reading this test entry. Feel free to explore the rest of the blog
-    and keep an eye out for new posts coming soon!
+    Thanks for reading this test entry.
   `
 };
 ---
@@ -129,47 +110,21 @@ const post = {
   </div>
 
   <style>
-    /* Add stars in the background */
+    /* Remove stars animation and keep only necessary styles */
     .min-h-screen {
       position: relative;
       overflow: hidden;
     }
 
-    .min-h-screen::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(2px 2px at 20px 30px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 40px 70px, #ffffff15 100%, transparent),
-        radial-gradient(2px 2px at 50px 160px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 90px 40px, #ffffff15 100%, transparent),
-        radial-gradient(2px 2px at 130px 80px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 160px 120px, #ffffff15 100%, transparent);
-      background-repeat: repeat;
-      background-size: 200px 200px;
-      animation: stars 4s linear infinite;
-      opacity: 0.4;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    @keyframes stars {
-      0% {
-        transform: translateY(0);
-      }
-      100% {
-        transform: translateY(-200px);
-      }
-    }
-
-    /* Ensure content stays above the stars */
+    /* Ensure content stays above background */
     .max-w-3xl {
       position: relative;
       z-index: 1;
+    }
+
+    /* Update Gastly container positioning */
+    #gastly-container {
+      z-index: 50;
     }
 
     /* Gastly animations */
@@ -223,11 +178,6 @@ const post = {
     .bg-primary\/5:hover {
       background-color: rgba(255, 255, 255, 0.05);
       border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Update Gastly container positioning */
-    #gastly-container {
-      z-index: 50;
     }
   </style>
 

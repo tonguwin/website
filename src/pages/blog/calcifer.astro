@@ -30,7 +30,7 @@ const post = {
             href="/secret-blog" 
             class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
           >
-            ← Back to Blog
+          ← "What possessed you to let them in here, Calcifer?" 
           </a>
         </div>
       </article>
@@ -135,44 +135,13 @@ const post = {
   </div>
 
   <style>
-    /* Add stars in the background */
+    /* Remove stars animation and keep only necessary styles */
     .min-h-screen {
       position: relative;
       overflow: hidden;
     }
 
-    .min-h-screen::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(2px 2px at 20px 30px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 40px 70px, #ffffff15 100%, transparent),
-        radial-gradient(2px 2px at 50px 160px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 90px 40px, #ffffff15 100%, transparent),
-        radial-gradient(2px 2px at 130px 80px, #ffffff10 100%, transparent),
-        radial-gradient(2px 2px at 160px 120px, #ffffff15 100%, transparent);
-      background-repeat: repeat;
-      background-size: 200px 200px;
-      animation: stars 4s linear infinite;
-      opacity: 0.4;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    @keyframes stars {
-      0% {
-        transform: translateY(0);
-      }
-      100% {
-        transform: translateY(-200px);
-      }
-    }
-
-    /* Ensure content stays above the stars */
+    /* Ensure content stays above background */
     .max-w-3xl {
       position: relative;
       z-index: 1;
