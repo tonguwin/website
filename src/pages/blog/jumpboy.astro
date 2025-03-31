@@ -37,14 +37,16 @@ const post = {
 
     <!-- Mobile Controls -->
     <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-32 bg-black/20 backdrop-blur-sm flex items-center justify-between px-8 md:hidden">
-      <button id="leftBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
-        ←
-      </button>
-      <button id="jumpBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
-        ⬆
-      </button>
-      <button id="rightBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
-        →
+      <div class="flex space-x-4">
+        <button id="leftBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
+          ←
+        </button>
+        <button id="rightBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
+          →
+        </button>
+      </div>
+      <button id="jumpBtn" class="w-20 h-20 rounded-full bg-red-500/80 flex items-center justify-center text-white text-xl font-bold">
+        Jump!
       </button>
     </div>
 
@@ -83,7 +85,15 @@ const post = {
 
     #mobileControls button:active {
       transform: scale(0.95);
+    }
+
+    #mobileControls #leftBtn:active,
+    #mobileControls #rightBtn:active {
       background-color: rgba(255, 255, 255, 0.3);
+    }
+
+    #mobileControls #jumpBtn:active {
+      background-color: rgba(239, 68, 68, 0.9);
     }
 
     /* Hide mobile controls on desktop */
