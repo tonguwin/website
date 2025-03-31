@@ -113,13 +113,74 @@ const post = {
     const PLATFORM_WIDTH = 100;
     const MONSTER_SIZE = 30;
     const LARGE_MONSTER_SIZE = 40;
+    const SMALL_MONSTER_SIZE = 20;
     const PLAYER_SIZE = 20;
     const SCREEN_SCROLL_THRESHOLD = 0.7;
     const ADVANCED_MONSTER_SCORE = 200;
+    const FAST_MONSTER_SCORE = 500;
+    const HYBRID_MONSTER_SCORE = 700;
+    const ULTIMATE_MONSTER_SCORE = 900;
+    const PLATFORM_SPACING = 80;
+    const MONSTER_SPAWN_CHANCE = 0.4;
+    const MAX_PARTICLES = 100;
+    const PARTICLE_LIFETIME = 1;
+    const PARTICLE_DECAY = 0.02;
+
+    // Type definitions
+    interface Particle {
+      x: number;
+      y: number;
+      color: string;
+      size: number;
+      speedX: number;
+      speedY: number;
+      life: number;
+      decay: number;
+      update(): void;
+      draw(ctx: CanvasRenderingContext2D): void;
+    }
+
+    interface Platform {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }
+
+    interface Monster {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      direction: number;
+      type: 'basic' | 'advanced' | 'fast' | 'hybrid' | 'ultimate';
+      color: string;
+      speed: number;
+      verticalSpeed?: number;
+      verticalDirection?: number;
+    }
+
+    interface Player {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      velocityY: number;
+      velocityX: number;
+      isJumping: boolean;
+      extraJumps: number;
+      wasJumping: boolean;
+    }
+
+    interface GameKeys {
+      left?: boolean;
+      right?: boolean;
+      [key: string]: boolean | undefined;
+    }
 
     // Particle system
-    class Particle {
-      constructor(x, y, color) {
+    class Particle implements Particle {
+      constructor(x: number, y: number, color: string) {
         this.x = x;
         this.y = y;
         this.color = color;
@@ -130,13 +191,13 @@ const post = {
         this.decay = 0.02 + Math.random() * 0.02;
       }
 
-      update() {
+      update(): void {
         this.x += this.speedX;
         this.y += this.speedY;
         this.life -= this.decay;
       }
 
-      draw(ctx) {
+      draw(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = this.color;
         ctx.globalAlpha = this.life;
         ctx.fillRect(this.x, this.y, this.size, this.size);
@@ -145,8 +206,9 @@ const post = {
     }
 
     // Game state
-    let canvas, ctx;
-    let player = {
+    let canvas: HTMLCanvasElement;
+    let ctx: CanvasRenderingContext2D;
+    let player: Player = {
       x: 0,
       y: 0,
       width: PLAYER_SIZE,
@@ -158,21 +220,24 @@ const post = {
       wasJumping: false
     };
 
-    let platforms = [];
-    let monsters = [];
-    let particles = [];
+    let platforms: Platform[] = [];
+    let monsters: Monster[] = [];
+    let particles: Particle[] = [];
     let score = 0;
     let gameOver = false;
     let gameStarted = false;
-    let keys = {};
+    let keys: GameKeys = {};
     let cameraY = 0;
-    let titleFlicker = true; // For title screen flickering
-    let flickerTimer = 0; // For controlling flicker timing
+    let titleFlicker = true;
+    let flickerTimer = 0;
+    let lastTime = 0;
+    let frameCount = 0;
+    let fps = 0;
 
     // Initialize game
     function init() {
-      canvas = document.getElementById('gameCanvas');
-      ctx = canvas.getContext('2d');
+      canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+      ctx = canvas.getContext('2d')!;
       
       // Set canvas size (narrower width)
       canvas.width = 600;
@@ -185,22 +250,12 @@ const post = {
       // Generate initial platforms
       generatePlatforms();
       
-      // Start game loop
-      gameLoop();
+      // Start game loop with timestamp
+      requestAnimationFrame(gameLoop);
       
       // Event listeners
-      window.addEventListener('keydown', (e) => {
-        keys[e.key] = true;
-        // Prevent space from scrolling the page
-        if (e.key === ' ') {
-          e.preventDefault();
-          // Start game or reset if game over
-          if (!gameStarted || gameOver) {
-            resetGame();
-          }
-        }
-      });
-      window.addEventListener('keyup', (e) => keys[e.key] = false);
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
       
       // Start button click handler
       const startButton = document.getElementById('startButton');
@@ -208,13 +263,29 @@ const post = {
         startButton.addEventListener('click', () => {
           if (!gameStarted) {
             resetGame();
-            startButton.classList.add('hidden'); // Hide the button when game starts
+            startButton.classList.add('hidden');
           }
         });
       }
     }
 
-    // Generate platforms
+    // Handle key down events
+    function handleKeyDown(e: KeyboardEvent) {
+      keys[e.key] = true;
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (!gameStarted || gameOver) {
+          resetGame();
+        }
+      }
+    }
+
+    // Handle key up events
+    function handleKeyUp(e: KeyboardEvent) {
+      keys[e.key] = false;
+    }
+
+    // Generate platforms with optimized spacing
     function generatePlatforms() {
       platforms = [];
       monsters = [];
@@ -227,15 +298,12 @@ const post = {
         height: PLATFORM_HEIGHT
       });
       
-      // Generate random platforms with better spacing
+      // Generate random platforms with optimized spacing
       for (let i = 0; i < 10; i++) {
-        // Ensure platforms are reachable
         const minX = 50;
         const maxX = canvas.width - PLATFORM_WIDTH - 50;
         const x = minX + Math.random() * (maxX - minX);
-        
-        // Space platforms more evenly
-        const y = canvas.height - 100 - i * 80;
+        const y = canvas.height - 100 - i * PLATFORM_SPACING;
         
         platforms.push({
           x: x,
@@ -244,19 +312,95 @@ const post = {
           height: PLATFORM_HEIGHT
         });
         
-        // Add monsters less frequently
-        if (Math.random() < 0.2) {
-          const isAdvanced = score >= ADVANCED_MONSTER_SCORE;
-          monsters.push({
-            x: x + PLATFORM_WIDTH / 2 - (isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE) / 2,
-            y: y - (isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE),
-            width: isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE,
-            height: isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE,
-            direction: Math.random() < 0.5 ? -1 : 1,
-            isAdvanced: isAdvanced,
-            color: isAdvanced ? '#00ff00' : '#ff0000'
-          });
+        // Add monsters with optimized spawn chance
+        if (Math.random() < MONSTER_SPAWN_CHANCE) {
+          const monsterType = determineMonsterType();
+          monsters.push(createMonster(x, y, monsterType));
         }
+      }
+    }
+
+    // Determine monster type based on score
+    function determineMonsterType() {
+      if (score >= ULTIMATE_MONSTER_SCORE) {
+        return 'ultimate';
+      } else if (score >= HYBRID_MONSTER_SCORE) {
+        return 'hybrid';
+      } else if (score >= FAST_MONSTER_SCORE) {
+        return 'fast';
+      } else if (score >= ADVANCED_MONSTER_SCORE) {
+        return 'advanced';
+      }
+      return 'basic';
+    }
+
+    // Create monster with specific type
+    function createMonster(x, y, type) {
+      const baseX = x + PLATFORM_WIDTH / 2;
+      const baseY = y - MONSTER_SIZE;
+      
+      switch(type) {
+        case 'ultimate':
+          return {
+            x: baseX - MONSTER_SIZE / 2,
+            y: baseY,
+            width: MONSTER_SIZE,
+            height: MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'ultimate',
+            color: '#ffff00',
+            speed: 4,
+            verticalSpeed: 0,
+            verticalDirection: 0
+          };
+        case 'hybrid':
+          return {
+            x: baseX - MONSTER_SIZE / 2,
+            y: baseY,
+            width: MONSTER_SIZE,
+            height: MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'hybrid',
+            color: '#00ffff',
+            speed: 2,
+            verticalSpeed: 0,
+            verticalDirection: 0
+          };
+        case 'fast':
+          return {
+            x: baseX - SMALL_MONSTER_SIZE / 2,
+            y: baseY,
+            width: SMALL_MONSTER_SIZE,
+            height: SMALL_MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'fast',
+            color: '#ffff00',
+            speed: 3
+          };
+        case 'advanced':
+          return {
+            x: baseX - LARGE_MONSTER_SIZE / 2,
+            y: baseY,
+            width: LARGE_MONSTER_SIZE,
+            height: LARGE_MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'advanced',
+            color: '#00ff00',
+            speed: 1,
+            verticalSpeed: 0,
+            verticalDirection: 0
+          };
+        default:
+          return {
+            x: baseX - MONSTER_SIZE / 2,
+            y: baseY,
+            width: MONSTER_SIZE,
+            height: MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'basic',
+            color: '#ff0000',
+            speed: 2
+          };
       }
     }
 
@@ -343,12 +487,8 @@ const post = {
       for (let i = monsters.length - 1; i >= 0; i--) {
         let monster = monsters[i];
         
-        // Move monster (slower if advanced)
-        const speed = monster.isAdvanced ? 1 : 2;
-        monster.x += monster.direction * speed;
-        if (monster.x < 0 || monster.x + monster.width > canvas.width) {
-          monster.direction *= -1;
-        }
+        // Move monster based on type
+        updateMonster(monster);
         
         // Check collision with player
         if (player.y + player.height > monster.y &&
@@ -360,7 +500,6 @@ const post = {
             createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
             monsters.splice(i, 1);
             player.extraJumps++;
-            score += monster.isAdvanced ? 200 : 100;
             // Apply jump force when killing monster
             player.velocityY = JUMP_FORCE;
             player.isJumping = true;
@@ -412,28 +551,68 @@ const post = {
           height: PLATFORM_HEIGHT
         });
         
-        // Add monsters less frequently
-        if (Math.random() < 0.2) {
-          const isAdvanced = score >= ADVANCED_MONSTER_SCORE;
-          monsters.push({
-            x: x + PLATFORM_WIDTH / 2 - (isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE) / 2,
-            y: y - (isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE),
-            width: isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE,
-            height: isAdvanced ? LARGE_MONSTER_SIZE : MONSTER_SIZE,
-            direction: Math.random() < 0.5 ? -1 : 1,
-            isAdvanced: isAdvanced,
-            color: isAdvanced ? '#00ff00' : '#ff0000'
-          });
+        // Add monsters more frequently
+        if (Math.random() < 0.4) {
+          const monsterType = determineMonsterType();
+          monsters.push(createMonster(x, y, monsterType));
         }
       }
       
       platforms.push(...newPlatforms);
     }
 
-    // Create landing particles
-    function createLandingParticles(x, y, color) {
+    // Optimize particle system
+    function createLandingParticles(x: number, y: number, color: string) {
+      // Limit total particles
+      if (particles.length >= MAX_PARTICLES) {
+        particles.splice(0, 4); // Remove oldest particles
+      }
+      
       for (let i = 0; i < 8; i++) {
         particles.push(new Particle(x, y, color));
+      }
+    }
+
+    // Optimize monster movement
+    function updateMonster(monster: Monster) {
+      switch(monster.type) {
+        case 'ultimate':
+          monster.x += monster.direction * monster.speed;
+          if (Math.abs(monster.x - player.x) < 50) {
+            monster.verticalDirection = monster.y > player.y ? -1 : 1;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.2);
+            monster.verticalSpeed *= 0.95;
+            monster.y += monster.verticalSpeed;
+          }
+          break;
+        case 'hybrid':
+          monster.x += monster.direction * monster.speed;
+          if (Math.abs(monster.x - player.x) < 100) {
+            monster.verticalDirection = monster.y > player.y ? -1 : 1;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1);
+            monster.verticalSpeed *= 0.98;
+            monster.y += monster.verticalSpeed;
+          }
+          break;
+        case 'fast':
+          monster.x += monster.direction * monster.speed;
+          break;
+        case 'advanced':
+          monster.x += monster.direction * monster.speed;
+          if (Math.abs(monster.x - player.x) < 30) {
+            monster.verticalDirection = monster.y > player.y ? -1 : 1;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1);
+            monster.verticalSpeed *= 0.98;
+            monster.y += monster.verticalSpeed;
+          }
+          break;
+        default:
+          monster.x += monster.direction * monster.speed;
+      }
+
+      // Keep monster in bounds
+      if (monster.x < 0 || monster.x + monster.width > canvas.width) {
+        monster.direction *= -1;
       }
     }
 
@@ -473,8 +652,18 @@ const post = {
       }
     }
 
-    // Game loop
-    function gameLoop() {
+    // Optimize game loop with FPS counter
+    function gameLoop(timestamp: number) {
+      if (!lastTime) lastTime = timestamp;
+      const deltaTime = timestamp - lastTime;
+      lastTime = timestamp;
+
+      frameCount++;
+      if (deltaTime >= 1000) {
+        fps = frameCount;
+        frameCount = 0;
+      }
+
       update();
       draw();
       requestAnimationFrame(gameLoop);
@@ -512,6 +701,7 @@ const post = {
     leftBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       keys.left = true;
+      keys.right = false; // Ensure right is false when left is pressed
     });
 
     leftBtn.addEventListener('touchend', (e) => {
@@ -522,9 +712,21 @@ const post = {
     rightBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       keys.right = true;
+      keys.left = false; // Ensure left is false when right is pressed
     });
 
     rightBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      keys.right = false;
+    });
+
+    // Add touchcancel event handlers
+    leftBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      keys.left = false;
+    });
+
+    rightBtn.addEventListener('touchcancel', (e) => {
       e.preventDefault();
       keys.right = false;
     });
