@@ -117,14 +117,21 @@ const post = {
     const PLAYER_SIZE = 20;
     const SCREEN_SCROLL_THRESHOLD = 0.7;
     const ADVANCED_MONSTER_SCORE = 200;
-    const FAST_MONSTER_SCORE = 500;
-    const HYBRID_MONSTER_SCORE = 700;
+    const FAST_MONSTER_SCORE = 400;
+    const HYBRID_MONSTER_SCORE = 600;
     const ULTIMATE_MONSTER_SCORE = 900;
     const PLATFORM_SPACING = 80;
+    const EASY_PLATFORM_SPACING = 60;  // Closer spacing for first 300 points
     const MONSTER_SPAWN_CHANCE = 0.4;
+    const EASY_MONSTER_SPAWN_CHANCE = 0.2;  // Lower monster spawn chance for first 300 points
     const MAX_PARTICLES = 100;
     const PARTICLE_LIFETIME = 1;
     const PARTICLE_DECAY = 0.02;
+    const CYAN_DUPLICATION_CHANCE = 0.45;
+    const DOUBLE_JUMP_UNLOCK_SCORE = 500;
+    const CUTSCENE_DURATION = 3000; // 3 seconds for each dialogue
+    const RAINBOW_COLORS = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'];
+    const EASY_MODE_THRESHOLD = 300;
 
     // Type definitions
     interface Particle {
@@ -158,6 +165,7 @@ const post = {
       speed: number;
       verticalSpeed?: number;
       verticalDirection?: number;
+      hasDuplicated: boolean;
     }
 
     interface Player {
@@ -168,8 +176,11 @@ const post = {
       velocityY: number;
       velocityX: number;
       isJumping: boolean;
-      extraJumps: number;
+      hasDoubleJump: boolean;  // Only need this flag
       wasJumping: boolean;
+      isInCutscene: boolean;
+      rainbowTimer: number;
+      currentRainbowIndex: number;
     }
 
     interface GameKeys {
@@ -216,8 +227,11 @@ const post = {
       velocityY: 0,
       velocityX: 0,
       isJumping: false,
-      extraJumps: 0,
-      wasJumping: false
+      hasDoubleJump: false,  // Only need this flag
+      wasJumping: false,
+      isInCutscene: false,
+      rainbowTimer: 0,
+      currentRainbowIndex: 0
     };
 
     let platforms: Platform[] = [];
@@ -233,6 +247,8 @@ const post = {
     let lastTime = 0;
     let frameCount = 0;
     let fps = 0;
+    let cutsceneStartTime = 0;
+    let currentDialogue = 0;
 
     // Initialize game
     function init() {
@@ -271,7 +287,10 @@ const post = {
 
     // Handle key down events
     function handleKeyDown(e: KeyboardEvent) {
-      keys[e.key] = true;
+      if (e.key === 'ArrowLeft') keys.left = true;
+      else if (e.key === 'ArrowRight') keys.right = true;
+      else keys[e.key] = true;
+      
       if (e.key === ' ') {
         e.preventDefault();
         if (!gameStarted || gameOver) {
@@ -282,7 +301,9 @@ const post = {
 
     // Handle key up events
     function handleKeyUp(e: KeyboardEvent) {
-      keys[e.key] = false;
+      if (e.key === 'ArrowLeft') keys.left = false;
+      else if (e.key === 'ArrowRight') keys.right = false;
+      else keys[e.key] = false;
     }
 
     // Generate platforms with optimized spacing
@@ -303,7 +324,10 @@ const post = {
         const minX = 50;
         const maxX = canvas.width - PLATFORM_WIDTH - 50;
         const x = minX + Math.random() * (maxX - minX);
-        const y = canvas.height - 100 - i * PLATFORM_SPACING;
+        
+        // Use easier spacing for first 300 points
+        const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
+        const y = canvas.height - 100 - i * spacing;
         
         platforms.push({
           x: x,
@@ -313,7 +337,8 @@ const post = {
         });
         
         // Add monsters with optimized spawn chance
-        if (Math.random() < MONSTER_SPAWN_CHANCE) {
+        const spawnChance = score < EASY_MODE_THRESHOLD ? EASY_MONSTER_SPAWN_CHANCE : MONSTER_SPAWN_CHANCE;
+        if (Math.random() < spawnChance) {
           const monsterType = determineMonsterType();
           monsters.push(createMonster(x, y, monsterType));
         }
@@ -335,13 +360,18 @@ const post = {
     }
 
     // Create monster with specific type
-    function createMonster(x, y, type) {
+    function createMonster(x: number, y: number, type: Monster['type']): Monster {
       const baseX = x + PLATFORM_WIDTH / 2;
       const baseY = y - MONSTER_SIZE;
+      
+      const baseMonster = {
+        hasDuplicated: false
+      };
       
       switch(type) {
         case 'ultimate':
           return {
+            ...baseMonster,
             x: baseX - MONSTER_SIZE / 2,
             y: baseY,
             width: MONSTER_SIZE,
@@ -355,6 +385,7 @@ const post = {
           };
         case 'hybrid':
           return {
+            ...baseMonster,
             x: baseX - MONSTER_SIZE / 2,
             y: baseY,
             width: MONSTER_SIZE,
@@ -368,6 +399,7 @@ const post = {
           };
         case 'fast':
           return {
+            ...baseMonster,
             x: baseX - SMALL_MONSTER_SIZE / 2,
             y: baseY,
             width: SMALL_MONSTER_SIZE,
@@ -375,10 +407,11 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'fast',
             color: '#ffff00',
-            speed: 3
+            speed: 4
           };
         case 'advanced':
           return {
+            ...baseMonster,
             x: baseX - LARGE_MONSTER_SIZE / 2,
             y: baseY,
             width: LARGE_MONSTER_SIZE,
@@ -392,6 +425,7 @@ const post = {
           };
         default:
           return {
+            ...baseMonster,
             x: baseX - MONSTER_SIZE / 2,
             y: baseY,
             width: MONSTER_SIZE,
@@ -411,15 +445,43 @@ const post = {
       // Update flicker timer
       if (!gameStarted) {
         flickerTimer++;
-        if (flickerTimer >= 30) { // Change every 30 frames (about 0.5 seconds)
+        if (flickerTimer >= 30) {
           titleFlicker = !titleFlicker;
           flickerTimer = 0;
         }
       }
+
+      // Check for cutscene trigger before handling cutscene
+      if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
+        player.isInCutscene = true;
+        cutsceneStartTime = Date.now();
+        currentDialogue = 0;
+      }
+
+      // Handle cutscene
+      if (player.isInCutscene) {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - cutsceneStartTime;
+
+        // Update rainbow effect
+        if (elapsedTime > CUTSCENE_DURATION) {
+          player.rainbowTimer++;
+          if (player.rainbowTimer >= 5) { // Change color every 5 frames
+            player.currentRainbowIndex = (player.currentRainbowIndex + 1) % RAINBOW_COLORS.length;
+            player.rainbowTimer = 0;
+          }
+        }
+
+        // End cutscene after both dialogues
+        if (elapsedTime > CUTSCENE_DURATION * 2) {
+          player.isInCutscene = false;
+          player.hasDoubleJump = true;  // Unlock double jump
+        }
+      }
       
       // Player movement
-      if (keys['ArrowLeft']) player.velocityX = -MOVE_SPEED;
-      else if (keys['ArrowRight']) player.velocityX = MOVE_SPEED;
+      if (keys.left) player.velocityX = -MOVE_SPEED;
+      else if (keys.right) player.velocityX = MOVE_SPEED;
       else player.velocityX = 0;
       
       // Apply horizontal movement
@@ -429,11 +491,14 @@ const post = {
       if (player.x < 0) player.x = 0;
       if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
       
-      // Jump
-      if (keys[' '] && !player.isJumping && player.extraJumps > 0) {
+      // Simplified jump logic
+      if (keys[' '] && !player.isJumping) {
+        // First jump
         player.velocityY = JUMP_FORCE;
         player.isJumping = true;
-        player.extraJumps--;
+      } else if (keys[' '] && player.isJumping && player.hasDoubleJump) {
+        // Second jump (air jump)
+        player.velocityY = JUMP_FORCE;
       }
       
       // Apply gravity
@@ -473,11 +538,18 @@ const post = {
             player.y = platform.y - player.height;
             player.velocityY = 0;
             player.isJumping = false;
-            player.extraJumps = 1;
             
-            // Create landing particles if we just landed
+            // Only create landing particles if we were previously jumping
             if (player.wasJumping) {
               createLandingParticles(player.x + player.width/2, player.y + player.height, '#333');
+            }
+            player.wasJumping = false;
+            
+            // Check for cutscene trigger
+            if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
+              player.isInCutscene = true;
+              cutsceneStartTime = Date.now();
+              currentDialogue = 0;
             }
           }
         }
@@ -499,7 +571,6 @@ const post = {
             // Player jumps on monster
             createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
             monsters.splice(i, 1);
-            player.extraJumps++;
             // Apply jump force when killing monster
             player.velocityY = JUMP_FORCE;
             player.isJumping = true;
@@ -538,11 +609,15 @@ const post = {
       const highestPlatform = Math.min(...platforms.map(p => p.y));
       const newPlatforms = [];
       
+      // Use easier spacing for first 300 points
+      const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
+      const spawnChance = score < EASY_MODE_THRESHOLD ? EASY_MONSTER_SPAWN_CHANCE : MONSTER_SPAWN_CHANCE;
+      
       for (let i = 0; i < 3; i++) {
         const minX = 50;
         const maxX = canvas.width - PLATFORM_WIDTH - 50;
         const x = minX + Math.random() * (maxX - minX);
-        const y = highestPlatform - 80 - i * 80;
+        const y = highestPlatform - spacing - i * spacing;
         
         newPlatforms.push({
           x: x,
@@ -551,8 +626,8 @@ const post = {
           height: PLATFORM_HEIGHT
         });
         
-        // Add monsters more frequently
-        if (Math.random() < 0.4) {
+        // Add monsters with adjusted spawn chance
+        if (Math.random() < spawnChance) {
           const monsterType = determineMonsterType();
           monsters.push(createMonster(x, y, monsterType));
         }
@@ -592,6 +667,21 @@ const post = {
             monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1);
             monster.verticalSpeed *= 0.98;
             monster.y += monster.verticalSpeed;
+
+            // Check for duplication when vertically aligned
+            if (!(monster as any).hasDuplicated && Math.abs(monster.x - player.x) < 30) {
+              if (Math.random() < CYAN_DUPLICATION_CHANCE) {
+                // Create a duplicate monster
+                const duplicate = createMonster(
+                  monster.x + (Math.random() < 0.5 ? -50 : 50),
+                  monster.y,
+                  'hybrid'
+                );
+                (duplicate as any).hasDuplicated = true;
+                monsters.push(duplicate);
+                (monster as any).hasDuplicated = true;
+              }
+            }
           }
           break;
         case 'fast':
@@ -646,9 +736,40 @@ const post = {
           particle.draw(ctx);
         }
         
-        // Draw player
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(player.x, player.y, player.width, player.height);
+        // Draw player with cutscene effects
+        if (player.isInCutscene) {
+          const currentTime = Date.now();
+          const elapsedTime = currentTime - cutsceneStartTime;
+          
+          // Zoom effect
+          const zoomScale = 1 + Math.sin(elapsedTime / 500) * 0.2;
+          ctx.save();
+          ctx.translate(player.x + player.width/2, player.y + player.height/2);
+          ctx.scale(zoomScale, zoomScale);
+          ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
+          
+          // Rainbow effect after first dialogue
+          if (elapsedTime > CUTSCENE_DURATION) {
+            ctx.fillStyle = RAINBOW_COLORS[player.currentRainbowIndex];
+          } else {
+            ctx.fillStyle = '#fff';
+          }
+          ctx.fillRect(player.x, player.y, player.width, player.height);
+          ctx.restore();
+
+          // Draw dialogue
+          ctx.fillStyle = '#fff';
+          ctx.font = '20px Arial';
+          ctx.textAlign = 'center';
+          if (elapsedTime < CUTSCENE_DURATION) {
+            ctx.fillText("Not bad, Jumpboy. You'll need this to continue", canvas.width / 2, canvas.height / 2 - 50);
+          } else {
+            ctx.fillText("You can now double jump!", canvas.width / 2, canvas.height / 2 - 50);
+          }
+        } else {
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
       }
     }
 
@@ -677,7 +798,10 @@ const post = {
       player.velocityX = 0;
       player.isJumping = false;
       player.wasJumping = false;
-      player.extraJumps = 1;
+      player.hasDoubleJump = false;
+      player.isInCutscene = false;
+      player.rainbowTimer = 0;
+      player.currentRainbowIndex = 0;
       score = 0;
       cameraY = 0;
       gameOver = false;
@@ -686,7 +810,7 @@ const post = {
       document.getElementById('gameOver').classList.add('hidden');
       const startButton = document.getElementById('startButton');
       if (startButton) {
-        startButton.style.display = 'none'; // Use display: none instead of classList.add('hidden')
+        startButton.style.display = 'none';
       }
       generatePlatforms();
     }
@@ -734,14 +858,18 @@ const post = {
     jumpBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
       if (!player.isJumping) {
+        // First jump
         player.velocityY = JUMP_FORCE;
         player.isJumping = true;
+      } else if (player.isJumping && player.hasDoubleJump) {
+        // Second jump (air jump)
+        player.velocityY = JUMP_FORCE;
       }
     });
 
     // Prevent default touch behaviors
     document.addEventListener('touchmove', (e) => {
-      if (e.target.closest('#mobileControls')) {
+      if (e.target instanceof Element && e.target.closest('#mobileControls')) {
         e.preventDefault();
       }
     }, { passive: false });
