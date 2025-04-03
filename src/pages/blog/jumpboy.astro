@@ -30,7 +30,7 @@ const post = {
         <div id="gameOver" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white p-8 rounded-lg text-center">
           <h2 class="text-2xl mb-4">Game Over</h2>
           <p class="mb-4">Score: <span id="score">0</span></p>
-          <p class="text-sm">Press Space to Restart</p>
+          <p class="text-sm">Jump to Restart</p>
         </div>
       </div>
       
@@ -113,7 +113,7 @@ const post = {
     // Game constants
     const GRAVITY = 0.5;
     const JUMP_FORCE = -12;
-    const MOVE_SPEED = 4;
+    let MOVE_SPEED = 4;
     const PLATFORM_HEIGHT = 12;
     const PLATFORM_WIDTH = 100;
     const MONSTER_SIZE = 30;
@@ -137,6 +137,17 @@ const post = {
     const CUTSCENE_DURATION = 3000; // 3 seconds for each dialogue
     const RAINBOW_COLORS = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'];
     const EASY_MODE_THRESHOLD = 300;
+    const BRITTLE_PLATFORM_SCORE = 350;
+    const BRITTLE_PLATFORM_CHANCE = 0.45;
+    const BRITTLE_PLATFORM_BREAK_TIME = 1500; // 1.5 seconds in milliseconds
+
+    // Device-specific speed adjustments
+    let isMobileDevice = false;
+    let speedMultiplier = 1.0;
+    let mobileMoveSpeed = 3;
+    let desktopMoveSpeed = 4;
+    let mobileMonsterSpeedMultiplier = 0.8;
+    let desktopMonsterSpeedMultiplier = 1.0;
 
     // Type definitions
     interface Particle {
@@ -157,6 +168,8 @@ const post = {
       y: number;
       width: number;
       height: number;
+      type?: 'normal' | 'brittle';
+      breakTimer?: number;
     }
 
     interface Monster {
@@ -260,6 +273,18 @@ const post = {
       canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
       ctx = canvas.getContext('2d')!;
       
+      // Detect mobile device
+      isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Set speed multiplier based on device
+      if (isMobileDevice) {
+        speedMultiplier = 1.2;
+        MOVE_SPEED = mobileMoveSpeed;
+      } else {
+        speedMultiplier = 0.7;
+        MOVE_SPEED = desktopMoveSpeed;
+      }
+      
       // Set canvas size (narrower width)
       canvas.width = 600;
       canvas.height = 600;
@@ -321,7 +346,8 @@ const post = {
         x: canvas.width / 2 - PLATFORM_WIDTH / 2,
         y: canvas.height - 60,
         width: PLATFORM_WIDTH,
-        height: PLATFORM_HEIGHT
+        height: PLATFORM_HEIGHT,
+        type: 'normal'
       });
       
       // Generate random platforms with optimized spacing
@@ -334,11 +360,15 @@ const post = {
         const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
         const y = canvas.height - 100 - i * spacing;
         
+        // Determine platform type based on score
+        const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
+        
         platforms.push({
           x: x,
           y: y,
           width: PLATFORM_WIDTH,
-          height: PLATFORM_HEIGHT
+          height: PLATFORM_HEIGHT,
+          type: platformType
         });
         
         // Add monsters with optimized spawn chance
@@ -373,6 +403,9 @@ const post = {
         hasDuplicated: false
       };
       
+      // Apply device-specific speed multiplier
+      const monsterSpeedMultiplier = isMobileDevice ? mobileMonsterSpeedMultiplier : desktopMonsterSpeedMultiplier;
+      
       switch(type) {
         case 'ultimate':
           return {
@@ -384,7 +417,7 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'ultimate',
             color: '#ffff00',
-            speed: 4,
+            speed: 4 * monsterSpeedMultiplier,
             verticalSpeed: 0,
             verticalDirection: 0
           };
@@ -398,7 +431,7 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'hybrid',
             color: '#00ffff',
-            speed: 2,
+            speed: 2 * monsterSpeedMultiplier,
             verticalSpeed: 0,
             verticalDirection: 0
           };
@@ -412,7 +445,7 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'fast',
             color: '#ffff00',
-            speed: 4
+            speed: 4 * monsterSpeedMultiplier
           };
         case 'advanced':
           return {
@@ -424,7 +457,7 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'advanced',
             color: '#00ff00',
-            speed: 1,
+            speed: 1 * monsterSpeedMultiplier,
             verticalSpeed: 0,
             verticalDirection: 0
           };
@@ -438,7 +471,7 @@ const post = {
             direction: Math.random() < 0.5 ? -1 : 1,
             type: 'basic',
             color: '#ff0000',
-            speed: 2
+            speed: 2 * monsterSpeedMultiplier
           };
       }
     }
@@ -546,7 +579,8 @@ const post = {
       
       // Platform collision
       player.isJumping = true;
-      for (let platform of platforms) {
+      for (let i = platforms.length - 1; i >= 0; i--) {
+        const platform = platforms[i];
         if (player.y + player.height > platform.y &&
             player.y < platform.y + platform.height &&
             player.x + player.width > platform.x &&
@@ -562,6 +596,25 @@ const post = {
             }
             player.wasJumping = false;
             
+            // Handle brittle platform
+            if (platform.type === 'brittle') {
+              // Start break timer if not already started
+              if (!platform.breakTimer) {
+                platform.breakTimer = Date.now();
+              }
+              
+              // Check if platform should break
+              if (platform.breakTimer && Date.now() - platform.breakTimer > BRITTLE_PLATFORM_BREAK_TIME) {
+                // Create breaking particles
+                createLandingParticles(platform.x + platform.width/2, platform.y, '#888');
+                // Remove the platform
+                platforms.splice(i, 1);
+                // Make player fall
+                player.isJumping = true;
+                continue;
+              }
+            }
+            
             // Check for cutscene trigger
             if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
               player.isInCutscene = true;
@@ -569,6 +622,9 @@ const post = {
               currentDialogue = 0;
             }
           }
+        } else if (platform.type === 'brittle' && platform.breakTimer) {
+          // Reset break timer when player is not on the platform
+          platform.breakTimer = undefined;
         }
       }
       
@@ -637,11 +693,15 @@ const post = {
         const x = minX + Math.random() * (maxX - minX);
         const y = highestPlatform - spacing - i * spacing;
         
+        // Determine platform type based on score
+        const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
+        
         newPlatforms.push({
           x: x,
           y: y,
           width: PLATFORM_WIDTH,
-          height: PLATFORM_HEIGHT
+          height: PLATFORM_HEIGHT,
+          type: platformType
         });
         
         // Add monsters with adjusted spawn chance
@@ -668,12 +728,15 @@ const post = {
 
     // Optimize monster movement
     function updateMonster(monster: Monster) {
+      // Apply device-specific speed adjustments for vertical movement
+      const verticalSpeedMultiplier = isMobileDevice ? 0.7 : 1.0;
+      
       switch(monster.type) {
         case 'ultimate':
           monster.x += monster.direction * monster.speed;
           if (Math.abs(monster.x - player.x) < 50) {
             monster.verticalDirection = monster.y > player.y ? -1 : 1;
-            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.2);
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.2 * verticalSpeedMultiplier);
             monster.verticalSpeed *= 0.95;
             monster.y += monster.verticalSpeed;
           }
@@ -682,7 +745,7 @@ const post = {
           monster.x += monster.direction * monster.speed;
           if (Math.abs(monster.x - player.x) < 100) {
             monster.verticalDirection = monster.y > player.y ? -1 : 1;
-            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1);
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1 * verticalSpeedMultiplier);
             monster.verticalSpeed *= 0.98;
             monster.y += monster.verticalSpeed;
 
@@ -709,7 +772,7 @@ const post = {
           monster.x += monster.direction * monster.speed;
           if (Math.abs(monster.x - player.x) < 30) {
             monster.verticalDirection = monster.y > player.y ? -1 : 1;
-            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.05);
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.05 * verticalSpeedMultiplier);
             monster.verticalSpeed *= 0.95;
             monster.y += monster.verticalSpeed;
           }
@@ -740,6 +803,28 @@ const post = {
         // Draw platforms
         ctx.fillStyle = '#333';
         for (let platform of platforms) {
+          if (platform.type === 'brittle') {
+            // Make brittle platforms slightly darker
+            ctx.fillStyle = '#222';
+            
+            // Add visual indicator when about to break
+            if (platform.breakTimer) {
+              const timeLeft = BRITTLE_PLATFORM_BREAK_TIME - (Date.now() - platform.breakTimer);
+              const breakProgress = timeLeft / BRITTLE_PLATFORM_BREAK_TIME;
+              
+              // Add a pulsing effect as the platform gets closer to breaking
+              const pulseIntensity = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+              ctx.fillStyle = `rgba(34, 34, 34, ${pulseIntensity})`;
+              
+              // Add a red border that grows as the platform gets closer to breaking
+              ctx.strokeStyle = `rgba(255, 0, 0, ${1 - breakProgress})`;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+            }
+          } else {
+            ctx.fillStyle = '#333';
+          }
+          
           ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
         }
         
