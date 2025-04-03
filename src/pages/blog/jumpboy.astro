@@ -33,6 +33,11 @@ const post = {
           <p class="text-sm">Press Space to Restart</p>
         </div>
       </div>
+      
+      <!-- Score display below the canvas -->
+      <div id="scoreDisplay" class="mt-4 text-white text-xl font-bold">
+        Score: <span id="scoreValue">0</span>
+      </div>
     </div>
 
     <!-- Mobile Controls -->
@@ -469,6 +474,12 @@ const post = {
           if (player.rainbowTimer >= 5) { // Change color every 5 frames
             player.currentRainbowIndex = (player.currentRainbowIndex + 1) % RAINBOW_COLORS.length;
             player.rainbowTimer = 0;
+            
+            // Apply rainbow effect to score display
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            if (scoreDisplay) {
+              scoreDisplay.style.color = RAINBOW_COLORS[player.currentRainbowIndex];
+            }
           }
         }
 
@@ -476,6 +487,12 @@ const post = {
         if (elapsedTime > CUTSCENE_DURATION * 2) {
           player.isInCutscene = false;
           player.hasDoubleJump = true;  // Unlock double jump
+          
+          // Reset score display color
+          const scoreDisplay = document.getElementById('scoreDisplay');
+          if (scoreDisplay) {
+            scoreDisplay.style.color = 'white';
+          }
         }
       }
       
@@ -596,6 +613,7 @@ const post = {
       // Update score
       score = Math.floor((cameraY + canvas.height - player.y) / 10);
       document.getElementById('score').textContent = score.toString();
+      document.getElementById('scoreValue').textContent = score.toString();
       
       // Check if player fell
       if (player.y > canvas.height) {
@@ -691,8 +709,8 @@ const post = {
           monster.x += monster.direction * monster.speed;
           if (Math.abs(monster.x - player.x) < 30) {
             monster.verticalDirection = monster.y > player.y ? -1 : 1;
-            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1);
-            monster.verticalSpeed *= 0.98;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.05);
+            monster.verticalSpeed *= 0.95;
             monster.y += monster.verticalSpeed;
           }
           break;
@@ -808,6 +826,13 @@ const post = {
       gameStarted = true;
       particles = [];
       document.getElementById('gameOver').classList.add('hidden');
+      
+      // Reset score display color
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      if (scoreDisplay) {
+        scoreDisplay.style.color = 'white';
+      }
+      
       const startButton = document.getElementById('startButton');
       if (startButton) {
         startButton.style.display = 'none';
