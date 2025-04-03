@@ -38,6 +38,27 @@ const post = {
       <div id="scoreDisplay" class="mt-4 text-white text-xl font-bold">
         Score: <span id="scoreValue">0</span>
       </div>
+
+      <!-- Items section -->
+      <div id="itemsSection" class="mt-4 flex justify-end">
+        <div id="pointyHatItem" class="hidden w-8 h-8 relative cursor-pointer">
+          <canvas id="pointyHatCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Item Modal -->
+      <div id="itemModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-black/80 p-6 rounded-lg max-w-sm w-full">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-white" id="itemModalTitle">Pointy Hat</h3>
+            <button id="closeModal" class="text-white hover:text-gray-300">✕</button>
+          </div>
+          <div class="flex items-center justify-center mb-4">
+            <canvas id="itemModalCanvas" class="w-16 h-16"></canvas>
+          </div>
+          <p class="text-white text-center" id="itemModalDescription">A white oversized birthday hat. Seems like a lame birthday.</p>
+        </div>
+      </div>
     </div>
 
     <!-- Mobile Controls -->
@@ -123,23 +144,28 @@ const post = {
     const SCREEN_SCROLL_THRESHOLD = 0.7;
     const ADVANCED_MONSTER_SCORE = 200;
     const FAST_MONSTER_SCORE = 400;
-    const HYBRID_MONSTER_SCORE = 600;
+    const HYBRID_MONSTER_SCORE = 1000;
     const ULTIMATE_MONSTER_SCORE = 900;
-    const PLATFORM_SPACING = 80;
-    const EASY_PLATFORM_SPACING = 60;  // Closer spacing for first 300 points
+    const PLATFORM_SPACING = 60;  // Reduced from 80 to 60
+    const EASY_PLATFORM_SPACING = 50;  // Reduced from 60 to 50
+    const MIN_PLATFORMS = 12;  // Increased from 15 to 20
+    const PLATFORM_BUFFER = 5;  // Increased from 3 to 5
+    const MAX_JUMP_DISTANCE = 200;  // Maximum horizontal distance between platforms
     const MONSTER_SPAWN_CHANCE = 0.4;
-    const EASY_MONSTER_SPAWN_CHANCE = 0.2;  // Lower monster spawn chance for first 300 points
-    const MAX_PARTICLES = 100;
+    const EASY_MONSTER_SPAWN_CHANCE = 0.2;
+    const VERY_EASY_MONSTER_SPAWN_CHANCE = 0.05;
+    const MAX_PARTICLES = 80;
     const PARTICLE_LIFETIME = 1;
     const PARTICLE_DECAY = 0.02;
     const CYAN_DUPLICATION_CHANCE = 0.45;
-    const DOUBLE_JUMP_UNLOCK_SCORE = 500;
-    const CUTSCENE_DURATION = 3000; // 3 seconds for each dialogue
+    const DOUBLE_JUMP_UNLOCK_SCORE = 700;
+    const CUTSCENE_DURATION = 3000;
     const RAINBOW_COLORS = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'];
     const EASY_MODE_THRESHOLD = 300;
     const BRITTLE_PLATFORM_SCORE = 350;
     const BRITTLE_PLATFORM_CHANCE = 0.45;
-    const BRITTLE_PLATFORM_BREAK_TIME = 1500; // 1.5 seconds in milliseconds
+    const BRITTLE_PLATFORM_BREAK_TIME = 1500;
+    const POINTY_HAT_SCORE = 450;
 
     // Device-specific speed adjustments
     let isMobileDevice = false;
@@ -148,6 +174,7 @@ const post = {
     let desktopMoveSpeed = 4;
     let mobileMonsterSpeedMultiplier = 0.8;
     let desktopMonsterSpeedMultiplier = 1.0;
+    let canvasScale = 1.0;
 
     // Type definitions
     interface Particle {
@@ -178,7 +205,7 @@ const post = {
       width: number;
       height: number;
       direction: number;
-      type: 'basic' | 'advanced' | 'fast' | 'hybrid' | 'ultimate';
+      type: 'basic' | 'advanced' | 'fast' | 'hybrid';
       color: string;
       speed: number;
       verticalSpeed?: number;
@@ -199,6 +226,16 @@ const post = {
       isInCutscene: boolean;
       rainbowTimer: number;
       currentRainbowIndex: number;
+      hasPointyHat: boolean;  // New property for the pointy hat
+    }
+
+    interface Item {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      type: 'pointyHat';
+      collected: boolean;
     }
 
     interface GameKeys {
@@ -249,11 +286,13 @@ const post = {
       wasJumping: false,
       isInCutscene: false,
       rainbowTimer: 0,
-      currentRainbowIndex: 0
+      currentRainbowIndex: 0,
+      hasPointyHat: false  // Initialize pointy hat
     };
 
     let platforms: Platform[] = [];
     let monsters: Monster[] = [];
+    let items: Item[] = [];  // New array for items
     let particles: Particle[] = [];
     let score = 0;
     let gameOver = false;
@@ -267,27 +306,99 @@ const post = {
     let fps = 0;
     let cutsceneStartTime = 0;
     let currentDialogue = 0;
+    let pointyHatCutsceneStartTime = 0;
+    let pointyHatCutscenePhase = 0;
+
+    // Initialize item display
+    function initItemDisplay() {
+      const pointyHatCanvas = document.getElementById('pointyHatCanvas') as HTMLCanvasElement;
+      const pointyHatCtx = pointyHatCanvas.getContext('2d')!;
+      const itemModalCanvas = document.getElementById('itemModalCanvas') as HTMLCanvasElement;
+      const itemModalCtx = itemModalCanvas.getContext('2d')!;
+      
+      // Set canvas sizes with mobile scaling
+      const itemSize = isMobileDevice ? 24 : 32;
+      const modalSize = isMobileDevice ? 48 : 64;
+      
+      pointyHatCanvas.width = itemSize;
+      pointyHatCanvas.height = itemSize;
+      itemModalCanvas.width = modalSize;
+      itemModalCanvas.height = modalSize;
+      
+      // Draw pointy hat on both canvases
+      function drawPointyHat(ctx: CanvasRenderingContext2D, width: number, height: number) {
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(width / 2, 0);
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+      }
+      
+      drawPointyHat(pointyHatCtx, itemSize, itemSize);
+      drawPointyHat(itemModalCtx, modalSize, modalSize);
+      
+      // Add click handlers with touch support
+      const pointyHatItem = document.getElementById('pointyHatItem');
+      const itemModal = document.getElementById('itemModal');
+      const closeModal = document.getElementById('closeModal');
+      
+      if (pointyHatItem && itemModal && closeModal) {
+        const showModal = () => itemModal.classList.remove('hidden');
+        const hideModal = () => itemModal.classList.add('hidden');
+        
+        pointyHatItem.addEventListener('click', showModal);
+        pointyHatItem.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          showModal();
+        });
+        
+        closeModal.addEventListener('click', hideModal);
+        closeModal.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          hideModal();
+        });
+      }
+    }
+
+    // Update item display
+    function updateItemDisplay() {
+      const pointyHatItem = document.getElementById('pointyHatItem');
+      if (pointyHatItem) {
+        if (player.hasPointyHat) {
+          pointyHatItem.classList.remove('hidden');
+        } else {
+          pointyHatItem.classList.add('hidden');
+        }
+      }
+    }
 
     // Initialize game
     function init() {
       canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
       ctx = canvas.getContext('2d')!;
       
-      // Detect mobile device
+      // Initialize item display
+      initItemDisplay();
+      
+      // Detect mobile device and set appropriate settings
       isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
-      // Set speed multiplier based on device
+      // Set speed multiplier and canvas scale based on device
       if (isMobileDevice) {
         speedMultiplier = 1.2;
         MOVE_SPEED = mobileMoveSpeed;
+        canvasScale = window.innerWidth < 600 ? 0.8 : 1.0; // Scale down on very small screens
       } else {
         speedMultiplier = 0.7;
         MOVE_SPEED = desktopMoveSpeed;
+        canvasScale = 1.0;
       }
       
-      // Set canvas size (narrower width)
-      canvas.width = 600;
-      canvas.height = 600;
+      // Set canvas size with scaling
+      canvas.width = 600 * canvasScale;
+      canvas.height = 600 * canvasScale;
       
       // Set initial player position
       player.x = canvas.width / 2;
@@ -312,6 +423,25 @@ const post = {
             startButton.classList.add('hidden');
           }
         });
+      }
+
+      // Add window resize handler
+      window.addEventListener('resize', handleResize);
+    }
+
+    // Handle window resize
+    function handleResize() {
+      if (isMobileDevice) {
+        canvasScale = window.innerWidth < 600 ? 0.8 : 1.0;
+        canvas.width = 600 * canvasScale;
+        canvas.height = 600 * canvasScale;
+        
+        // Adjust player position
+        player.x = canvas.width / 2;
+        player.y = canvas.height - 100;
+        
+        // Regenerate platforms
+        generatePlatforms();
       }
     }
 
@@ -340,6 +470,7 @@ const post = {
     function generatePlatforms() {
       platforms = [];
       monsters = [];
+      items = [];  // Reset items
       
       // Bottom platform
       platforms.push({
@@ -351,14 +482,19 @@ const post = {
       });
       
       // Generate random platforms with optimized spacing
-      for (let i = 0; i < 10; i++) {
-        const minX = 50;
-        const maxX = canvas.width - PLATFORM_WIDTH - 50;
-        const x = minX + Math.random() * (maxX - minX);
-        
+      let lastPlatformX = canvas.width / 2;  // Track last platform position
+      for (let i = 0; i < MIN_PLATFORMS; i++) {
         // Use easier spacing for first 300 points
         const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
         const y = canvas.height - 100 - i * spacing;
+        
+        // Calculate safe x position range based on last platform
+        const minX = Math.max(50, lastPlatformX - MAX_JUMP_DISTANCE);
+        const maxX = Math.min(canvas.width - PLATFORM_WIDTH - 50, lastPlatformX + MAX_JUMP_DISTANCE);
+        const x = minX + Math.random() * (maxX - minX);
+        
+        // Update last platform position
+        lastPlatformX = x + PLATFORM_WIDTH / 2;
         
         // Determine platform type based on score
         const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
@@ -372,26 +508,48 @@ const post = {
         });
         
         // Add monsters with optimized spawn chance
-        const spawnChance = score < EASY_MODE_THRESHOLD ? EASY_MONSTER_SPAWN_CHANCE : MONSTER_SPAWN_CHANCE;
+        let spawnChance;
+        if (score < 100) {
+          spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
+        } else if (score < EASY_MODE_THRESHOLD) {
+          spawnChance = EASY_MONSTER_SPAWN_CHANCE;
+        } else {
+          spawnChance = MONSTER_SPAWN_CHANCE;
+        }
+        
         if (Math.random() < spawnChance) {
           const monsterType = determineMonsterType();
-          monsters.push(createMonster(x, y, monsterType));
+          if (monsterType) {
+            monsters.push(createMonster(x, y, monsterType));
+          }
         }
       }
     }
 
     // Determine monster type based on score
     function determineMonsterType() {
-      if (score >= ULTIMATE_MONSTER_SCORE) {
-        return 'ultimate';
-      } else if (score >= HYBRID_MONSTER_SCORE) {
+      if (score >= HYBRID_MONSTER_SCORE) {
+        // At 1000+, spawn cyan monsters
         return 'hybrid';
-      } else if (score >= FAST_MONSTER_SCORE) {
+      } else if (score >= 900) {
+        // At 900+, spawn red and green monsters together
+        const redMonster = createMonster(0, 0, 'basic');
+        const greenMonster = createMonster(0, 0, 'advanced');
+        monsters.push(redMonster, greenMonster);
+        return null;
+      } else if (score >= 600) {
+        // At 600+, spawn yellow monsters
         return 'fast';
-      } else if (score >= ADVANCED_MONSTER_SCORE) {
+      } else if (score >= 400) {
+        // At 400+, spawn green monsters
         return 'advanced';
+      } else if (score >= 200) {
+        // At 200+, spawn red monsters
+        return 'basic';
+      } else {
+        // Below 200, no monsters
+        return null;
       }
-      return 'basic';
     }
 
     // Create monster with specific type
@@ -407,20 +565,6 @@ const post = {
       const monsterSpeedMultiplier = isMobileDevice ? mobileMonsterSpeedMultiplier : desktopMonsterSpeedMultiplier;
       
       switch(type) {
-        case 'ultimate':
-          return {
-            ...baseMonster,
-            x: baseX - MONSTER_SIZE / 2,
-            y: baseY,
-            width: MONSTER_SIZE,
-            height: MONSTER_SIZE,
-            direction: Math.random() < 0.5 ? -1 : 1,
-            type: 'ultimate',
-            color: '#ffff00',
-            speed: 4 * monsterSpeedMultiplier,
-            verticalSpeed: 0,
-            verticalDirection: 0
-          };
         case 'hybrid':
           return {
             ...baseMonster,
@@ -480,6 +624,29 @@ const post = {
     function update() {
       if (!gameStarted || gameOver) return;
       
+      // Update item display
+      updateItemDisplay();
+      
+      // Check for pointy hat spawn
+      if (score >= POINTY_HAT_SCORE && !player.hasPointyHat && items.length === 0) {
+        // Find a suitable platform (not the bottom one)
+        const suitablePlatforms = platforms.filter((_, index) => index > 0);
+        if (suitablePlatforms.length > 0) {
+          const randomPlatform = suitablePlatforms[Math.floor(Math.random() * suitablePlatforms.length)];
+          
+          items.push({
+            x: randomPlatform.x + randomPlatform.width / 2 - 10,
+            y: randomPlatform.y - 20,
+            width: 20,
+            height: 20,
+            type: 'pointyHat',
+            collected: false
+          });
+          
+          console.log('Pointy hat spawned at score:', score);
+        }
+      }
+      
       // Update flicker timer
       if (!gameStarted) {
         flickerTimer++;
@@ -529,6 +696,17 @@ const post = {
         }
       }
       
+      // Handle pointy hat cutscene
+      if (pointyHatCutscenePhase > 0) {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - pointyHatCutsceneStartTime;
+        
+        // End cutscene after both dialogues
+        if (elapsedTime > CUTSCENE_DURATION * 2) {
+          pointyHatCutscenePhase = 0;
+        }
+      }
+      
       // Player movement
       if (keys.left) player.velocityX = -MOVE_SPEED;
       else if (keys.right) player.velocityX = MOVE_SPEED;
@@ -568,6 +746,11 @@ const post = {
         });
         monsters.forEach(monster => {
           monster.y += scrollAmount;
+        });
+        
+        // Move items with camera
+        items.forEach(item => {
+          item.y += scrollAmount;
         });
         
         // Generate new platforms if needed
@@ -628,6 +811,33 @@ const post = {
         }
       }
       
+      // Item collection
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        if (!item.collected && 
+            player.y + player.height > item.y &&
+            player.y < item.y + item.height &&
+            player.x + player.width > item.x &&
+            player.x < item.x + item.width) {
+          
+          // Collect the item
+          item.collected = true;
+          
+          // Handle different item types
+          if (item.type === 'pointyHat') {
+            player.hasPointyHat = true;
+            // Start pointy hat cutscene
+            pointyHatCutsceneStartTime = Date.now();
+            pointyHatCutscenePhase = 1;
+            // Create collection particles
+            createLandingParticles(item.x + item.width/2, item.y + item.height/2, '#ffffff');
+          }
+          
+          // Remove the item
+          items.splice(i, 1);
+        }
+      }
+      
       // Monster collision and movement
       for (let i = monsters.length - 1; i >= 0; i--) {
         let monster = monsters[i];
@@ -640,15 +850,30 @@ const post = {
             player.y < monster.y + monster.height &&
             player.x + player.width > monster.x &&
             player.x < monster.x + monster.width) {
-          if (player.velocityY > 0) {
-            // Player jumps on monster
+          
+          // Check if player is above the monster and has pointy hat
+          if (player.velocityY > 0 && player.y + player.height < monster.y + monster.height / 2 && player.hasPointyHat) {
+            // Player jumps on monster with pointy hat
             createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
             monsters.splice(i, 1);
             // Apply jump force when killing monster
             player.velocityY = JUMP_FORCE;
             player.isJumping = true;
+          } else if (player.velocityY > 0 && player.y + player.height < monster.y + monster.height / 2) {
+            // Player jumps on monster without pointy hat (normal behavior)
+            createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
+            monsters.splice(i, 1);
+            // Apply jump force when killing monster
+            player.velocityY = JUMP_FORCE;
+            player.isJumping = true;
+          } else if (player.velocityY < 0 && player.y > monster.y + monster.height / 2 && player.hasPointyHat) {
+            // Player jumps up into monster from below with pointy hat
+            createLandingParticles(player.x + player.width/2, player.y, monster.color);
+            monsters.splice(i, 1);
+            // Apply downward force when killing monster
+            player.velocityY = 2;
           } else {
-            // Player hits monster
+            // Player hits monster from the side
             gameOver = true;
             document.getElementById('gameOver').classList.remove('hidden');
           }
@@ -685,13 +910,30 @@ const post = {
       
       // Use easier spacing for first 300 points
       const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
-      const spawnChance = score < EASY_MODE_THRESHOLD ? EASY_MONSTER_SPAWN_CHANCE : MONSTER_SPAWN_CHANCE;
       
-      for (let i = 0; i < 3; i++) {
-        const minX = 50;
-        const maxX = canvas.width - PLATFORM_WIDTH - 50;
+      // Get the last platform's position
+      let lastPlatformX = platforms[platforms.length - 1].x + PLATFORM_WIDTH / 2;
+      
+      // Determine spawn chance based on score
+      let spawnChance;
+      if (score < 100) {
+        spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
+      } else if (score < EASY_MODE_THRESHOLD) {
+        spawnChance = EASY_MONSTER_SPAWN_CHANCE;
+      } else {
+        spawnChance = MONSTER_SPAWN_CHANCE;
+      }
+      
+      // Generate more platforms at once
+      for (let i = 0; i < PLATFORM_BUFFER; i++) {
+        // Calculate safe x position range based on last platform
+        const minX = Math.max(50, lastPlatformX - MAX_JUMP_DISTANCE);
+        const maxX = Math.min(canvas.width - PLATFORM_WIDTH - 50, lastPlatformX + MAX_JUMP_DISTANCE);
         const x = minX + Math.random() * (maxX - minX);
         const y = highestPlatform - spacing - i * spacing;
+        
+        // Update last platform position
+        lastPlatformX = x + PLATFORM_WIDTH / 2;
         
         // Determine platform type based on score
         const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
@@ -707,52 +949,56 @@ const post = {
         // Add monsters with adjusted spawn chance
         if (Math.random() < spawnChance) {
           const monsterType = determineMonsterType();
-          monsters.push(createMonster(x, y, monsterType));
+          if (monsterType) {
+            monsters.push(createMonster(x, y, monsterType));
+          }
         }
       }
       
       platforms.push(...newPlatforms);
+      
+      // Remove platforms that are too far below the screen
+      const screenBottom = cameraY + canvas.height;
+      platforms = platforms.filter(platform => platform.y < screenBottom + 200);
     }
 
     // Optimize particle system
     function createLandingParticles(x: number, y: number, color: string) {
-      // Limit total particles
+      // Limit total particles and remove oldest ones more aggressively
       if (particles.length >= MAX_PARTICLES) {
-        particles.splice(0, 4); // Remove oldest particles
+        particles.splice(0, 8); // Remove more particles at once
       }
       
-      for (let i = 0; i < 8; i++) {
+      // Create fewer particles on mobile
+      const particleCount = isMobileDevice ? 6 : 8;
+      for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle(x, y, color));
       }
     }
 
     // Optimize monster movement
     function updateMonster(monster: Monster) {
+      // Cache frequently used values
+      const playerX = player.x;
+      const playerY = player.y;
+      const monsterX = monster.x;
+      const monsterY = monster.y;
+      
       // Apply device-specific speed adjustments for vertical movement
       const verticalSpeedMultiplier = isMobileDevice ? 0.7 : 1.0;
       
       switch(monster.type) {
-        case 'ultimate':
-          monster.x += monster.direction * monster.speed;
-          if (Math.abs(monster.x - player.x) < 50) {
-            monster.verticalDirection = monster.y > player.y ? -1 : 1;
-            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.2 * verticalSpeedMultiplier);
-            monster.verticalSpeed *= 0.95;
-            monster.y += monster.verticalSpeed;
-          }
-          break;
         case 'hybrid':
           monster.x += monster.direction * monster.speed;
-          if (Math.abs(monster.x - player.x) < 100) {
-            monster.verticalDirection = monster.y > player.y ? -1 : 1;
+          if (Math.abs(monster.x - playerX) < 100) {
+            monster.verticalDirection = monster.y > playerY ? -1 : 1;
             monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1 * verticalSpeedMultiplier);
             monster.verticalSpeed *= 0.98;
             monster.y += monster.verticalSpeed;
 
             // Check for duplication when vertically aligned
-            if (!(monster as any).hasDuplicated && Math.abs(monster.x - player.x) < 30) {
+            if (!(monster as any).hasDuplicated && Math.abs(monster.x - playerX) < 30) {
               if (Math.random() < CYAN_DUPLICATION_CHANCE) {
-                // Create a duplicate monster
                 const duplicate = createMonster(
                   monster.x + (Math.random() < 0.5 ? -50 : 50),
                   monster.y,
@@ -770,8 +1016,8 @@ const post = {
           break;
         case 'advanced':
           monster.x += monster.direction * monster.speed;
-          if (Math.abs(monster.x - player.x) < 30) {
-            monster.verticalDirection = monster.y > player.y ? -1 : 1;
+          if (Math.abs(monster.x - playerX) < 30) {
+            monster.verticalDirection = monster.y > playerY ? -1 : 1;
             monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.05 * verticalSpeedMultiplier);
             monster.verticalSpeed *= 0.95;
             monster.y += monster.verticalSpeed;
@@ -784,10 +1030,12 @@ const post = {
       // Keep monster in bounds
       if (monster.x < 0 || monster.x + monster.width > canvas.width) {
         monster.direction *= -1;
+        // Ensure monster doesn't get stuck in wall
+        monster.x = Math.max(0, Math.min(canvas.width - monster.width, monster.x));
       }
     }
 
-    // Draw game
+    // Optimize drawing functions
     function draw() {
       // Clear canvas
       ctx.fillStyle = '#000';
@@ -796,7 +1044,7 @@ const post = {
       if (!gameStarted) {
         // Draw title screen
         ctx.fillStyle = '#fff';
-        ctx.font = '24px Arial';
+        ctx.font = `${24 * canvasScale}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText('Can you make it out, Jumpboy?', canvas.width / 2, canvas.height / 2);
       } else {
@@ -804,19 +1052,14 @@ const post = {
         ctx.fillStyle = '#333';
         for (let platform of platforms) {
           if (platform.type === 'brittle') {
-            // Make brittle platforms slightly darker
             ctx.fillStyle = '#222';
             
-            // Add visual indicator when about to break
             if (platform.breakTimer) {
               const timeLeft = BRITTLE_PLATFORM_BREAK_TIME - (Date.now() - platform.breakTimer);
               const breakProgress = timeLeft / BRITTLE_PLATFORM_BREAK_TIME;
-              
-              // Add a pulsing effect as the platform gets closer to breaking
               const pulseIntensity = Math.sin(Date.now() / 200) * 0.3 + 0.7;
               ctx.fillStyle = `rgba(34, 34, 34, ${pulseIntensity})`;
               
-              // Add a red border that grows as the platform gets closer to breaking
               ctx.strokeStyle = `rgba(255, 0, 0, ${1 - breakProgress})`;
               ctx.lineWidth = 2;
               ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
@@ -826,6 +1069,19 @@ const post = {
           }
           
           ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+        }
+        
+        // Draw items
+        for (let item of items) {
+          if (!item.collected && item.type === 'pointyHat') {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.moveTo(item.x + item.width / 2, item.y);
+            ctx.lineTo(item.x + item.width, item.y + item.height);
+            ctx.lineTo(item.x, item.y + item.height);
+            ctx.closePath();
+            ctx.fill();
+          }
         }
         
         // Draw monsters
@@ -841,42 +1097,83 @@ const post = {
         
         // Draw player with cutscene effects
         if (player.isInCutscene) {
-          const currentTime = Date.now();
-          const elapsedTime = currentTime - cutsceneStartTime;
-          
-          // Zoom effect
-          const zoomScale = 1 + Math.sin(elapsedTime / 500) * 0.2;
-          ctx.save();
-          ctx.translate(player.x + player.width/2, player.y + player.height/2);
-          ctx.scale(zoomScale, zoomScale);
-          ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
-          
-          // Rainbow effect after first dialogue
-          if (elapsedTime > CUTSCENE_DURATION) {
-            ctx.fillStyle = RAINBOW_COLORS[player.currentRainbowIndex];
-          } else {
-            ctx.fillStyle = '#fff';
-          }
-          ctx.fillRect(player.x, player.y, player.width, player.height);
-          ctx.restore();
-
-          // Draw dialogue
-          ctx.fillStyle = '#fff';
-          ctx.font = '20px Arial';
-          ctx.textAlign = 'center';
-          if (elapsedTime < CUTSCENE_DURATION) {
-            ctx.fillText("Not bad, Jumpboy. You'll need this to continue", canvas.width / 2, canvas.height / 2 - 50);
-          } else {
-            ctx.fillText("You can now double jump!", canvas.width / 2, canvas.height / 2 - 50);
-          }
+          drawPlayerWithCutscene();
+        } else if (pointyHatCutscenePhase > 0) {
+          drawPlayerWithPointyHatCutscene();
         } else {
-          ctx.fillStyle = '#fff';
-          ctx.fillRect(player.x, player.y, player.width, player.height);
+          drawPlayerNormal();
         }
       }
     }
 
-    // Optimize game loop with FPS counter
+    // Separate player drawing functions for better organization
+    function drawPlayerWithCutscene() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - cutsceneStartTime;
+      
+      const zoomScale = 1 + Math.sin(elapsedTime / 500) * 0.2;
+      ctx.save();
+      ctx.translate(player.x + player.width/2, player.y + player.height/2);
+      ctx.scale(zoomScale, zoomScale);
+      ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
+      
+      ctx.fillStyle = elapsedTime > CUTSCENE_DURATION ? RAINBOW_COLORS[player.currentRainbowIndex] : '#fff';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      ctx.restore();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = `${20 * canvasScale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        elapsedTime < CUTSCENE_DURATION 
+          ? "Not bad, Jumpboy. You'll need this to continue"
+          : "You can now double jump!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+      );
+    }
+
+    function drawPlayerWithPointyHatCutscene() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - pointyHatCutsceneStartTime;
+      
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      drawPointyHat(player.x, player.y);
+      
+      ctx.fillStyle = '#fff';
+      ctx.font = `${20 * canvasScale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        elapsedTime < CUTSCENE_DURATION
+          ? "It's a pointy hat."
+          : "Pierce through the heavens, Jumpboy!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+      );
+    }
+
+    function drawPlayerNormal() {
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      if (player.hasPointyHat) {
+        drawPointyHat(player.x, player.y);
+      }
+    }
+
+    function drawPointyHat(x: number, y: number) {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(x + player.width / 2, y - 15);
+      ctx.lineTo(x + player.width + 5, y + 5);
+      ctx.lineTo(x - 5, y + 5);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    // Optimize game loop
     function gameLoop(timestamp: number) {
       if (!lastTime) lastTime = timestamp;
       const deltaTime = timestamp - lastTime;
@@ -905,11 +1202,13 @@ const post = {
       player.isInCutscene = false;
       player.rainbowTimer = 0;
       player.currentRainbowIndex = 0;
+      player.hasPointyHat = false;  // Reset pointy hat
       score = 0;
       cameraY = 0;
       gameOver = false;
       gameStarted = true;
       particles = [];
+      pointyHatCutscenePhase = 0;  // Reset pointy hat cutscene
       document.getElementById('gameOver').classList.add('hidden');
       
       // Reset score display color
