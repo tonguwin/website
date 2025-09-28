@@ -20,6 +20,11 @@ const otherprojects = [
     
     "title": "Netflix Watch Party Project",
     "description": "Conducted 25+ Netflix user interviews to identify key pain points; analyzed market trends and organizational needs to inform the implementation of a social integration feature."
+  },
+  {
+    "url": "/case-study/accessories-copper",
+    "title": "Accessories Case Study - Copper",
+    "description": "Strategic analysis exploring business-expanding accessories that create meaningful impact and unlock new revenue opportunities through thoughtful product development."
   }
   // Add more projects as needed...
 ];
@@ -72,17 +77,26 @@ function calculateAosDuration(index) {
                   {project.description}
                 </p>
               </div>
-              {
-                project.url && (
-                  <a href={project.url}>
-                    <div>
-                      <p class="hover:text-secondary/80 mt-3 text-base font-semibold">
-                        ↗
-                      </p>
-                    </div>
-                  </a>
-                )
-              }
+              <div class="flex items-center justify-between mt-3">
+                {
+                  project.url && (
+                    <a href={project.url} class="group">
+                      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 hover:bg-secondary hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
+                        <span class="text-xl font-bold text-secondary group-hover:text-primary group-hover:rotate-12 transition-all duration-300 ease-out">
+                          ↗
+                        </span>
+                      </div>
+                    </a>
+                  )
+                }
+                {
+                  project.title === "Accessories Case Study - Copper" && (
+                    <span class="text-secondary text-xs font-bold tracking-wider uppercase" style="text-shadow: 0 0 1px currentColor, 0 0 2px currentColor;">
+                      NEW
+                    </span>
+                  )
+                }
+              </div>
             </div>
           </li>
         ))

@@ -22,8 +22,11 @@
   <style>
     @keyframes wiggle {
       0% { transform: translate3d(0, 0, 0); }
-      50% { transform: translate3d(0, -2px, 0); }
-      70% { transform: translate3d(0, 3px, 0); }
+      25% { transform: translate3d(0, -1px, 0); }
+      50% { transform: translate3d(0, -3px, 0); }
+      65% { transform: translate3d(0, 1px, 0); }
+      75% { transform: translate3d(0, 2px, 0); }
+      85% { transform: translate3d(0, -0.5px, 0); }
       100% { transform: translate3d(0, 0, 0); }
     }
 
@@ -35,18 +38,19 @@
       will-change: transform;
       transform-style: preserve-3d;
       backface-visibility: hidden;
+      transition: transform 0.1s ease-out;
     }
 
-    #letter1 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.5s; }
-    #letter2 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.8s; }
-    #letter3 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.2s; }
-    #letter4 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.7s; }
-    #letter5 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.3s; }
-    #letter6 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.4s; }
-    #letter7 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.1s; }
-    #letter8 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.9s; }
-    #letter9 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.6s; }
-    #letter10 { animation: wiggle 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.8s; }
+    #letter1 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.5s; }
+    #letter2 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.8s; }
+    #letter3 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.2s; }
+    #letter4 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 1.2s; }
+    #letter5 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.3s; }
+    #letter6 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.9s; }
+    #letter7 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.1s; }
+    #letter8 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 1.4s; }
+    #letter9 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.6s; }
+    #letter10 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 1.1s; }
   </style>
 </head>
 
