@@ -22,6 +22,25 @@
     "cv09", /* Flat-top three */
     "cv02" 1; /* Open 4 */
 }
+
+/* Selection glitch container - very subtle */
+.selection-glitch {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-family: monospace;
+  font-size: 8px; /* Smaller size */
+  color: rgb(var(--color-secondary));
+  opacity: 0;
+  animation: glitchFade 0.35s ease-in-out; /* Faster fade */
+}
+
+@keyframes glitchFade {
+  0% { opacity: 0; transform: scale(0.9); }
+  20% { opacity: 0.3; transform: scale(1.05); } /* Lower peak opacity */
+  80% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
 :root[data-theme="dark"] {
   color-scheme: dark;
   --color-secondary: 235 235 235;

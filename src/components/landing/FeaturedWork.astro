@@ -64,25 +64,77 @@ const features = [
         data-aos="fade-up"
         data-aos-duration="2000">
       </div>
-      <div class="h-3 bg-secondary" data-aos="fade-up" data-aos-duration="2500">
+      <div 
+        class="ascii-bar h-3 bg-secondary relative overflow-hidden cursor-none" 
+        data-aos="fade-up" 
+        data-aos-duration="2500"
+        data-bar-size="small">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 80px; height: 80px; opacity: 0;"></div>
       </div>
-      <div class="h-6 bg-secondary" data-aos="fade-up" data-aos-duration="3000">
+      <div 
+        class="ascii-bar h-6 bg-secondary relative overflow-hidden cursor-none" 
+        data-aos="fade-up" 
+        data-aos-duration="3000"
+        data-bar-size="small">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 100px; height: 100px; opacity: 0;"></div>
       </div>
       <div
-        class="h-12 bg-secondary"
-        data-aos="fade-up"
-        data-aos-duration="3000">
-      </div>
-      <div
-        class="h-24 bg-secondary"
+        class="ascii-bar h-12 bg-secondary relative overflow-hidden cursor-none"
         data-aos="fade-up"
         data-aos-duration="3000"
-        data-aos-delay="150">
+        data-bar-size="medium">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 120px; height: 120px; opacity: 0;"></div>
+      </div>
+      <div
+        class="ascii-bar h-24 bg-secondary relative overflow-hidden cursor-none"
+        data-aos="fade-up"
+        data-aos-duration="3000"
+        data-aos-delay="150"
+        data-bar-size="large">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 150px; height: 150px; opacity: 0;"></div>
       </div>
     </div>
 
 
     <style>
+      .ascii-bar {
+        position: relative;
+        touch-action: none; /* Improve touch performance */
+      }
+
+      .ascii-canvas {
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .magnifier {
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+        backdrop-filter: blur(0px);
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .ascii-bar:hover .magnifier {
+        opacity: 1 !important;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 767px) {
+        .ascii-bar {
+          cursor: pointer; /* Better mobile UX */
+        }
+        
+        .magnifier {
+          transition: opacity 0.2s ease; /* Faster transitions on mobile */
+        }
+      }
+
       .marquee-container {
         overflow: hidden;
         white-space: nowrap;
@@ -168,6 +220,321 @@ const features = [
       }
     </style>
     
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const asciiBars = document.querySelectorAll('.ascii-bar');
+        
+        // ASCII art patterns that can appear
+        const asciiArtPatterns = [
+          {
+            art: `                                           .-=+++==:                                      
+                                       =##%%%%%%%%%%%%#+                                  
+                                    -#%%%%%%%%%%%%%%%%%%%=                                
+                                  :#%%%%%%%%%%%%%%%%%%%%%%%                               
+                                 -%%%%%%%%%%%%%%%%%%%%%%%%%#.                             
+                                 %@%%%%%%%%%%%%%%%%%%%%%%%%%*                             
+                                *@%%%%%%%%%%%%%%%%%%%%%%%%%%%:                            
+                                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%=                            
+                               -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+                            
+                               =%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*                            
+                               =%@@@@%%%%%@@%%%%%%%%%%%%%%%%%*                            
+                 ......        =@@@@@%%%%%@@@%%%%%%%%%%%%%@%%+                            
+           -+#%%%%%%%%%%%##+-  :@@@@@%%%@@@@@%%%%@@%%%%%@@%%%-      :+*##%%#*+=           
+       -*%%%%%%%%%%%%%%%%%%@@%#:%@@@%%%%%@@@@@%%@@@%%%%@@%%%#.   +%%%%%%%%%%%%%%#+.       
+     #%%%%%%%%%%%%%%%%%%%%@@%@@@@@@@%%%%%%@@@@%@@@%%%%%@%%%@+ .%@@%%%@%%@%%%%%%%%%%#.     
+   +%%%%%%%%%%%%%%%%%%%%%%%@@%%@@@@@@%%%%%%@@@%@@%%%%@%%%%@%+#@@%%%%@@%%%%%%%%%%%%%%%*    
+  +%%%%%%%%%%%%%%%%%%%%%%%%@@@%%@@%@@@%%%%%@@@@@@%%%@%%%%@@@@@%%%%@@%%%%%%%%%%%%%%%%%%*   
+ -%%%%%%%%%%%%%%%%%%%%%%%%%%@@@%%@@%%@@%%%%@@%@@%%%%%%%%@%%@%%%@@@%%%%%%%%%%%%%%%%%%%%%*  
+ *%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@%@@@%%@@%%%@@%@@%%%%%%%@@%%%@@@%%%%%@@@@@@%%%%%%%%%%%%%%+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@%@@@%%@@%%@@%@@%%@%%@@%%@@@@%%%%@@@@%@@@@%%%%%%%%%%%%%%% 
+ #%%%%%%%%%%%%@@@@@@@@%%%%%%%%%@%%@@@@%%@%%@@@@@@@@@@%%@@@%%%%%@@@@@@@@@%%%%%%%%%%%%%%%%%.
+ =%%%%%%%%%%%%@@@@@@@@@@@@@@%%%%%@@@@@%%=    --=@@@@@@@@%%%%@@@@@@@@@@%%%%%%%%%%%%%%%%%%# 
+  #%%%%%%%%%%%%%%@@@@@@@@@@@@@%%%%%%@@+         -=*%@@%%%%@@%%%%%%%%%%%%%%%%%%%%%%%%%%%%+ 
+  -%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@+            *@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*  
+   -%%%%%%%%@@@@%%%%%%%%%%%%%%%%%@@@%%               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*   
+    .@@@%%%@@@@@@%%%%%%%%%@@@@@@@@@@@@+             +@@@@@@%%%%%%%%%%%%%%%%%%%%%@@@@%=    
+      +@@@@@@@@@@@@@@@@@@@@@@%%%@@@@@@@%:            @@@@@@@@@@@@@@@%%%%%@@@@@@@@@%#      
+        =%@@@@@@@@@@@@@@@@@@@@%%%%%%%%@@%@%=      =#%@%%@@@%%%%%%%@@@@@@@@@@@@@%#=        
+           -+#@@@@@@@@@@@@@%%%%%%%@@@@@%%@%@@%%%@%%@@%%%%%%%%%%%%%%%@@@@@@@%#+-           
+                  .=#@@@@@%%%%%%%@@@@%%@@@%%%@%%%@@@@@@@%%%%%%%%%%%%@@@*.                 
+                  #@@@@@%%%%%%%%@@@@%%%%@%%%@@%@@@%@@@@@@@%%%%%%%%%%%%@@%-                
+                .%@@@@%%%%%%%%%@@@@%%%%@%%%%@@%%@@@%%@@@@@@@@@%%%%%%%%%%@@#               
+                %@@@%%%%%%%%%%@@@@%%%%%%%%%%@@%%%@@%%@@@%@@%%%@@%%%%%%%%%%%#              
+               =@%%%%%%%%%%%@@@@@%%%%%%%%%%%@@%%@%@%%@@%@%%%%%%%%%%%%%%%%%%%*             
+               #@%%%%%%%%%%%%%@%%%%%%%%%%%%%@@@@@%@%%%%%%@@%%%%%%%%%%%%%%%%%%-            
+               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%@@%%%%@%@@@%%%%%%%%%%%%%%%%+            
+              :%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@%%@@%%%%%%%%@@%%%%%%%%%%%%%%%+            
+              -%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%%@@@%%%%%%%%%%%%%%%%%%%%%%%%+            
+              :%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%%%@@@%%%%%%%%%%%%%%%%%%%%%%%+            
+               #%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@=@%%%%%@%%%@@%%%%%%%%%%%%%%%%%%-            
+               =%%%%%%%%%%%%%%%%%%%%%%%%%%@@%: *@%%%%%@%%%@@%%%%%%@@%%%%%%%%#             
+                *%%%%%%%%%%%%%%%%%%%%%%%%@@#.   %@%%%%%@%%%%%%%%%%%%%%%%%%%#-             
+                 =%%%%%%%%%%%%%%%%%%%%%%@%=      +%%%%%%%%%%%%%%%%%%%%%%%%#               
+                   +%%%%%%%%%%%%%%%%%%%%+         .#%%%%%%%%%%%%%%%%%%%%#:                
+                     .+#%%%%%%%%%%%%%%=              +#%%%%%%%%%%%%%%%*:                  
+                          :=*##%%#*-                     -+**####*+-`,
+            width: 90,
+            height: 50
+          }
+        ];
+        
+        // Pure ASCII characters (no emojis) for random generation
+        const asciiChars = [
+          '░', '▒', '▓', '█', '▀', '▄', '▌', '▐', '■', '□', '▪', '▫',
+          '◆', '◇', '◈', '◉', '◊', '○', '◌', '◍', '◎', '●', '◐', '◑', '◒', '◓',
+          '◔', '◕', '◖', '◗', '◘', '◙', '◚', '◛', '◜', '◝', '◞', '◟', '◠', '◡',
+          '◢', '◣', '◤', '◥', '◦', '◧', '◨', '◩', '◪', '◫', '◬', '◭', '◮', '◯',
+          '★', '☆', '▲', '△', '▴', '▵', '▶', '▷', '▸', '▹', '►', '▻', '▼',
+          '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅', '⊕', '⊗', '⊙', '⊚', '⊛',
+          '⊜', '⊝', '⊞', '⊟', '⊠', '⊡', '⋆', '⋇', '⋈', '⋉', '⋊', '⋋', '⋌', '⋍',
+          '▬', '▭', '▮', '▯', '▰', '▱', '▲', '▴', '▵', '▶', '▷', '▸', '▹', '►',
+          '▻', '▼', '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅', '◆', '◇', '◈',
+          '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬', '═', '║', '╒', '╓', '╕',
+          '╖', '╘', '╙', '╛', '╜', '╞', '╟', '╡', '╢', '╤', '╥', '╧', '╨', '╪',
+          '╫', '╬', '─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼', '━',
+          '┃', '┏', '┓', '┗', '┛', '┣', '┫', '┳', '┻', '╋', '┠', '┨', '┯', '┷',
+          '┿', '╂', '╄', '╅', '╆', '╇', '╈', '╉', '╊', '╌', '╍', '╎', '╏', '═',
+          '║', '╒', '╓', '╔', '╕', '╖', '╗', '╘', '╙', '╚', '╛', '╜', '╝', '╞',
+          '╟', '╠', '╡', '╢', '╣', '╤', '╥', '╦', '╧', '╨', '╩', '╪', '╫', '╬',
+          '▀', ' ', '▂', '▃', '▄', '▅', '▆', '▇', '█', '▉', '▊', '▋', '▌', '▍',
+          '▎', '▏', '▐', '░', '▒', '▓', '▔', '▕', '▖', '▗', '▘', '▙', '▚', '▛',
+          '▜', '▝', '▞', '▟', '■', '□', '▢', '▣', '▤', '▥', '▦', '▧', '▨', '▩',
+          '▪', '▫', '▬', '▭', '▮', '▯', '▰', '▱', '▲', '△', '▴', '▵', '▶', '▷',
+          '▸', '▹', '►', '▻', '▼', '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅'
+        ];
+
+        // Initialize each bar
+        asciiBars.forEach((bar, index) => {
+          const canvas = bar.querySelector('.ascii-canvas');
+          const magnifier = bar.querySelector('.magnifier');
+          const ctx = canvas.getContext('2d');
+          const size = bar.dataset.barSize;
+          
+          // Set canvas size
+          const rect = bar.getBoundingClientRect();
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+          
+          // Character settings based on bar size - balanced density
+          // Adjust for mobile screens
+          const isMobile = window.innerWidth < 768;
+          const charSize = size === 'large' ? (isMobile ? 12 : 15) : size === 'medium' ? (isMobile ? 9 : 11) : (isMobile ? 7 : 9);
+          const density = size === 'large' ? (isMobile ? 0.5 : 0.6) : size === 'medium' ? (isMobile ? 0.35 : 0.45) : (isMobile ? 0.3 : 0.375);
+          
+          // Generate random ASCII character positions
+          const characters = [];
+          const cols = Math.floor(canvas.width / charSize);
+          const rows = Math.floor(canvas.height / charSize);
+          const totalChars = Math.floor(cols * rows * density);
+          
+          // Occasionally add ASCII art pattern (10% chance for large bars)
+          if (size === 'large' && Math.random() < 0.1 && asciiArtPatterns.length > 0) {
+            const pattern = asciiArtPatterns[Math.floor(Math.random() * asciiArtPatterns.length)];
+            const lines = pattern.art.split('\n');
+            const patternCharSize = 2; // Smaller size for art patterns
+            
+            // Random position for the pattern
+            const patternX = Math.random() * (canvas.width - pattern.width * patternCharSize);
+            const patternY = Math.random() * (canvas.height - pattern.height * patternCharSize);
+            
+            // Add each character from the pattern
+            lines.forEach((line, lineIndex) => {
+              for (let charIndex = 0; charIndex < line.length; charIndex++) {
+                const char = line[charIndex];
+                if (char !== ' ') { // Skip spaces
+                  characters.push({
+                    char: char,
+                    x: patternX + charIndex * patternCharSize,
+                    y: patternY + lineIndex * patternCharSize,
+                    baseX: 0,
+                    baseY: 0,
+                    offsetX: 0,
+                    offsetY: 0,
+                    targetOffsetX: 0,
+                    targetOffsetY: 0,
+                    visible: false,
+                    glitchTimer: Math.random() * 5000,
+                    isPattern: true
+                  });
+                }
+              }
+            });
+          }
+          
+          // Add random individual characters
+          for (let i = 0; i < totalChars; i++) {
+            characters.push({
+              char: asciiChars[Math.floor(Math.random() * asciiChars.length)],
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              baseX: 0,
+              baseY: 0,
+              offsetX: 0,
+              offsetY: 0,
+              targetOffsetX: 0,
+              targetOffsetY: 0,
+              visible: false,
+              glitchTimer: Math.random() * 5000,
+              isPattern: false
+            });
+          }
+          
+          // Store base positions
+          characters.forEach(char => {
+            char.baseX = char.x;
+            char.baseY = char.y;
+          });
+          
+          let mouseX = -1000;
+          let mouseY = -1000;
+          let isHovering = false;
+          
+          // Mouse tracking
+          bar.addEventListener('mouseenter', () => {
+            isHovering = true;
+          });
+          
+          bar.addEventListener('mouseleave', () => {
+            isHovering = false;
+            mouseX = -1000;
+            mouseY = -1000;
+          });
+          
+          bar.addEventListener('mousemove', (e) => {
+            const barRect = bar.getBoundingClientRect();
+            mouseX = e.clientX - barRect.left;
+            mouseY = e.clientY - barRect.top;
+            
+            // Update magnifier position
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          // Touch support for mobile
+          bar.addEventListener('touchstart', (e) => {
+            isHovering = true;
+            const touch = e.touches[0];
+            const barRect = bar.getBoundingClientRect();
+            mouseX = touch.clientX - barRect.left;
+            mouseY = touch.clientY - barRect.top;
+            
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          bar.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scrolling while touching
+            const touch = e.touches[0];
+            const barRect = bar.getBoundingClientRect();
+            mouseX = touch.clientX - barRect.left;
+            mouseY = touch.clientY - barRect.top;
+            
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          bar.addEventListener('touchend', () => {
+            isHovering = false;
+            mouseX = -1000;
+            mouseY = -1000;
+          });
+          
+          // Animation loop
+          function animate() {
+            // Get current theme colors
+            const root = document.documentElement;
+            const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
+            let r, g, b;
+            
+            // Parse the primary (background) color to use as text color for contrast
+            if (primaryColor && primaryColor.includes(' ')) {
+              [r, g, b] = primaryColor.split(' ').map(v => parseInt(v.trim()));
+            } else {
+              // Fallback to light color
+              r = 235; g = 235; b = 235;
+            }
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${charSize}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Adjust magnifier size for mobile
+            const magnifierRadius = isMobile 
+              ? (size === 'large' ? 60 : size === 'medium' ? 50 : size === 'thin' ? 25 : 35)
+              : (size === 'large' ? 75 : size === 'medium' ? 60 : size === 'thin' ? 30 : 40);
+            const jiggleIntensity = isMobile ? 1.5 : 2;
+            const returnSpeed = 0.1;
+            
+            characters.forEach(char => {
+              // Calculate distance from mouse
+              const dx = char.x - mouseX;
+              const dy = char.y - mouseY;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Magnifier effect - show characters within radius
+              if (isHovering && distance < magnifierRadius) {
+                char.visible = true;
+                
+                // Jiggle effect
+                const influence = 1 - (distance / magnifierRadius);
+                char.targetOffsetX = (Math.random() - 0.5) * jiggleIntensity * influence;
+                char.targetOffsetY = (Math.random() - 0.5) * jiggleIntensity * influence;
+              } else {
+                char.visible = false;
+                char.targetOffsetX = 0;
+                char.targetOffsetY = 0;
+              }
+              
+              // Smooth return animation
+              char.offsetX += (char.targetOffsetX - char.offsetX) * returnSpeed;
+              char.offsetY += (char.targetOffsetY - char.offsetY) * returnSpeed;
+              
+              // Random glitch hints - more subtle
+              char.glitchTimer -= 16;
+              if (char.glitchTimer <= 0) {
+                char.glitchTimer = 5000 + Math.random() * 10000; // Longer intervals
+                if (!isHovering && Math.random() < 0.03) { // Reduced from 0.1 to 0.03
+                  // Show character briefly
+                  const glitchDuration = 150 + Math.random() * 200; // Shorter duration
+                  char.visible = true;
+                  setTimeout(() => {
+                    if (!isHovering) char.visible = false;
+                  }, glitchDuration);
+                }
+              }
+              
+              // Draw character with theme-aware color
+              if (char.visible) {
+                const opacity = isHovering && distance < magnifierRadius 
+                  ? Math.min(1, 1 - (distance / magnifierRadius) * 0.5)
+                  : 0.5;
+                
+                // Use primary (background) color for contrast against the dark bar
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${opacity})`;
+                ctx.fillText(
+                  char.char,
+                  char.x + char.offsetX,
+                  char.y + char.offsetY
+                );
+              }
+            });
+            
+            requestAnimationFrame(animate);
+          }
+          
+          animate();
+          
+          // Handle window resize
+          window.addEventListener('resize', () => {
+            const newRect = bar.getBoundingClientRect();
+            canvas.width = newRect.width;
+            canvas.height = newRect.height;
+          });
+        });
+      });
+    </script>
     
     <script>
       // Declare the function type globally
