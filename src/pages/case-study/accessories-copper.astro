@@ -38,13 +38,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
           <div class="space-y-8">
             <div>
-                 <h3 class="text-xl font-semibold text-secondary mb-4">Copper faces a customer adoption challenge: <span class="bg-yellow-100 px-1 rounded">Charlie's $5,999</span> base price point limits market reach. <span class="bg-yellow-100 px-1 rounded">Strategic accessories</span> can solve two critical business problems:</h3>
+                 <h3 class="text-xl font-semibold text-secondary mb-4">Copper faces a customer adoption challenge: <span class="highlight">Charlie's $5,999</span> base price point limits market reach. <span class="highlight">Strategic accessories</span> can solve two critical business problems:</h3>
                 <ul class="list-disc list-inside space-y-2 text-secondary/90 ml-4">
                   <li>Customer acquisition - Lower-cost entry points let customers experience Copper's brand and technology before committing to Charlie</li>
                   <li>Revenue expansion - Create upsell opportunities and recurring touchpoints with existing customers</li>
                 </ul>
                 <p class="text-secondary/90 leading-relaxed mt-4">
-                  Rather than standalone accessories, I focused on building an <span class="bg-yellow-100 px-1 rounded">integrated ecosystem</span> that reinforces some of Copper's core value propositions: precision cooking and innovation.
+                  Rather than standalone accessories, I focused on building an <span class="highlight">integrated ecosystem</span> that reinforces some of Copper's core value propositions: precision cooking and innovation.
                 </p>
             </div>
 
@@ -103,7 +103,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             </div>
 
             <div class="mt-32">
-                <h3 class="text-xl font-semibold text-secondary mb-4">Copper alternatives that could be added to further create an <span class="bg-yellow-100 px-1 rounded">integrated ecosystem</span>. 
+                <h3 class="text-xl font-semibold text-secondary mb-4">Copper alternatives that could be added to further create an <span class="highlight">integrated ecosystem</span>. 
                 </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -143,7 +143,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </div>
                 
               <p class="text-secondary/90 leading-relaxed">
-                These alternatives serve important but narrower purposes: <span class="font-semibold">Spike</span> deepens Charlie ecosystem engagement, while <span class="font-semibold">Perch</span> provides universal brand exposure at a lower cost. <span class="font-semibold">Scout</span> uniquely tackles <span class="bg-yellow-100 px-1 rounded">both customer acquisition and capacity expansion</span>, delivering the highest business impact.
+                These alternatives serve important but narrower purposes: <span class="font-semibold">Spike</span> deepens Charlie ecosystem engagement, while <span class="font-semibold">Perch</span> provides universal brand exposure at a lower cost. <span class="font-semibold">Scout</span> uniquely tackles <span class="highlight">both customer acquisition and capacity expansion</span>, delivering the highest business impact.
               </p>
               
           </div>
@@ -161,7 +161,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               </p>
               
               <p>
-                <span class="bg-yellow-100 px-1 rounded">In today's competitive landscape, the companies that win aren't just those with the best hero product, but those who <span class="font-semibold">create the most compelling reasons for customers to stay, explore, and invest deeper into their world.</span></span>
+                <span class="highlight">In today's competitive landscape, the companies that win aren't just those with the best hero product, but those who <span class="font-semibold">create the most compelling reasons for customers to stay, explore, and invest deeper into their world.</span></span>
               </p>
             </div>
           </div>
@@ -199,6 +199,21 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     .physics-block:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .highlight {
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.25rem;
+      background-color: rgb(254 249 195); /* yellow-100 for light mode */
+      color: rgb(19 19 19); /* dark text for light mode */
+      transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+    }
+
+    :root[data-theme="dark"] .highlight,
+    :root[data-theme="earth-night"] .highlight,
+    :root[data-theme="random"][color-scheme="dark"] .highlight {
+      background-color: rgb(113 63 18); /* amber-800 for dark mode */
+      color: rgb(254 243 199); /* amber-100 for dark mode */
     }
   </style>
 
@@ -262,9 +277,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       }
       
       setupBlockEvents(block) {
-        let startX, startY, initialMouseX, initialMouseY;
+        let startX, startY, initialMouseX, initialMouseY, initialTouchX, initialTouchY;
         
-        const onMouseDown = (e) => {
+        const onStart = (e) => {
           this.isDragging = true;
           this.draggedBlock = block;
           block.isDragging = true;
@@ -273,19 +288,33 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           const rect = block.element.getBoundingClientRect();
           startX = rect.left;
           startY = rect.top;
-          initialMouseX = e.clientX;
-          initialMouseY = e.clientY;
           
-          document.addEventListener('mousemove', onMouseMove);
-          document.addEventListener('mouseup', onMouseUp);
+          if (e.type === 'touchstart') {
+            initialTouchX = e.touches[0].clientX;
+            initialTouchY = e.touches[0].clientY;
+          } else {
+            initialMouseX = e.clientX;
+            initialMouseY = e.clientY;
+          }
+          
+          document.addEventListener('mousemove', onMove);
+          document.addEventListener('mouseup', onEnd);
+          document.addEventListener('touchmove', onMove, { passive: false });
+          document.addEventListener('touchend', onEnd);
           e.preventDefault();
         };
         
-        const onMouseMove = (e) => {
+        const onMove = (e) => {
           if (!this.isDragging || !block.isDragging) return;
           
-          const deltaX = e.clientX - initialMouseX;
-          const deltaY = e.clientY - initialMouseY;
+          let deltaX, deltaY;
+          if (e.type === 'touchmove') {
+            deltaX = e.touches[0].clientX - initialTouchX;
+            deltaY = e.touches[0].clientY - initialTouchY;
+          } else {
+            deltaX = e.clientX - initialMouseX;
+            deltaY = e.clientY - initialMouseY;
+          }
           
           // Constrain movement within bounds
           block.x = Math.max(block.bounds.left, Math.min(block.bounds.right, deltaX));
@@ -293,20 +322,24 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
           
           // Apply transform relative to original position
           block.element.style.transform = `translate(${block.x}px, ${block.y}px)`;
+          e.preventDefault();
         };
         
-        const onMouseUp = () => {
+        const onEnd = () => {
           this.isDragging = false;
           if (block.isDragging) {
             block.isDragging = false;
             block.element.classList.remove('dragging');
           }
           
-          document.removeEventListener('mousemove', onMouseMove);
-          document.removeEventListener('mouseup', onMouseUp);
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onEnd);
+          document.removeEventListener('touchmove', onMove);
+          document.removeEventListener('touchend', onEnd);
         };
         
-        block.element.addEventListener('mousedown', onMouseDown);
+        block.element.addEventListener('mousedown', onStart);
+        block.element.addEventListener('touchstart', onStart, { passive: false });
       }
       
       getDistance(blockA, blockB) {

@@ -1,3 +1,7 @@
+---
+import ThemeToggle from "../ThemeToggle.astro";
+---
+
 <!------
   /------------------
 // Astro template - 
@@ -33,12 +37,12 @@
     text {
       font-family: Arial, sans-serif;
       font-size: 42px;
-      fill: var(--color-secondary);
+      fill: rgb(var(--color-secondary));
       font-weight: bold;
       will-change: transform;
       transform-style: preserve-3d;
       backface-visibility: hidden;
-      transition: transform 0.1s ease-out;
+      transition: transform 0.1s ease-out, fill 0.5s ease;
     }
 
     #letter1 { animation: wiggle 8s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite 0.5s; }
@@ -103,7 +107,7 @@
           </a>
 
         </div>
-        <div>
+        <div class="flex items-center gap-3">
           <ul class="items-center inline-flex gap-3 relative">
             <li>
               <a
@@ -198,9 +202,22 @@
            data-aos="fade-up"
            data-aos-duration="3000"
            data-aos-delay="300">
-        <div class="w-full flex justify-between">
-          <span class="text-xs font-medium text-secondary" id="currentDate"></span>
-          <span class="text-xs font-medium text-secondary" id="currentTime"></span>
+        <div class="w-full flex flex-col gap-1">
+          <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0">
+            <span class="text-xs font-medium text-secondary" id="currentDate"></span>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-medium text-secondary" id="currentTime"></span>
+              <ThemeToggle />
+            </div>
+          </div>
+          <div class="w-full flex justify-end">
+            <span 
+              id="earth-mode-hint" 
+              class="text-[10px] italic text-secondary/70 opacity-0 transition-opacity duration-500 ease-in-out pointer-events-none"
+            >
+              Theme changes as the day changes
+            </span>
+          </div>
         </div>
 
         <script>

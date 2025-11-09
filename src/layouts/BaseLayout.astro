@@ -2,12 +2,175 @@
 import BaseHead from "../components/BaseHead.astro";
 ---
 
-<html lang="en" class="selection:bg-secondary selection:text-secondary">
+<html lang="en" class="preload selection:bg-secondary selection:text-secondary" data-theme="light">
   <head>
     <BaseHead />
+    <script is:inline>
+      (function () {
+        const storageKey = 'theme-preference';
+        const root = document.documentElement;
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const safeLocalStorage = {
+          get(key) {
+            try {
+              return localStorage.getItem(key);
+            } catch {
+              return null;
+            }
+          },
+          set(key, value) {
+            try {
+              localStorage.setItem(key, value);
+            } catch {
+              /* noop */
+            }
+          },
+          remove(key) {
+            try {
+              localStorage.removeItem(key);
+            } catch {
+              /* noop */
+            }
+          },
+        };
+
+        const getTimeOfDay = () => {
+          const hour = new Date().getHours();
+          if (hour >= 5 && hour < 11) return 'morning';
+          if (hour >= 11 && hour < 17) return 'afternoon';
+          if (hour >= 17 && hour < 21) return 'evening';
+          return 'night';
+        };
+
+        const generateRandomColors = () => {
+          // Curated color palettes with guaranteed good contrast
+          const palettes = [
+            // Warm palettes
+            { bg: '254 243 199', text: '120 53 15', scheme: 'light' }, // amber cream / brown
+            { bg: '254 226 226', text: '127 29 29', scheme: 'light' }, // rose / dark red
+            { bg: '253 230 138', text: '113 63 18', scheme: 'light' }, // yellow / amber dark
+            { bg: '251 207 232', text: '131 24 67', scheme: 'light' }, // pink / rose dark
+            { bg: '255 237 213', text: '124 45 18', scheme: 'light' }, // peach / burnt orange
+            
+            // Cool palettes
+            { bg: '219 234 254', text: '30 58 138', scheme: 'light' }, // sky blue / deep blue
+            { bg: '224 242 254', text: '7 89 133', scheme: 'light' }, // light blue / blue
+            { bg: '221 214 254', text: '76 29 149', scheme: 'light' }, // purple light / purple dark
+            { bg: '209 250 229', text: '6 78 59', scheme: 'light' }, // green light / green dark
+            { bg: '204 251 241', text: '19 78 74', scheme: 'light' }, // teal light / teal dark
+            
+            // Dark palettes
+            { bg: '30 41 59', text: '191 219 254', scheme: 'dark' }, // slate / light blue
+            { bg: '23 37 84', text: '191 219 254', scheme: 'dark' }, // navy / light blue
+            { bg: '49 46 129', text: '224 231 255', scheme: 'dark' }, // indigo / indigo light
+            { bg: '88 28 135', text: '243 232 255', scheme: 'dark' }, // purple / purple light
+            { bg: '20 83 45', text: '187 247 208', scheme: 'dark' }, // forest / green light
+            { bg: '127 29 29', text: '254 226 226', scheme: 'dark' }, // dark red / rose
+            
+            // Unique palettes
+            { bg: '254 252 232', text: '133 77 14', scheme: 'light' }, // cream / amber
+            { bg: '236 253 245', text: '6 95 70', scheme: 'light' }, // mint / emerald
+            { bg: '241 245 249', text: '51 65 85', scheme: 'light' }, // slate light / slate
+            { bg: '44 62 80', text: '236 240 241', scheme: 'dark' }, // midnight / cloud
+          ];
+          
+          return palettes[Math.floor(Math.random() * palettes.length)];
+        };
+
+        const applyTheme = (theme) => {
+          if (theme === 'earth') {
+            // Clear any random mode inline styles
+            root.style.removeProperty('--color-primary');
+            root.style.removeProperty('--color-secondary');
+            const timeOfDay = getTimeOfDay();
+            root.setAttribute('data-theme', `earth-${timeOfDay}`);
+            root.setAttribute('data-theme-mode', 'earth');
+          } else if (theme === 'random') {
+            const colors = generateRandomColors();
+            root.style.setProperty('--color-primary', colors.bg);
+            root.style.setProperty('--color-secondary', colors.text);
+            root.setAttribute('color-scheme', colors.scheme);
+            root.setAttribute('data-theme', 'random');
+            root.setAttribute('data-theme-mode', 'random');
+          } else {
+            // Clear any random mode inline styles when switching to light/dark
+            root.style.removeProperty('--color-primary');
+            root.style.removeProperty('--color-secondary');
+            root.setAttribute('data-theme', theme);
+            root.setAttribute('data-theme-mode', theme);
+          }
+        };
+
+        const getPreferredTheme = () => {
+          const storedPreference = safeLocalStorage.get(storageKey);
+          if (storedPreference === 'light' || storedPreference === 'dark' || storedPreference === 'earth' || storedPreference === 'random') {
+            return storedPreference;
+          }
+          return mediaQuery.matches ? 'dark' : 'light';
+        };
+
+        applyTheme(getPreferredTheme());
+
+        // Update earth mode every minute
+        let earthModeInterval = null;
+        const startEarthModeUpdates = () => {
+          if (earthModeInterval) clearInterval(earthModeInterval);
+          earthModeInterval = setInterval(() => {
+            const currentMode = root.getAttribute('data-theme-mode');
+            if (currentMode === 'earth') {
+              applyTheme('earth');
+            }
+          }, 60000); // Check every minute
+        };
+
+        const stopEarthModeUpdates = () => {
+          if (earthModeInterval) {
+            clearInterval(earthModeInterval);
+            earthModeInterval = null;
+          }
+        };
+
+        if (getPreferredTheme() === 'earth') {
+          startEarthModeUpdates();
+        }
+
+        mediaQuery.addEventListener('change', (event) => {
+          const storedPreference = safeLocalStorage.get(storageKey);
+          if (!storedPreference) {
+            applyTheme(event.matches ? 'dark' : 'light');
+          }
+        });
+
+        window.__setPreferredTheme = (theme) => {
+          if (theme !== 'light' && theme !== 'dark' && theme !== 'earth' && theme !== 'random') return;
+          safeLocalStorage.set(storageKey, theme);
+          applyTheme(theme);
+          
+          if (theme === 'earth') {
+            startEarthModeUpdates();
+          } else {
+            stopEarthModeUpdates();
+          }
+        };
+
+        window.__clearPreferredTheme = () => {
+          safeLocalStorage.remove(storageKey);
+          stopEarthModeUpdates();
+          applyTheme(getPreferredTheme());
+        };
+
+        // Remove preload class after initial load to enable transitions
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            root.classList.remove('preload');
+          }, 100);
+        });
+      })();
+    </script>
   </head>
 
-  <body class="bg-primary">
+  <body class="bg-primary text-secondary transition-colors duration-500 ease-in-out">
     <slot />
     <script src="https://unpkg.com/mailgo@0.12.2/dist/mailgo.min.js"></script>
     <script type="text/javascript" src="https://unpkg.com/aos@2.3.1/dist/aos.js"

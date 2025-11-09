@@ -1,0 +1,129 @@
+---
+---
+
+<button
+  id="theme-toggle"
+  class="theme-toggle relative inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-secondary/20 bg-transparent text-secondary transition-all duration-300 ease-out hover:bg-secondary/5 active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary touch-manipulation"
+  type="button"
+  aria-label="Toggle color theme"
+  aria-pressed="false"
+  data-theme-mode="light"
+>
+  <span class="sr-only">Toggle color theme</span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--sun">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+    </svg>
+  </span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--moon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+      <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 0 0 12 21a9 9 0 0 0 9-8.21z"></path>
+    </svg>
+  </span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--earth">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+  </span>
+  <span aria-hidden="true" class="theme-toggle__icon theme-toggle__icon--random">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+      <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>
+    </svg>
+  </span>
+</button>
+
+<script>
+  const toggleNode = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+
+  if (toggleNode) {
+    const updateButtonState = () => {
+      const themeMode = root.getAttribute('data-theme-mode') || 'light';
+      toggleNode.dataset.themeMode = themeMode;
+      toggleNode.setAttribute('aria-label', `Current theme: ${themeMode}`);
+    };
+
+    updateButtonState();
+
+    toggleNode.addEventListener('click', () => {
+      const currentMode = root.getAttribute('data-theme-mode') || 'light';
+      let nextMode;
+      
+      // Cycle through: light -> dark -> earth -> random -> light
+      if (currentMode === 'light') {
+        nextMode = 'dark';
+      } else if (currentMode === 'dark') {
+        nextMode = 'earth';
+      } else if (currentMode === 'earth') {
+        nextMode = 'random';
+      } else {
+        nextMode = 'light';
+      }
+
+      if (typeof window.__setPreferredTheme === 'function') {
+        window.__setPreferredTheme(nextMode);
+      } else {
+        root.setAttribute('data-theme', nextMode);
+        root.setAttribute('data-theme-mode', nextMode);
+      }
+
+      updateButtonState();
+
+      // Show hint when switching to earth or random mode
+      const hintElement = document.getElementById('earth-mode-hint');
+      if (hintElement) {
+        if (nextMode === 'earth') {
+          hintElement.textContent = 'Theme changes as the day changes';
+          hintElement.style.opacity = '1';
+          setTimeout(() => {
+            hintElement.style.opacity = '0';
+          }, 3000);
+        } else if (nextMode === 'random') {
+          hintElement.textContent = 'Random dancing!';
+          hintElement.style.opacity = '1';
+          setTimeout(() => {
+            hintElement.style.opacity = '0';
+          }, 3000);
+        }
+      }
+    });
+
+    const observer = new MutationObserver(updateButtonState);
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme-mode'] });
+  }
+</script>
+
+<style>
+  .theme-toggle__icon {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    transform: scale(0.6) rotate(-20deg);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  button[data-theme-mode="light"] .theme-toggle__icon--sun {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  button[data-theme-mode="dark"] .theme-toggle__icon--moon {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  button[data-theme-mode="earth"] .theme-toggle__icon--earth {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+
+  button[data-theme-mode="random"] .theme-toggle__icon--random {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+</style>
+
