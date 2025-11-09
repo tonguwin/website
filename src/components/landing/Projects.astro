@@ -17,21 +17,20 @@ const otherprojects = [
     "description": "Coordinated a 10 team organization to host 2 virtual TEDx conferences with 80,000+ views featuring prominent speakers like Mayuko Inoue."
   },
   {
-    
     "title": "Netflix Watch Party Project",
     "description": "Conducted 25+ Netflix user interviews to identify key pain points; analyzed market trends and organizational needs to inform the implementation of a social integration feature."
   },
   {
     "url": "/case-study/accessories-copper",
     "title": "Accessories Case Study - Copper",
-    "description": "Strategic analysis exploring business-expanding accessories that create meaningful impact and unlock new revenue opportunities through thoughtful product development."
+    "description": "Strategic analysis exploring business-expanding accessories that create meaningful impact and unlock new revenue opportunities through thoughtful product development.",
+    "badge": "New"
   }
   // Add more projects as needed...
 ];
 
-// Function to calculate `data-aos-duration` based on index
-function calculateAosDuration(index) {
-  return 1500 + index * 500; // Example: Increment duration by 500ms for each project
+function calculateAosDelay(index) {
+  return index * 150;
 }
 ---
 
@@ -59,48 +58,41 @@ function calculateAosDuration(index) {
       class="mx-auto grid grid-cols-1 sm:grid-cols-2 text-secondary md:grid-cols-3 lg:grid-cols-4 items-start gap-6 mt-20"
       role="list"
     >
-      {
-        otherprojects.map((project, index) => (
-          <li
-            class="flow-root h-full"
-            data-aos="fade-up"
-            data-aos-duration={calculateAosDuration(index)}
-            key={index}
-          >
-            <div class="h-full flex flex-col justify-between">
-              <div>
-               {/* <p class="group-hover:text-secondary/70 text-secondary text-9xl font-black lg:rotate-90 xl:-translate-x-28 lg:-translate-x-16 lg:mb-8 xl:mb-0">
-                  0{index + 1}.
-                </p> */}
+      {otherprojects.map((project, index) => (
+        <li
+          class="flow-root h-full"
+          data-aos="fade-up"
+          data-aos-duration="1000"
+          data-aos-delay={calculateAosDelay(index).toString()}
+        >
+          <div class="h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-4">
                 <p class="font-bold shrink-0">{project.title}</p>
-                <p class="text-base mt-3 leading-relaxed">
-                  {project.description}
-                </p>
+                {project.badge && (
+                  <span class="inline-flex items-center rounded-full border border-secondary/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">
+                    {project.badge}
+                  </span>
+                )}
               </div>
-              <div class="flex items-center justify-between mt-3">
-                {
-                  project.url && (
-                    <a href={project.url} class="group">
-                      <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 hover:bg-secondary hover:scale-110 transition-all duration-300 ease-out cursor-pointer">
-                        <span class="text-xl font-bold text-secondary group-hover:text-primary group-hover:rotate-12 transition-all duration-300 ease-out">
-                          ↗
-                        </span>
-                      </div>
-                    </a>
-                  )
-                }
-                {
-                  project.title === "Accessories Case Study - Copper" && (
-                    <span class="text-secondary text-xs font-bold tracking-wider uppercase" style="text-shadow: 0 0 1px currentColor, 0 0 2px currentColor;">
-                      NEW
-                    </span>
-                  )
-                }
-              </div>
+              <p class="text-base mt-3 leading-relaxed">
+                {project.description}
+              </p>
             </div>
-          </li>
-        ))
-      }
+            {project.url && (
+              <div class="flex items-center justify-start mt-4">
+                <a href={project.url} class="group">
+                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 transition-all duration-300 ease-out group-hover:bg-secondary group-hover:scale-110">
+                    <span class="text-xl font-bold text-secondary transition-all duration-300 ease-out group-hover:rotate-12 group-hover:text-primary">
+                      ↗
+                    </span>
+                  </div>
+                </a>
+              </div>
+            )}
+          </div>
+        </li>
+      ))}
     </ul>
   </div>
 </section>
