@@ -22,18 +22,18 @@ const post = {
         </h1>
       </div>
 
-      <div class="relative">
-        <canvas id="gameCanvas" class="w-full h-full"></canvas>
+      <div class="relative w-full flex justify-center">
+        <canvas id="gameCanvas" class="w-full max-w-[600px]"></canvas>
         <button 
           id="startButton" 
-          class="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors duration-300"
+          class="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-8 py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 touch-none z-10"
         >
-          Start
+          Start Game
         </button>
-        <div id="gameOver" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white p-8 rounded-lg text-center">
-          <h2 class="text-2xl mb-4">Game Over</h2>
-          <p class="mb-4">Score: <span id="score">0</span></p>
-          <p class="text-sm">Jump to Restart</p>
+        <div id="gameOver" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-6 sm:p-8 rounded-lg text-center backdrop-blur-sm border border-white/10 z-10">
+          <h2 class="text-xl sm:text-2xl mb-4 font-bold">Game Over</h2>
+          <p class="mb-4 text-lg">Score: <span id="score" class="font-bold text-red-400">0</span></p>
+          <p class="text-sm opacity-80">Tap Jump to Restart</p>
         </div>
       </div>
       
@@ -68,17 +68,17 @@ const post = {
     </div>
 
     <!-- Mobile Controls -->
-    <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-32 bg-black/20 backdrop-blur-sm flex items-center justify-between px-8 md:hidden">
-      <div class="flex space-x-4">
-        <button id="leftBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
+    <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-36 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm flex items-end justify-between px-4 pb-4 sm:px-8 sm:pb-6 md:hidden z-50">
+      <div class="flex space-x-3 sm:space-x-4">
+        <button id="leftBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
           ←
         </button>
-        <button id="rightBtn" class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl">
+        <button id="rightBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
           →
         </button>
       </div>
-      <button id="jumpBtn" class="w-20 h-20 rounded-full bg-red-500/80 flex items-center justify-center text-white text-xl font-bold">
-        Jump!
+      <button id="jumpBtn" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-red-500/90 border-2 border-red-400 flex items-center justify-center text-white text-lg sm:text-xl font-bold active:bg-red-600 active:scale-95 transition-all shadow-lg shadow-red-500/50 touch-none">
+        JUMP
       </button>
     </div>
 
@@ -99,10 +99,16 @@ const post = {
     .max-w-3xl {
       position: relative;
       z-index: 1;
+      padding-bottom: 140px; /* Add padding to prevent overlap with mobile controls */
     }
 
     #gameCanvas {
       border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      touch-action: none; /* Prevent default touch behaviors */
     }
 
     /* Update hover effects to use white */
@@ -111,27 +117,68 @@ const post = {
     }
 
     /* Mobile Controls Styles */
+    #mobileControls {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
     #mobileControls button {
-      transition: all 0.1s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    #mobileControls button:active {
-      transform: scale(0.95);
+    /* Score display optimization for mobile */
+    #scoreDisplay {
+      font-size: 18px;
+      padding: 8px 0;
     }
 
-    #mobileControls #leftBtn:active,
-    #mobileControls #rightBtn:active {
-      background-color: rgba(255, 255, 255, 0.3);
+    /* Item section optimization */
+    #itemsSection {
+      min-height: 40px;
+      align-items: center;
     }
 
-    #mobileControls #jumpBtn:active {
-      background-color: rgba(239, 68, 68, 0.9);
+    /* Game over modal optimization */
+    #gameOver {
+      max-width: 90%;
+      padding: 1.5rem;
+    }
+
+    #gameOver h2 {
+      font-size: 1.5rem;
+    }
+
+    /* Item modal optimization */
+    #itemModal > div {
+      margin: 1rem;
     }
 
     /* Hide mobile controls on desktop */
     @media (min-width: 768px) {
       #mobileControls {
-        display: none;
+        display: none !important;
+      }
+      
+      .max-w-3xl {
+        padding-bottom: 0;
+      }
+    }
+
+    /* Very small mobile screens */
+    @media (max-width: 400px) {
+      #scoreDisplay {
+        font-size: 16px;
+      }
+      
+      #gameOver {
+        padding: 1rem;
+      }
+      
+      #gameOver h2 {
+        font-size: 1.25rem;
       }
     }
   </style>
@@ -287,6 +334,67 @@ const post = {
         ctx.fillRect(this.x, this.y, this.size, this.size);
         ctx.globalAlpha = 1;
       }
+    }
+
+    // Theme colors
+    let themeColors = {
+      background: '#000000',
+      platform: '#333333',
+      brittlePlatform: '#222222',
+      player: '#ffffff',
+      text: '#ffffff'
+    };
+
+    // Function to update theme colors based on current theme
+    function updateThemeColors() {
+      const root = document.documentElement;
+      const currentTheme = root.getAttribute('data-theme') || 'light';
+      const themeMode = root.getAttribute('data-theme-mode') || 'light';
+      
+      // Get computed colors from CSS variables
+      const computedStyle = getComputedStyle(root);
+      const primaryRGB = computedStyle.getPropertyValue('--color-primary').trim();
+      const secondaryRGB = computedStyle.getPropertyValue('--color-secondary').trim();
+      
+      // Convert RGB values to hex
+      function rgbToHex(rgb: string): string {
+        const values = rgb.split(' ').map(v => parseInt(v.trim()));
+        if (values.length === 3) {
+          return '#' + values.map(v => {
+            const hex = v.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          }).join('');
+        }
+        return '#000000';
+      }
+      
+      const primaryHex = rgbToHex(primaryRGB);
+      const secondaryHex = rgbToHex(secondaryRGB);
+      
+      // Set colors based on theme (inverted for Attic aesthetic)
+      themeColors.background = primaryHex; // Background uses primary
+      themeColors.text = secondaryHex; // Text uses secondary
+      themeColors.player = secondaryHex; // Player uses secondary
+      
+      // Platform colors - slightly lighter/darker than background
+      if (themeMode === 'light') {
+        // Light mode (classic dark Jumpboy)
+        themeColors.platform = '#333333';
+        themeColors.brittlePlatform = '#222222';
+      } else {
+        // Dark mode (light Jumpboy)
+        themeColors.platform = adjustBrightness(primaryHex, -15);
+        themeColors.brittlePlatform = adjustBrightness(primaryHex, -25);
+      }
+    }
+    
+    // Helper function to adjust color brightness
+    function adjustBrightness(hex: string, percent: number): string {
+      const num = parseInt(hex.replace('#', ''), 16);
+      const r = Math.min(255, Math.max(0, (num >> 16) + percent));
+      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + percent));
+      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + percent));
+      return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
     }
 
     // Game state
@@ -488,26 +596,42 @@ const post = {
       canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
       ctx = canvas.getContext('2d')!;
       
+      // Initialize theme colors
+      updateThemeColors();
+      
+      // Watch for theme changes
+      const themeObserver = new MutationObserver(() => {
+        updateThemeColors();
+      });
+      
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme', 'data-theme-mode']
+      });
+      
       // Initialize item display
       initItemDisplay();
       
       // Detect mobile device and set appropriate settings
-      isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
       
-      // Set speed multiplier and canvas scale based on device
+      // Set canvas size based on device for better responsiveness
       if (isMobileDevice) {
-        speedMultiplier = 1.2;
+        speedMultiplier = 1.0; // Slightly slower for better control
         MOVE_SPEED = mobileMoveSpeed;
-        canvasScale = window.innerWidth < 600 ? 0.8 : 1.0; // Scale down on very small screens
+        
+        // Make canvas fill available width on mobile
+        const maxWidth = Math.min(window.innerWidth - 32, 600); // 32px for padding
+        canvasScale = maxWidth / 600;
+        canvas.width = maxWidth;
+        canvas.height = maxWidth; // Square canvas
       } else {
         speedMultiplier = 0.7;
         MOVE_SPEED = desktopMoveSpeed;
         canvasScale = 1.0;
+        canvas.width = 600;
+        canvas.height = 600;
       }
-      
-      // Set canvas size with scaling
-      canvas.width = 600 * canvasScale;
-      canvas.height = 600 * canvasScale;
       
       // Set initial player position
       player.x = canvas.width / 2;
@@ -538,20 +662,36 @@ const post = {
       window.addEventListener('resize', handleResize);
     }
 
-    // Handle window resize
+    // Handle window resize with debouncing
+    let resizeTimeout: number | undefined;
     function handleResize() {
-      if (isMobileDevice) {
-        canvasScale = window.innerWidth < 600 ? 0.8 : 1.0;
-        canvas.width = 600 * canvasScale;
-        canvas.height = 600 * canvasScale;
+      // Debounce resize events
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      
+      resizeTimeout = window.setTimeout(() => {
+        const wasMobile = isMobileDevice;
+        isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
         
-        // Adjust player position
-        player.x = canvas.width / 2;
-        player.y = canvas.height - 100;
-        
-        // Regenerate platforms
-        generatePlatforms();
-      }
+        // Only resize if device type changed or on mobile
+        if (wasMobile !== isMobileDevice || isMobileDevice) {
+          if (isMobileDevice) {
+            const maxWidth = Math.min(window.innerWidth - 32, 600);
+            canvasScale = maxWidth / 600;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth;
+          } else {
+            canvasScale = 1.0;
+            canvas.width = 600;
+            canvas.height = 600;
+          }
+          
+          // Adjust player position proportionally
+          const oldX = player.x;
+          const oldY = player.y;
+          player.x = (oldX / canvas.width) * canvas.width;
+          player.y = (oldY / canvas.height) * canvas.height;
+        }
+      }, 250); // Wait 250ms after last resize event
     }
 
     // Handle key down events
@@ -1247,35 +1387,36 @@ const post = {
 
     // Optimize drawing functions
     function draw() {
-      // Clear canvas
-      ctx.fillStyle = '#000';
+      // Clear canvas with theme background
+      ctx.fillStyle = themeColors.background;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       if (!gameStarted) {
         // Draw title screen
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = themeColors.text;
         ctx.font = `${24 * canvasScale}px Arial`;
         ctx.textAlign = 'center';
         ctx.fillText('Can you make it out, Jumpboy?', canvas.width / 2, canvas.height / 2);
       } else {
         // Draw platforms
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = themeColors.platform;
         for (let platform of platforms) {
           if (platform.type === 'brittle') {
-            ctx.fillStyle = '#222';
+            ctx.fillStyle = themeColors.brittlePlatform;
             
             if (platform.breakTimer) {
               const timeLeft = BRITTLE_PLATFORM_BREAK_TIME - (Date.now() - platform.breakTimer);
               const breakProgress = timeLeft / BRITTLE_PLATFORM_BREAK_TIME;
               const pulseIntensity = Math.sin(Date.now() / 200) * 0.3 + 0.7;
-              ctx.fillStyle = `rgba(34, 34, 34, ${pulseIntensity})`;
+              // Use brittle platform color with pulse
+              ctx.fillStyle = themeColors.brittlePlatform;
               
               ctx.strokeStyle = `rgba(255, 0, 0, ${1 - breakProgress})`;
               ctx.lineWidth = 2;
               ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
             }
           } else {
-            ctx.fillStyle = '#333';
+            ctx.fillStyle = themeColors.platform;
           }
           
           ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
@@ -1374,11 +1515,11 @@ const post = {
       ctx.scale(zoomScale, zoomScale);
       ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
       
-      ctx.fillStyle = elapsedTime > CUTSCENE_DURATION ? RAINBOW_COLORS[player.currentRainbowIndex] : '#fff';
+      ctx.fillStyle = elapsedTime > CUTSCENE_DURATION ? RAINBOW_COLORS[player.currentRainbowIndex] : themeColors.player;
       ctx.fillRect(player.x, player.y, player.width, player.height);
       ctx.restore();
 
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = themeColors.text;
       ctx.font = `${20 * canvasScale}px Arial`;
       ctx.textAlign = 'center';
       ctx.fillText(
@@ -1394,12 +1535,12 @@ const post = {
       const currentTime = Date.now();
       const elapsedTime = currentTime - pointyHatCutsceneStartTime;
       
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = themeColors.player;
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
       drawPointyHat(player.x, player.y);
       
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = themeColors.text;
       ctx.font = `${20 * canvasScale}px Arial`;
       ctx.textAlign = 'center';
       ctx.fillText(
@@ -1427,8 +1568,8 @@ const post = {
       ctx.scale(totalScale, totalScale);
       ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
       
-      // Draw enlarged player (white with green pulse)
-      ctx.fillStyle = '#fff';
+      // Draw enlarged player with theme color
+      ctx.fillStyle = themeColors.player;
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
       const pulseIntensity = Math.sin(elapsedTime / 200) * 0.3 + 0.3; 
@@ -1442,7 +1583,7 @@ const post = {
       
       ctx.restore();
       
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = themeColors.text;
       ctx.font = `${20 * canvasScale}px Arial`;
       ctx.textAlign = 'center';
       ctx.fillText(
@@ -1455,7 +1596,7 @@ const post = {
     }
 
     function drawPlayerNormal() {
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = themeColors.player;
       ctx.fillRect(player.x, player.y, player.width, player.height);
       
       // Only show green glow during cutscene, not permanently
@@ -1465,7 +1606,7 @@ const post = {
     }
 
     function drawPointyHat(x: number, y: number) {
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = themeColors.player;
       ctx.beginPath();
       ctx.moveTo(x + player.width / 2, y - 15);
       ctx.lineTo(x + player.width + 5, y + 5);
@@ -1545,62 +1686,90 @@ const post = {
     const rightBtn = document.getElementById('rightBtn');
     const jumpBtn = document.getElementById('jumpBtn');
 
-    // Touch event handlers
+    // Better touch event handlers with haptic feedback simulation
     leftBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       keys.left = true;
-      keys.right = false; // Ensure right is false when left is pressed
+      keys.right = false;
+      leftBtn.style.transform = 'scale(0.9)';
     });
 
     leftBtn.addEventListener('touchend', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       keys.left = false;
+      leftBtn.style.transform = 'scale(1)';
     });
 
     rightBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       keys.right = true;
-      keys.left = false; // Ensure left is false when right is pressed
+      keys.left = false;
+      rightBtn.style.transform = 'scale(0.9)';
     });
 
     rightBtn.addEventListener('touchend', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       keys.right = false;
+      rightBtn.style.transform = 'scale(1)';
     });
 
     // Add touchcancel event handlers
     leftBtn.addEventListener('touchcancel', (e) => {
       e.preventDefault();
       keys.left = false;
+      leftBtn.style.transform = 'scale(1)';
     });
 
     rightBtn.addEventListener('touchcancel', (e) => {
       e.preventDefault();
       keys.right = false;
+      rightBtn.style.transform = 'scale(1)';
     });
 
-    // Improve jump button responsiveness with debouncing
+    // Improved jump button with better timing
     let lastJumpTime = 0;
+    let jumpPressed = false;
+    
     jumpBtn.addEventListener('touchstart', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       const now = Date.now();
-      // Prevent multiple rapid taps (within 300ms) from triggering unintended jumps
-      if (now - lastJumpTime < 300) return;
-      lastJumpTime = now;
+      jumpBtn.style.transform = 'scale(0.9)';
       
       if (!gameStarted || gameOver) {
         resetGame();
         return;
       }
       
+      // Allow more responsive jumping (reduced from 300ms to 200ms)
+      if (now - lastJumpTime < 200) return;
+      lastJumpTime = now;
+      jumpPressed = true;
+      
       if (!player.isJumping) {
-        // First jump
         player.velocityY = JUMP_FORCE;
         player.isJumping = true;
-      } else if (player.isJumping && player.hasDoubleJump) {
-        // Second jump (air jump)
+      } else if (player.isJumping && player.hasDoubleJump && jumpPressed) {
         player.velocityY = JUMP_FORCE;
+        jumpPressed = false; // Prevent triple jump
       }
+    });
+    
+    jumpBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      jumpBtn.style.transform = 'scale(1)';
+      jumpPressed = false;
+    });
+    
+    jumpBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      jumpBtn.style.transform = 'scale(1)';
+      jumpPressed = false;
     });
 
     // Prevent default touch behaviors

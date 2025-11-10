@@ -278,7 +278,7 @@ import BaseHead from "../components/BaseHead.astro";
                 this.y = -20;
                 this.speed = 1 + Math.random() * 2;
                 this.size = 2 + Math.random() * 3;
-                this.opacity = 0.3 + Math.random() * 0.4;
+                this.opacity = 0.4 + Math.random() * 0.5;
               }
               
               update() {
@@ -290,12 +290,12 @@ import BaseHead from "../components/BaseHead.astro";
               draw() {
                 ctx.save();
                 ctx.globalAlpha = this.opacity;
-                ctx.fillStyle = '#87CEEB';
+                ctx.fillStyle = '#4A90A4'; // Darker blue
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
                 // Sparkle effect
-                ctx.fillStyle = '#FFFFFF';
+                ctx.fillStyle = '#A0D6E8';
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size * 0.3, 0, Math.PI * 2);
                 ctx.fill();
@@ -303,42 +303,113 @@ import BaseHead from "../components/BaseHead.astro";
               }
             }
             
-            class SunRay {
+            class Cloud {
               constructor() {
-                this.side = Math.random() < 0.5 ? 'left' : 'right';
-                this.x = this.side === 'left' ? 0 : canvas.width;
-                this.y = Math.random() * canvas.height * 0.3;
-                this.length = 100 + Math.random() * 200;
-                this.angle = this.side === 'left' ? Math.PI / 6 : (5 * Math.PI) / 6;
-                this.opacity = 0;
-                this.maxOpacity = 0.1 + Math.random() * 0.1;
-                this.pulseSpeed = 0.01 + Math.random() * 0.01;
-                this.phase = Math.random() * Math.PI * 2;
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.speedX = 0.1 + Math.random() * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.1;
+                this.size = 60 + Math.random() * 80;
+                this.opacity = 0.15 + Math.random() * 0.15;
+                this.puffCount = 3 + Math.floor(Math.random() * 3);
+                this.puffs = [];
+                this.dispersing = false;
+                this.disperseSpeed = 0;
+                this.maxDisperseSpeed = 3;
+                
+                // Create cloud puffs
+                for (let i = 0; i < this.puffCount; i++) {
+                  this.puffs.push({
+                    offsetX: (Math.random() - 0.5) * this.size * 0.8,
+                    offsetY: (Math.random() - 0.5) * this.size * 0.4,
+                    size: this.size * (0.5 + Math.random() * 0.5),
+                    disperseAngle: Math.random() * Math.PI * 2,
+                    disperseDistance: 0
+                  });
+                }
               }
               
-              update() {
-                this.phase += this.pulseSpeed;
-                this.opacity = this.maxOpacity * (0.5 + 0.5 * Math.sin(this.phase));
+              checkMouseProximity(mouseX, mouseY) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // If mouse is within cloud radius, start dispersing
+                if (distance < this.size * 1.5) {
+                  this.dispersing = true;
+                  this.disperseSpeed = Math.min(this.disperseSpeed + 0.2, this.maxDisperseSpeed);
+                } else if (this.dispersing) {
+                  // Slowly reform
+                  this.disperseSpeed = Math.max(this.disperseSpeed - 0.1, 0);
+                  if (this.disperseSpeed === 0) {
+                    this.dispersing = false;
+                    // Reset disperse distances
+                    this.puffs.forEach(puff => {
+                      puff.disperseDistance *= 0.95;
+                    });
+                  }
+                }
+              }
+              
+              update(mouseX, mouseY) {
+                // Check mouse proximity
+                this.checkMouseProximity(mouseX, mouseY);
+                
+                // Move cloud
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Update puff positions if dispersing
+                if (this.dispersing || this.disperseSpeed > 0) {
+                  this.puffs.forEach(puff => {
+                    puff.disperseDistance += this.disperseSpeed;
+                  });
+                }
+                
+                // Wrap around screen
+                if (this.x > canvas.width + this.size) {
+                  this.x = -this.size;
+                  this.y = Math.random() * canvas.height * 0.5;
+                  // Reset disperse
+                  this.dispersing = false;
+                  this.disperseSpeed = 0;
+                  this.puffs.forEach(puff => puff.disperseDistance = 0);
+                }
+                
                 return true;
               }
               
               draw() {
                 ctx.save();
-                ctx.globalAlpha = this.opacity;
-                const gradient = ctx.createLinearGradient(
-                  this.x, this.y,
-                  this.x + Math.cos(this.angle) * this.length,
-                  this.y + Math.sin(this.angle) * this.length
-                );
-                gradient.addColorStop(0, '#FFD700');
-                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.moveTo(this.x, this.y);
-                ctx.lineTo(this.x + Math.cos(this.angle) * this.length, this.y + Math.sin(this.angle) * this.length);
-                ctx.lineTo(this.x + Math.cos(this.angle + 0.1) * this.length, this.y + Math.sin(this.angle + 0.1) * this.length);
-                ctx.closePath();
-                ctx.fill();
+                ctx.globalAlpha = this.opacity * (1 - Math.min(this.disperseSpeed / this.maxDisperseSpeed, 0.8));
+                
+                // Draw each puff
+                this.puffs.forEach(puff => {
+                  const disperseX = Math.cos(puff.disperseAngle) * puff.disperseDistance;
+                  const disperseY = Math.sin(puff.disperseAngle) * puff.disperseDistance;
+                  
+                  const puffX = this.x + puff.offsetX + disperseX;
+                  const puffY = this.y + puff.offsetY + disperseY;
+                  
+                  const gradient = ctx.createRadialGradient(
+                    puffX, puffY, 0,
+                    puffX, puffY, puff.size
+                  );
+                  
+                  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
+                  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                  
+                  ctx.fillStyle = gradient;
+                  ctx.filter = 'blur(12px)';
+                  ctx.beginPath();
+                  ctx.arc(puffX, puffY, puff.size, 0, Math.PI * 2);
+                  ctx.fill();
+                });
+                
+                ctx.filter = 'none';
                 ctx.restore();
               }
             }
@@ -577,6 +648,34 @@ import BaseHead from "../components/BaseHead.astro";
               }
             }
             
+            // Track mouse position for cloud interaction
+            let mouseX = -1000;
+            let mouseY = -1000;
+            
+            canvas.addEventListener('mousemove', (e) => {
+              const rect = canvas.getBoundingClientRect();
+              mouseX = e.clientX - rect.left;
+              mouseY = e.clientY - rect.top;
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+              mouseX = -1000;
+              mouseY = -1000;
+            });
+            
+            // Touch support for mobile
+            canvas.addEventListener('touchmove', (e) => {
+              const rect = canvas.getBoundingClientRect();
+              const touch = e.touches[0];
+              mouseX = touch.clientX - rect.left;
+              mouseY = touch.clientY - rect.top;
+            });
+            
+            canvas.addEventListener('touchend', () => {
+              mouseX = -1000;
+              mouseY = -1000;
+            });
+            
             // Initialize particles based on time of day
             function initParticles(timeOfDay) {
               particles = [];
@@ -584,11 +683,11 @@ import BaseHead from "../components/BaseHead.astro";
               
               switch(timeOfDay) {
                 case 'morning':
-                  // Dewdrops + Sun rays
+                  // Dewdrops + Clouds
                   const dewCount = isMobile ? 3 : 5;
-                  const rayCount = isMobile ? 2 : 4;
+                  const cloudCount = isMobile ? 2 : 4;
                   for (let i = 0; i < dewCount; i++) particles.push(new Dewdrop());
-                  for (let i = 0; i < rayCount; i++) particles.push(new SunRay());
+                  for (let i = 0; i < cloudCount; i++) particles.push(new Cloud());
                   break;
                   
                 case 'afternoon':
@@ -642,7 +741,8 @@ import BaseHead from "../components/BaseHead.astro";
               
               // Update and draw particles
               particles = particles.filter(particle => {
-                const alive = particle.update();
+                // Pass mouse coordinates to clouds
+                const alive = particle instanceof Cloud ? particle.update(mouseX, mouseY) : particle.update();
                 if (alive) particle.draw();
                 return alive;
               });
@@ -654,6 +754,9 @@ import BaseHead from "../components/BaseHead.astro";
               if (timeOfDay === 'morning') {
                 if (particles.filter(p => p instanceof Dewdrop).length < (isMobile ? 3 : 5)) {
                   if (Math.random() < 0.02) particles.push(new Dewdrop());
+                }
+                if (particles.filter(p => p instanceof Cloud).length < (isMobile ? 2 : 4)) {
+                  if (Math.random() < 0.005) particles.push(new Cloud());
                 }
               } else if (timeOfDay === 'afternoon') {
                 if (particles.filter(p => p instanceof Leaf).length < (isMobile ? 2 : 3)) {
