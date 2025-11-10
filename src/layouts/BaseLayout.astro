@@ -249,5 +249,470 @@ import BaseHead from "../components/BaseHead.astro";
             });
           })();
         </script>
+        
+        <!-- Earth Mode Animated Graphics -->
+        <canvas id="earth-mode-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; opacity: 0; transition: opacity 0.5s ease;"></canvas>
+        
+        <script is:inline>
+          (function() {
+            const canvas = document.getElementById('earth-mode-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId = null;
+            
+            // Set canvas size
+            function resizeCanvas() {
+              canvas.width = window.innerWidth;
+              canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Check if user prefers reduced motion
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            // Particle classes for different effects
+            class Dewdrop {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 1 + Math.random() * 2;
+                this.size = 2 + Math.random() * 3;
+                this.opacity = 0.3 + Math.random() * 0.4;
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.opacity -= 0.002;
+                return this.y < canvas.height && this.opacity > 0;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#87CEEB';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                // Sparkle effect
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class SunRay {
+              constructor() {
+                this.side = Math.random() < 0.5 ? 'left' : 'right';
+                this.x = this.side === 'left' ? 0 : canvas.width;
+                this.y = Math.random() * canvas.height * 0.3;
+                this.length = 100 + Math.random() * 200;
+                this.angle = this.side === 'left' ? Math.PI / 6 : (5 * Math.PI) / 6;
+                this.opacity = 0;
+                this.maxOpacity = 0.1 + Math.random() * 0.1;
+                this.pulseSpeed = 0.01 + Math.random() * 0.01;
+                this.phase = Math.random() * Math.PI * 2;
+              }
+              
+              update() {
+                this.phase += this.pulseSpeed;
+                this.opacity = this.maxOpacity * (0.5 + 0.5 * Math.sin(this.phase));
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const gradient = ctx.createLinearGradient(
+                  this.x, this.y,
+                  this.x + Math.cos(this.angle) * this.length,
+                  this.y + Math.sin(this.angle) * this.length
+                );
+                gradient.addColorStop(0, '#FFD700');
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + Math.cos(this.angle) * this.length, this.y + Math.sin(this.angle) * this.length);
+                ctx.lineTo(this.x + Math.cos(this.angle + 0.1) * this.length, this.y + Math.sin(this.angle + 0.1) * this.length);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Leaf {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 0.5 + Math.random() * 1;
+                this.size = 8 + Math.random() * 12;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                this.sway = Math.random() * 2;
+                this.swaySpeed = 0.02 + Math.random() * 0.02;
+                this.phase = Math.random() * Math.PI * 2;
+                this.opacity = 0.4 + Math.random() * 0.4;
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.rotation += this.rotationSpeed;
+                this.phase += this.swaySpeed;
+                this.x += Math.sin(this.phase) * this.sway;
+                return this.y < canvas.height + 20;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#1a6b1a';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            class DappledLight {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 30 + Math.random() * 50;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = 0;
+                this.maxOpacity = 0.05 + Math.random() * 0.05;
+                this.pulseSpeed = 0.01 + Math.random() * 0.01;
+                this.phase = Math.random() * Math.PI * 2;
+              }
+              
+              update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.phase += this.pulseSpeed;
+                this.opacity = this.maxOpacity * (0.5 + 0.5 * Math.sin(this.phase));
+                
+                if (this.x < -this.size) this.x = canvas.width + this.size;
+                if (this.x > canvas.width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = canvas.height + this.size;
+                if (this.y > canvas.height + this.size) this.y = -this.size;
+                
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, '#FFFFE0');
+                gradient.addColorStop(1, 'rgba(255, 255, 224, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Firefly {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 2 + Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 1;
+                this.speedY = (Math.random() - 0.5) * 1;
+                this.opacity = 0;
+                this.maxOpacity = 0.6 + Math.random() * 0.4;
+                this.pulseSpeed = 0.03 + Math.random() * 0.03;
+                this.phase = Math.random() * Math.PI * 2;
+                this.hue = 45 + Math.random() * 15; // Yellow-orange
+              }
+              
+              update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.phase += this.pulseSpeed;
+                this.opacity = this.maxOpacity * (0.3 + 0.7 * Math.sin(this.phase));
+                
+                // Gentle direction changes
+                if (Math.random() < 0.02) {
+                  this.speedX += (Math.random() - 0.5) * 0.2;
+                  this.speedY += (Math.random() - 0.5) * 0.2;
+                  this.speedX = Math.max(-1, Math.min(1, this.speedX));
+                  this.speedY = Math.max(-1, Math.min(1, this.speedY));
+                }
+                
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+                
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+                gradient.addColorStop(0, `hsl(${this.hue}, 100%, 70%)`);
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Petal {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 0.3 + Math.random() * 0.7;
+                this.size = 6 + Math.random() * 8;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.08;
+                this.sway = Math.random() * 3;
+                this.swaySpeed = 0.015 + Math.random() * 0.015;
+                this.phase = Math.random() * Math.PI * 2;
+                this.opacity = 0.3 + Math.random() * 0.4;
+                this.color = Math.random() < 0.5 ? '#DDA0DD' : '#FFB6C1'; // Plum or light pink
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.rotation += this.rotationSpeed;
+                this.phase += this.swaySpeed;
+                this.x += Math.sin(this.phase) * this.sway;
+                return this.y < canvas.height + 20;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = this.color;
+                // Draw petal shape
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size * 1.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class ShootingStar {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.length = 30 + Math.random() * 50;
+                this.speed = 8 + Math.random() * 4;
+                this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.5;
+                this.opacity = 1;
+                this.life = 30 + Math.random() * 20;
+              }
+              
+              update() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                this.life--;
+                this.opacity = this.life / 50;
+                return this.life > 0;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                  this.x - Math.cos(this.angle) * this.length,
+                  this.y - Math.sin(this.angle) * this.length
+                );
+                ctx.stroke();
+                // Glow
+                ctx.strokeStyle = '#87CEEB';
+                ctx.lineWidth = 4;
+                ctx.globalAlpha = this.opacity * 0.5;
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            class WaveRipple {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = 0;
+                this.maxRadius = 50 + Math.random() * 100;
+                this.speed = 1 + Math.random() * 1;
+                this.opacity = 0.3;
+              }
+              
+              update() {
+                this.radius += this.speed;
+                this.opacity = 0.3 * (1 - this.radius / this.maxRadius);
+                return this.radius < this.maxRadius;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#87CEEB';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            // Initialize particles based on time of day
+            function initParticles(timeOfDay) {
+              particles = [];
+              const isMobile = window.innerWidth < 768;
+              
+              switch(timeOfDay) {
+                case 'morning':
+                  // Dewdrops + Sun rays
+                  const dewCount = isMobile ? 3 : 5;
+                  const rayCount = isMobile ? 2 : 4;
+                  for (let i = 0; i < dewCount; i++) particles.push(new Dewdrop());
+                  for (let i = 0; i < rayCount; i++) particles.push(new SunRay());
+                  break;
+                  
+                case 'afternoon':
+                  // Leaves + Dappled light
+                  const leafCount = isMobile ? 2 : 3;
+                  const lightCount = isMobile ? 3 : 5;
+                  for (let i = 0; i < leafCount; i++) particles.push(new Leaf());
+                  for (let i = 0; i < lightCount; i++) particles.push(new DappledLight());
+                  break;
+                  
+                case 'evening':
+                  // Fireflies + Petals
+                  const fireflyCount = isMobile ? 4 : 6;
+                  const petalCount = isMobile ? 2 : 3;
+                  for (let i = 0; i < fireflyCount; i++) particles.push(new Firefly());
+                  for (let i = 0; i < petalCount; i++) particles.push(new Petal());
+                  break;
+                  
+                case 'night':
+                  // Shooting stars (spawn occasionally) + Wave ripples
+                  const rippleCount = isMobile ? 2 : 3;
+                  for (let i = 0; i < rippleCount; i++) particles.push(new WaveRipple());
+                  break;
+              }
+            }
+            
+            let lastShootingStarTime = 0;
+            let lastRippleTime = 0;
+            
+            function animate() {
+              const root = document.documentElement;
+              const themeMode = root.getAttribute('data-theme-mode');
+              const currentTheme = root.getAttribute('data-theme');
+              
+              // Only animate in earth mode
+              if (themeMode !== 'earth') {
+                canvas.style.opacity = '0';
+                if (animationId) {
+                  cancelAnimationFrame(animationId);
+                  animationId = null;
+                }
+                return;
+              }
+              
+              canvas.style.opacity = '1';
+              
+              // Get time of day from theme
+              const timeOfDay = currentTheme.replace('earth-', '');
+              
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              
+              // Update and draw particles
+              particles = particles.filter(particle => {
+                const alive = particle.update();
+                if (alive) particle.draw();
+                return alive;
+              });
+              
+              // Spawn new particles as needed
+              const now = Date.now();
+              const isMobile = window.innerWidth < 768;
+              
+              if (timeOfDay === 'morning') {
+                if (particles.filter(p => p instanceof Dewdrop).length < (isMobile ? 3 : 5)) {
+                  if (Math.random() < 0.02) particles.push(new Dewdrop());
+                }
+              } else if (timeOfDay === 'afternoon') {
+                if (particles.filter(p => p instanceof Leaf).length < (isMobile ? 2 : 3)) {
+                  if (Math.random() < 0.01) particles.push(new Leaf());
+                }
+              } else if (timeOfDay === 'evening') {
+                if (particles.filter(p => p instanceof Petal).length < (isMobile ? 2 : 3)) {
+                  if (Math.random() < 0.01) particles.push(new Petal());
+                }
+              } else if (timeOfDay === 'night') {
+                // Spawn shooting stars occasionally
+                if (now - lastShootingStarTime > 10000 && Math.random() < 0.01) {
+                  particles.push(new ShootingStar());
+                  lastShootingStarTime = now;
+                }
+                // Spawn ripples
+                if (now - lastRippleTime > 3000 && Math.random() < 0.02) {
+                  particles.push(new WaveRipple());
+                  lastRippleTime = now;
+                }
+              }
+              
+              animationId = requestAnimationFrame(animate);
+            }
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(() => {
+              const root = document.documentElement;
+              const themeMode = root.getAttribute('data-theme-mode');
+              const currentTheme = root.getAttribute('data-theme');
+              
+              if (themeMode === 'earth' && !prefersReducedMotion) {
+                const timeOfDay = currentTheme.replace('earth-', '');
+                initParticles(timeOfDay);
+                if (!animationId) animate();
+              } else {
+                canvas.style.opacity = '0';
+                if (animationId) {
+                  cancelAnimationFrame(animationId);
+                  animationId = null;
+                }
+              }
+            });
+            
+            observer.observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['data-theme', 'data-theme-mode']
+            });
+            
+            // Initialize if already in earth mode
+            const root = document.documentElement;
+            const themeMode = root.getAttribute('data-theme-mode');
+            if (themeMode === 'earth' && !prefersReducedMotion) {
+              const currentTheme = root.getAttribute('data-theme');
+              const timeOfDay = currentTheme.replace('earth-', '');
+              initParticles(timeOfDay);
+              animate();
+            }
+          })();
+        </script>
       </body>
     </html>
