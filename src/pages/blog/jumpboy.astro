@@ -456,6 +456,7 @@ const post = {
     let restStop: RestStop | null = null;
     let restStopCreated = false;
     let theoInteractionCount = 0; // Track how many times player talked to Theo
+    let skipMonsterCleanupThisFrame = false; // Skip cleanup on frames where monsters are generated
     
     // Rest stop NPC (Theo) dialogue lines
     const restStopDialogues = [
@@ -1172,6 +1173,8 @@ const post = {
       
       // Screen scrolling
       const scrollThreshold = canvas.height * SCREEN_SCROLL_THRESHOLD;
+      
+      
       if (player.y < scrollThreshold) {
         const scrollAmount = scrollThreshold - player.y;
         cameraY += scrollAmount;
@@ -1181,6 +1184,7 @@ const post = {
         platforms.forEach(platform => {
           platform.y += scrollAmount;
         });
+        
         monsters.forEach(monster => {
           monster.y += scrollAmount;
         });
@@ -1420,6 +1424,24 @@ const post = {
       document.getElementById('score').textContent = score.toString();
       document.getElementById('scoreValue').textContent = score.toString();
       
+      // Clean up off-screen monsters and particles (after camera scroll)
+      // Skip cleanup on frames where new monsters were just generated
+      if (!skipMonsterCleanupThisFrame) {
+        const screenBottom = cameraY + canvas.height;
+        
+        // Keep monsters that are on screen or just off screen (within buffer zone)
+        // Only remove monsters that are way below the screen (fell off)
+        // Don't remove monsters above - they'll scroll into view
+        monsters = monsters.filter(monster => {
+          return monster.y <= screenBottom + 400; // Keep if not too far below screen
+        });
+      }
+      
+      // Reset flag for next frame
+      skipMonsterCleanupThisFrame = false;
+      
+      particles = particles.filter(particle => particle.life > 0);
+      
       // Check if player fell
       if (player.y > canvas.height) {
         gameOver = true;
@@ -1456,6 +1478,7 @@ const post = {
 
     // Generate new platforms at the top
     function generateNewPlatforms() {
+      skipMonsterCleanupThisFrame = true; // Don't clean up newly created monsters this frame
       const highestPlatform = Math.min(...platforms.map(p => p.y));
       const newPlatforms = [];
       
@@ -1518,14 +1541,6 @@ const post = {
       // Remove platforms that are too far below the screen
       const screenBottom = cameraY + canvas.height;
       platforms = platforms.filter(platform => platform.y < screenBottom + 200);
-      
-      // Clean up off-screen monsters
-      monsters = monsters.filter(monster => 
-        monster.y < screenBottom + 200 && monster.y > cameraY - 200
-      );
-      
-      // Clean up old particles
-      particles = particles.filter(particle => particle.life > 0);
     }
 
     // Optimize particle system
