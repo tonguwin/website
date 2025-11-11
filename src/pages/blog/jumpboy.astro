@@ -38,7 +38,7 @@ const post = {
       </div>
       
       <!-- Score display below the canvas -->
-      <div id="scoreDisplay" class="mt-4 text-white text-xl font-bold">
+      <div id="scoreDisplay" class="mt-4 text-xl font-bold text-primary">
         Score: <span id="scoreValue">0</span>
       </div>
 
@@ -223,6 +223,7 @@ const post = {
     const PLAYER_ENLARGED_SIZE = 40; // Same size as green monster (LARGE_MONSTER_SIZE)
     const ENLARGED_MOVE_SPEED = 1.5; // Slower movement speed when enlarged
     const PLAYER_GLUTTONY_SIZE = 35; // Slightly larger than red monster
+    const REST_STOP_SCORE = 500; // Score when rest stop appears (after green monsters at 400)
 
     // Device-specific speed adjustments
     let isMobileDevice = false;
@@ -258,8 +259,23 @@ const post = {
       y: number;
       width: number;
       height: number;
-      type?: 'normal' | 'brittle';
+      type?: 'normal' | 'brittle' | 'rest';
       breakTimer?: number;
+    }
+    
+    interface RestStop {
+      platform: Platform;
+      npc: {
+        x: number;
+        y: number;
+        size: number;
+        hornOffset: number; // For animation
+        swordFloat: number; // For sword animation
+      };
+      active: boolean;
+      interacting: boolean;
+      dialogueIndex: number;
+      dialogueTimer: number;
     }
 
     interface Monster {
@@ -284,7 +300,8 @@ const post = {
       velocityY: number;
       velocityX: number;
       isJumping: boolean;
-      hasDoubleJump: boolean;  // Only need this flag
+      hasDoubleJump: boolean;  // Unlocked ability flag
+      doubleJumpUsed: boolean;  // Track if double jump was used
       wasJumping: boolean;
       isInCutscene: boolean;
       rainbowTimer: number;
@@ -408,7 +425,8 @@ const post = {
       velocityY: 0,
       velocityX: 0,
       isJumping: false,
-      hasDoubleJump: false,  // Only need this flag
+      hasDoubleJump: false,  // Unlocked ability flag
+      doubleJumpUsed: false,  // Track if double jump was used
       wasJumping: false,
       isInCutscene: false,
       rainbowTimer: 0,
@@ -435,6 +453,36 @@ const post = {
     let cutsceneStartTime = 0;
     let currentDialogue = 0;
     let pointyHatCutsceneStartTime = 0;
+    let restStop: RestStop | null = null;
+    let restStopCreated = false;
+    let theoInteractionCount = 0; // Track how many times player talked to Theo
+    
+    // Rest stop NPC (Theo) dialogue lines
+    const restStopDialogues = [
+      // First 3 interactions - mysterious
+      "...",
+      "The climb never ends, does it?",
+      "You should keep moving.",
+      // 4th interaction - reveals name
+      "...I suppose I should introduce myself.",
+      "My name is Theo.",
+      "I've been here... a long time.",
+      // Subsequent interactions
+      "Too long, perhaps.",
+      "I used to be like you, always climbing.",
+      "Now I just... wait.",
+      "These swords? Memories of battles.",
+      "Or maybe just decoration. I forget.",
+      "You should keep going.",
+      "Don't end up like me.",
+      "Tired. So tired.",
+      "But someone has to guard this place.",
+      "Safe from the monsters, at least.",
+      "For now.",
+      "Still here? The exit is up, not down.",
+      "I wonder what's at the top...",
+      "If there even is a top."
+    ];
     let pointyHatCutscenePhase = 0;
     let greensGluttonyCutsceneStartTime = 0;
     let greensGluttonyCutscenePhase = 0;
@@ -660,6 +708,28 @@ const post = {
 
       // Add window resize handler
       window.addEventListener('resize', handleResize);
+      
+      // Add canvas tap for mobile Theo interaction
+      canvas.addEventListener('touchstart', (e) => {
+        if (!isMobileDevice || !restStop || !restStop.active) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const canvasY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        
+        // Calculate NPC position
+        const npcX = restStop.platform.x + restStop.npc.x;
+        const npcY = restStop.platform.y + restStop.npc.y;
+        
+        // Check if tap is near Theo
+        const tapDistance = Math.abs(canvasX - npcX) + Math.abs(canvasY - npcY);
+        if (tapDistance < 100) {
+          // Simulate E key press for interaction
+          keys['e'] = true;
+          setTimeout(() => { keys['e'] = false; }, 100);
+        }
+      });
     }
 
     // Handle window resize with debouncing
@@ -716,6 +786,66 @@ const post = {
     }
 
     // Generate platforms with optimized spacing
+    // Create rest stop - called when score reaches threshold
+    function createRestStop(highestPlatformY: number) {
+      if (restStopCreated) return [];
+      
+      const restPlatformWidth = canvas.width - 40; // Nearly full screen width
+      const restPlatformY = highestPlatformY - 120; // Closer to previous platforms
+      
+      const restPlatform: Platform = {
+        x: 20, // Small margin from edges
+        y: restPlatformY,
+        width: restPlatformWidth,
+        height: PLATFORM_HEIGHT,
+        type: 'rest'
+      };
+      
+      const newPlatforms = [restPlatform];
+      
+      // Add a transition platform before rest stop (easier to reach)
+      newPlatforms.push({
+        x: canvas.width / 2 - PLATFORM_WIDTH / 2,
+        y: highestPlatformY - 60,
+        width: PLATFORM_WIDTH,
+        height: PLATFORM_HEIGHT,
+        type: 'normal'
+      });
+      
+      // Create ladder platforms above rest stop
+      const ladderPlatformWidth = 60;
+      const ladderSpacing = 80;
+      for (let i = 1; i <= 5; i++) {
+        const ladderX = restPlatform.x + (i % 2 === 0 ? restPlatformWidth - ladderPlatformWidth - 20 : 20);
+        newPlatforms.push({
+          x: ladderX,
+          y: restPlatformY - (i * ladderSpacing),
+          width: ladderPlatformWidth,
+          height: PLATFORM_HEIGHT,
+          type: 'normal'
+        });
+      }
+      
+      // Create NPC data (store reference to platform, calculate position when drawing)
+      restStop = {
+        platform: restPlatform,
+        npc: {
+          x: restPlatformWidth / 2, // Relative to platform (center)
+          y: -40, // Relative to platform (above it)
+          size: 30,
+          hornOffset: 0,
+          swordFloat: 0
+        },
+        active: true,
+        interacting: false,
+        dialogueIndex: 0,
+        dialogueTimer: 0
+      };
+      
+      restStopCreated = true;
+      return newPlatforms;
+    }
+    
     function generatePlatforms() {
       platforms = [];
       monsters = [];
@@ -756,20 +886,24 @@ const post = {
           type: platformType
         });
         
-        // Add monsters with optimized spawn chance
-        let spawnChance;
-        if (score < 100) {
-          spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
-        } else if (score < EASY_MODE_THRESHOLD) {
-          spawnChance = EASY_MONSTER_SPAWN_CHANCE;
-        } else {
-          spawnChance = MONSTER_SPAWN_CHANCE;
-        }
+        // Add monsters with optimized spawn chance (but not on rest platforms)
+        const isRestPlatform = platformType === 'rest';
         
-        if (Math.random() < spawnChance) {
-          const monsterType = determineMonsterType();
-          if (monsterType) {
-            monsters.push(createMonster(x, y, monsterType));
+        if (!isRestPlatform) {
+          let spawnChance;
+          if (score < 100) {
+            spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
+          } else if (score < EASY_MODE_THRESHOLD) {
+            spawnChance = EASY_MONSTER_SPAWN_CHANCE;
+          } else {
+            spawnChance = MONSTER_SPAWN_CHANCE;
+          }
+          
+          if (Math.random() < spawnChance) {
+            const monsterType = determineMonsterType();
+            if (monsterType) {
+              monsters.push(createMonster(x, y, monsterType));
+            }
           }
         }
       }
@@ -885,6 +1019,8 @@ const post = {
         }
       }
 
+      // Rest stop will be created in generateNewPlatforms when score is reached
+      
       // Check for cutscene trigger before handling cutscene
       if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
         player.isInCutscene = true;
@@ -917,10 +1053,10 @@ const post = {
           player.isInCutscene = false;
           player.hasDoubleJump = true;  // Unlock double jump
           
-          // Reset score display color
+          // Reset score display color (CSS class handles theme color)
           const scoreDisplay = document.getElementById('scoreDisplay');
           if (scoreDisplay) {
-            scoreDisplay.style.color = 'white';
+            scoreDisplay.style.color = '';
           }
         }
       }
@@ -964,10 +1100,71 @@ const post = {
         // First jump
         player.velocityY = JUMP_FORCE;
         player.isJumping = true;
-      } else if (keys[' '] && player.isJumping && player.hasDoubleJump) {
-        // Second jump (air jump)
+        player.doubleJumpUsed = false; // Reset double jump when jumping from ground
+      } else if (keys[' '] && player.isJumping && player.hasDoubleJump && !player.doubleJumpUsed && !keys.wasSpacePressed) {
+        // Second jump (air jump) - only if not already used
         player.velocityY = JUMP_FORCE;
+        player.doubleJumpUsed = true; // Mark double jump as used
       }
+      
+      // Track space key state to prevent holding space
+      keys.wasSpacePressed = keys[' '];
+      
+      // Handle rest stop interaction
+      if (restStop && restStop.active) {
+        // Calculate absolute NPC position from platform
+        const npcAbsoluteX = restStop.platform.x + restStop.npc.x;
+        const npcAbsoluteY = restStop.platform.y + restStop.npc.y;
+        
+        const distanceToNPC = Math.abs(player.x - npcAbsoluteX) + Math.abs(player.y - npcAbsoluteY);
+        
+        // Check if player is near NPC (within interaction range)
+        if (distanceToNPC < 80) {
+          // Press E to interact
+          if (keys['e'] && !keys.wasEPressed) {
+            if (!restStop.interacting) {
+              restStop.interacting = true;
+              theoInteractionCount++;
+              
+              // Select dialogue based on interaction count
+              if (theoInteractionCount <= 3) {
+                // First 3 times: show early dialogues in order
+                restStop.dialogueIndex = theoInteractionCount - 1;
+              } else if (theoInteractionCount <= 6) {
+                // 4th-6th time: show name reveal dialogues in order
+                restStop.dialogueIndex = theoInteractionCount - 1;
+              } else {
+                // After that: random from remaining dialogues
+                restStop.dialogueIndex = 6 + Math.floor(Math.random() * (restStopDialogues.length - 6));
+              }
+              
+              restStop.dialogueTimer = Date.now();
+            } else {
+              // Continue to next dialogue or exit
+              if (theoInteractionCount <= 6) {
+                // During intro phase, advance sequentially
+                restStop.interacting = false;
+              } else if (Math.random() < 0.3) {
+                restStop.interacting = false;
+              } else {
+                // Random dialogue after intro
+                restStop.dialogueIndex = 6 + Math.floor(Math.random() * (restStopDialogues.length - 6));
+                restStop.dialogueTimer = Date.now();
+              }
+            }
+          }
+        } else {
+          // Exit interaction if player moves away
+          restStop.interacting = false;
+        }
+        
+        // Animate NPC - gentle bobbing and sword floating
+        restStop.npc.hornOffset = Math.sin(Date.now() / 1500) * 4; // Slower, more pronounced bob
+        restStop.npc.swordFloat = Math.sin(Date.now() / 1200) * 8; // Vertical sword float
+      }
+      
+      // Track E key state
+      keys.wasEPressed = keys['e'];
       
       // Apply gravity
       player.velocityY += GRAVITY;
@@ -993,6 +1190,9 @@ const post = {
           item.y += scrollAmount;
         });
         
+        // Rest stop platform moves with camera like other platforms
+        // NPC position will be calculated relative to platform when drawing
+        
         // Generate new platforms if needed
         const highestPlatform = Math.min(...platforms.map(p => p.y));
         if (highestPlatform > 0) {
@@ -1012,6 +1212,7 @@ const post = {
             player.y = platform.y - player.height;
             player.velocityY = 0;
             player.isJumping = false;
+            player.doubleJumpUsed = false; // Reset double jump when landing
             
             // Only create landing particles if we were previously jumping
             if (player.wasJumping) {
@@ -1258,6 +1459,13 @@ const post = {
       const highestPlatform = Math.min(...platforms.map(p => p.y));
       const newPlatforms = [];
       
+      // Check if we should create the rest stop
+      if (score >= REST_STOP_SCORE && !restStopCreated) {
+        const restStopPlatforms = createRestStop(highestPlatform);
+        platforms.push(...restStopPlatforms);
+        return; // Don't generate regular platforms this cycle
+      }
+      
       // Use easier spacing for first 300 points
       const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
       
@@ -1310,12 +1518,23 @@ const post = {
       // Remove platforms that are too far below the screen
       const screenBottom = cameraY + canvas.height;
       platforms = platforms.filter(platform => platform.y < screenBottom + 200);
+      
+      // Clean up off-screen monsters
+      monsters = monsters.filter(monster => 
+        monster.y < screenBottom + 200 && monster.y > cameraY - 200
+      );
+      
+      // Clean up old particles
+      particles = particles.filter(particle => particle.life > 0);
     }
 
     // Optimize particle system
     function createLandingParticles(x: number, y: number, color: string) {
+      // Dynamic max particles based on device
+      const maxParticles = isMobileDevice ? 40 : MAX_PARTICLES;
+      
       // Limit total particles and remove oldest ones more aggressively
-      if (particles.length >= MAX_PARTICLES) {
+      if (particles.length >= maxParticles) {
         particles.splice(0, 8); // Remove more particles at once
       }
       
@@ -1383,6 +1602,36 @@ const post = {
         // Ensure monster doesn't get stuck in wall
         monster.x = Math.max(0, Math.min(canvas.width - monster.width, monster.x));
       }
+      
+      // Check if monster is trying to cross rest platform
+      if (restStop && restStop.active) {
+        const restPlatform = restStop.platform;
+        const monsterBottom = monster.y + monster.height;
+        const monsterTop = monster.y;
+        const platformTop = restPlatform.y;
+        const platformBottom = restPlatform.y + restPlatform.height;
+        
+        // If monster is at the same vertical level as rest platform
+        if (monsterBottom > platformTop && monsterTop < platformBottom) {
+          const monsterRight = monster.x + monster.width;
+          const monsterLeft = monster.x;
+          const platformLeft = restPlatform.x;
+          const platformRight = restPlatform.x + restPlatform.width;
+          
+          // If monster is trying to cross the platform horizontally
+          if (monsterRight > platformLeft && monsterLeft < platformRight) {
+            // Reverse direction and push back
+            monster.direction *= -1;
+            if (monster.x < restPlatform.x + restPlatform.width / 2) {
+              // Monster is on left side, push left
+              monster.x = platformLeft - monster.width - 5;
+            } else {
+              // Monster is on right side, push right
+              monster.x = platformRight + 5;
+            }
+          }
+        }
+      }
     }
 
     // Optimize drawing functions
@@ -1401,7 +1650,15 @@ const post = {
         // Draw platforms
         ctx.fillStyle = themeColors.platform;
         for (let platform of platforms) {
-          if (platform.type === 'brittle') {
+          if (platform.type === 'rest') {
+            // Draw rest platform with special color
+            ctx.fillStyle = '#4a5568';
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            // Add border
+            ctx.strokeStyle = '#718096';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+          } else if (platform.type === 'brittle') {
             ctx.fillStyle = themeColors.brittlePlatform;
             
             if (platform.breakTimer) {
@@ -1415,11 +1672,110 @@ const post = {
               ctx.lineWidth = 2;
               ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
             }
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
           } else {
             ctx.fillStyle = themeColors.platform;
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+          }
+        }
+        
+        // Draw rest stop NPC
+        if (restStop && restStop.active) {
+          const npc = restStop.npc;
+          // Calculate absolute position from platform
+          const npcX = restStop.platform.x + npc.x;
+          const npcY = restStop.platform.y + npc.y;
+          
+          // Draw crowned cube (Jumpboy-like with crown) with bobbing
+          ctx.fillStyle = themeColors.player;
+          ctx.fillRect(npcX - npc.size/2, npcY - npc.size/2 + npc.hornOffset, npc.size, npc.size);
+          
+          // Draw three sharper horns (crown) - taller and pointier
+          ctx.fillStyle = '#ffffff';
+          const hornHeight = 12;
+          const hornWidth = 6;
+          const hornSpacing = npc.size / 3;
+          for (let i = 0; i < 3; i++) {
+            const hornX = npcX - npc.size/2 + (i * hornSpacing) + hornSpacing/2;
+            const hornY = npcY - npc.size/2 - hornHeight + npc.hornOffset;
+            ctx.beginPath();
+            ctx.moveTo(hornX, hornY); // Sharp tip
+            ctx.lineTo(hornX - hornWidth/2, hornY + hornHeight); // Left base
+            ctx.lineTo(hornX + hornWidth/2, hornY + hornHeight); // Right base
+            ctx.closePath();
+            ctx.fill();
           }
           
-          ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+          // Draw two vertical swords floating beside shoulders
+          ctx.fillStyle = '#cbd5e0';
+          const swordLeftX = npcX - 40; // Left side
+          const swordRightX = npcX + 40; // Right side
+          const swordY1 = npcY - 10 + npc.swordFloat; // Top sword
+          const swordY2 = npcY - 10 - npc.swordFloat; // Bottom sword (opposite float)
+          
+          // Left sword (vertical - pointing up)
+          // Blade (vertical rectangle)
+          ctx.fillRect(swordLeftX - 2.5, swordY1 - 35, 5, 35);
+          // Hilt (horizontal at bottom of blade)
+          ctx.fillRect(swordLeftX - 4.5, swordY1, 9, 7);
+          
+          // Right sword (vertical - pointing up)
+          // Blade (vertical rectangle)
+          ctx.fillRect(swordRightX - 2.5, swordY2 - 35, 5, 35);
+          // Hilt (horizontal at bottom of blade)
+          ctx.fillRect(swordRightX - 4.5, swordY2, 9, 7);
+          
+          // Draw interaction prompt if player is near
+          const distanceToNPC = Math.abs(player.x - npcX) + Math.abs(player.y - npcY);
+          if (distanceToNPC < 80 && !restStop.interacting) {
+            ctx.fillStyle = themeColors.text;
+            ctx.font = `${14 * canvasScale}px Arial`;
+            ctx.textAlign = 'center';
+            const promptText = isMobileDevice ? 'Tap to Talk' : '[E] Talk';
+            ctx.fillText(promptText, npcX, npcY - npc.size - 20);
+          }
+          
+          // Draw dialogue box
+          if (restStop.interacting) {
+            // Responsive dialogue box sizing
+            const boxWidth = Math.min(400, canvas.width - 40);
+            const boxHeight = isMobileDevice ? 110 : 100;
+            const boxX = canvas.width / 2 - boxWidth / 2;
+            const boxY = isMobileDevice ? canvas.height - 180 : canvas.height - 130; // Higher on mobile to avoid controls
+            
+            // Box background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Box border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Name label - show ??? until name is revealed
+            const nameLabel = theoInteractionCount >= 4 ? 'Theo' : '???';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${14 * canvasScale}px 'Courier New', monospace`;
+            ctx.textAlign = 'left';
+            ctx.fillText(nameLabel, boxX + 20, boxY + 20);
+            
+            // Dialogue text
+            ctx.fillStyle = '#cccccc';
+            ctx.font = `${15 * canvasScale}px 'Courier New', monospace`;
+            ctx.textAlign = 'left';
+            const dialogue = restStopDialogues[restStop.dialogueIndex];
+            const lines = dialogue.match(/.{1,42}/g) || [dialogue];
+            lines.forEach((line, i) => {
+              ctx.fillText(line, boxX + 20, boxY + 45 + (i * 20));
+            });
+            
+            // Continue prompt
+            ctx.font = `${11 * canvasScale}px Arial`;
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#888888';
+            const continueText = isMobileDevice ? 'Tap to Continue' : '[E] Continue';
+            ctx.fillText(continueText, boxX + boxWidth - 20, boxY + boxHeight - 12);
+          }
         }
         
         // Draw items
@@ -1641,6 +1997,7 @@ const post = {
       player.isJumping = false;
       player.wasJumping = false;
       player.hasDoubleJump = false;
+      player.doubleJumpUsed = false;
       player.isInCutscene = false;
       player.rainbowTimer = 0;
       player.currentRainbowIndex = 0;
@@ -1653,6 +2010,9 @@ const post = {
       growthProgress = 0;
       score = 0;
       cameraY = 0;
+      restStop = null;
+      restStopCreated = false;
+      theoInteractionCount = 0; // Reset Theo conversation progress
       gameOver = false;
       gameStarted = true;
       particles = [];
@@ -1661,10 +2021,10 @@ const post = {
       greensGluttonyCutscenePhase = 0;  // Reset Green's Gluttony cutscene
       document.getElementById('gameOver').classList.add('hidden');
       
-      // Reset score display color
+      // Reset score display color (CSS class handles theme color)
       const scoreDisplay = document.getElementById('scoreDisplay');
       if (scoreDisplay) {
-        scoreDisplay.style.color = 'white';
+        scoreDisplay.style.color = '';
       }
       
       const startButton = document.getElementById('startButton');
@@ -1682,102 +2042,106 @@ const post = {
 
     // Add mobile controls
     const mobileControls = document.getElementById('mobileControls');
-    const leftBtn = document.getElementById('leftBtn');
-    const rightBtn = document.getElementById('rightBtn');
-    const jumpBtn = document.getElementById('jumpBtn');
+    const leftBtn = document.getElementById('leftBtn')!;
+    const rightBtn = document.getElementById('rightBtn')!;
+    const jumpBtn = document.getElementById('jumpBtn')!;
 
     // Better touch event handlers with haptic feedback simulation
-    leftBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      keys.left = true;
-      keys.right = false;
-      leftBtn.style.transform = 'scale(0.9)';
-    });
-
-    leftBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      keys.left = false;
-      leftBtn.style.transform = 'scale(1)';
-    });
-
-    rightBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      keys.right = true;
-      keys.left = false;
-      rightBtn.style.transform = 'scale(0.9)';
-    });
-
-    rightBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      keys.right = false;
-      rightBtn.style.transform = 'scale(1)';
-    });
-
-    // Add touchcancel event handlers
-    leftBtn.addEventListener('touchcancel', (e) => {
-      e.preventDefault();
-      keys.left = false;
-      leftBtn.style.transform = 'scale(1)';
-    });
-
-    rightBtn.addEventListener('touchcancel', (e) => {
-      e.preventDefault();
-      keys.right = false;
-      rightBtn.style.transform = 'scale(1)';
-    });
-
-    // Improved jump button with better timing
-    let lastJumpTime = 0;
-    let jumpPressed = false;
-    
-    jumpBtn.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const now = Date.now();
-      jumpBtn.style.transform = 'scale(0.9)';
-      
-      if (!gameStarted || gameOver) {
-        resetGame();
-        return;
-      }
-      
-      // Allow more responsive jumping (reduced from 300ms to 200ms)
-      if (now - lastJumpTime < 200) return;
-      lastJumpTime = now;
-      jumpPressed = true;
-      
-      if (!player.isJumping) {
-        player.velocityY = JUMP_FORCE;
-        player.isJumping = true;
-      } else if (player.isJumping && player.hasDoubleJump && jumpPressed) {
-        player.velocityY = JUMP_FORCE;
-        jumpPressed = false; // Prevent triple jump
-      }
-    });
-    
-    jumpBtn.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      jumpBtn.style.transform = 'scale(1)';
-      jumpPressed = false;
-    });
-    
-    jumpBtn.addEventListener('touchcancel', (e) => {
-      e.preventDefault();
-      jumpBtn.style.transform = 'scale(1)';
-      jumpPressed = false;
-    });
-
-    // Prevent default touch behaviors
-    document.addEventListener('touchmove', (e) => {
-      if (e.target instanceof Element && e.target.closest('#mobileControls')) {
+    if (leftBtn && rightBtn && jumpBtn) {
+      leftBtn.addEventListener('touchstart', (e) => {
         e.preventDefault();
-      }
-    }, { passive: false });
+        e.stopPropagation();
+        keys.left = true;
+        keys.right = false;
+        leftBtn.style.transform = 'scale(0.9)';
+      });
+
+      leftBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.left = false;
+        leftBtn.style.transform = 'scale(1)';
+      });
+
+      rightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.right = true;
+        keys.left = false;
+        rightBtn.style.transform = 'scale(0.9)';
+      });
+
+      rightBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.right = false;
+        rightBtn.style.transform = 'scale(1)';
+      });
+
+      // Add touchcancel event handlers
+      leftBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.left = false;
+        leftBtn.style.transform = 'scale(1)';
+      });
+
+      rightBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.right = false;
+        rightBtn.style.transform = 'scale(1)';
+      });
+
+      // Improved jump button with better timing
+      let lastJumpTime = 0;
+      let jumpPressed = false;
+      
+      jumpBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const now = Date.now();
+        jumpBtn.style.transform = 'scale(0.9)';
+        
+        if (!gameStarted || gameOver) {
+          resetGame();
+          return;
+        }
+        
+        // Allow more responsive jumping (reduced from 300ms to 200ms)
+        if (now - lastJumpTime < 200) return;
+        lastJumpTime = now;
+        jumpPressed = true;
+        
+        if (!player.isJumping) {
+          player.velocityY = JUMP_FORCE;
+          player.isJumping = true;
+          player.doubleJumpUsed = false; // Reset double jump when jumping from ground
+        } else if (player.isJumping && player.hasDoubleJump && !player.doubleJumpUsed && jumpPressed) {
+          player.velocityY = JUMP_FORCE;
+          player.doubleJumpUsed = true; // Mark double jump as used
+          jumpPressed = false; // Prevent additional jumps
+        }
+      });
+      
+      jumpBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        jumpBtn.style.transform = 'scale(1)';
+        jumpPressed = false;
+      });
+      
+      jumpBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        jumpBtn.style.transform = 'scale(1)';
+        jumpPressed = false;
+      });
+
+      // Prevent default touch behaviors
+      document.addEventListener('touchmove', (e) => {
+        if (e.target instanceof Element && e.target.closest('#mobileControls')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
 
     // Start game when page loads
     window.addEventListener('load', init);
