@@ -22,8 +22,8 @@ const post = {
         </h1>
       </div>
 
-      <div class="relative w-full flex justify-center">
-        <canvas id="gameCanvas" class="w-full max-w-[600px]"></canvas>
+      <div class="relative w-full flex justify-center overflow-hidden">
+        <canvas id="gameCanvas" class="w-full max-w-[600px] touch-none" style="display: block; margin: 0 auto;"></canvas>
         <button 
           id="startButton" 
           class="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-8 py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 touch-none z-10"
@@ -154,6 +154,19 @@ const post = {
       border-color: white;
       box-shadow: 0 0 10px currentColor;
     }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+      }
+      
+      #gameCanvas {
+        max-width: calc(100vw - 32px) !important;
+        height: auto !important;
+        aspect-ratio: 1;
+      }
+    }
   </style>
 
   <script>
@@ -220,10 +233,16 @@ const post = {
       // Detect mobile
       isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
       
-      // Optimize canvas size for mobile
-      const canvasSize = isMobileDevice ? Math.min(window.innerWidth - 32, 500) : 600;
+      // Optimize canvas size for mobile (account for padding and mobile controls)
+      const canvasSize = isMobileDevice ? Math.min(window.innerWidth - 32, 400) : 600;
       canvas.width = canvasSize;
       canvas.height = canvasSize;
+      
+      // Set canvas display size
+      canvas.style.width = canvasSize + 'px';
+      canvas.style.height = canvasSize + 'px';
+      canvas.style.maxWidth = '100%';
+      canvas.style.touchAction = 'none';
       
       updateThemeColors();
       
@@ -238,6 +257,15 @@ const post = {
       });
       
       initFireUI();
+      
+      // Handle window resize for mobile orientation changes
+      window.addEventListener('resize', () => {
+        if (isMobileDevice) {
+          const newCanvasSize = Math.min(window.innerWidth - 32, 400);
+          canvas.style.width = newCanvasSize + 'px';
+          canvas.style.height = newCanvasSize + 'px';
+        }
+      });
       
       // Event listeners
       window.addEventListener('keydown', handleKeyDown);
@@ -1182,10 +1210,10 @@ const post = {
             ctx.fillText('[E] Talk', npc.x * CELL_SIZE + CELL_SIZE / 2, npc.y * CELL_SIZE - 5);
           }
           
-          // Draw dialogue box
+          // Draw dialogue box (optimized size)
           if (npc.interacting) {
-            const boxWidth = 300;
-            const boxHeight = 100;
+            const boxWidth = isMobileDevice ? Math.min(canvas.width - 40, 280) : 300;
+            const boxHeight = 80;
             const boxX = canvas.width / 2 - boxWidth / 2;
             const boxY = canvas.height - boxHeight - 20;
             
@@ -1198,23 +1226,24 @@ const post = {
             ctx.lineWidth = 2;
             ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
             
-            // NPC name
+            // NPC name (smaller)
             ctx.fillStyle = themeColors.text;
-            ctx.font = 'bold 14px Courier New';
+            ctx.font = 'bold 12px Courier New';
             ctx.textAlign = 'left';
-            ctx.fillText(npc.name, boxX + 10, boxY + 20);
+            ctx.fillText(npc.name, boxX + 10, boxY + 18);
             
-            // Dialogue text
+            // Dialogue text (tighter)
             ctx.fillStyle = '#cccccc';
-            ctx.font = '14px Courier New';
+            ctx.font = '12px Courier New';
             const dialogue = npc.dialogue[npc.currentDialogue];
-            const lines = dialogue.match(/.{1,35}/g) || [dialogue];
+            const maxChars = isMobileDevice ? 30 : 35;
+            const lines = dialogue.match(new RegExp(`.{1,${maxChars}}`, 'g')) || [dialogue];
             lines.forEach((line, i) => {
-              ctx.fillText(line, boxX + 10, boxY + 45 + (i * 18));
+              ctx.fillText(line, boxX + 10, boxY + 38 + (i * 16));
             });
             
             // Continue prompt (more visible)
-            ctx.font = 'bold 12px Arial';
+            ctx.font = 'bold 11px Arial';
             ctx.textAlign = 'right';
             ctx.fillStyle = '#ffffff';
             ctx.fillText('Press [E] to continue', boxX + boxWidth - 10, boxY + boxHeight - 10);
@@ -1362,10 +1391,10 @@ const post = {
             ctx.fillText('[E] Talk', centerX, centerY - 15);
           }
           
-          // Draw dialogue box
+          // Draw dialogue box (optimized)
           if (sequoia.interacting) {
-            const boxWidth = 300;
-            const boxHeight = 100;
+            const boxWidth = isMobileDevice ? Math.min(canvas.width - 40, 280) : 300;
+            const boxHeight = 80;
             const boxX = canvas.width / 2 - boxWidth / 2;
             const boxY = canvas.height - boxHeight - 20;
             
@@ -1378,21 +1407,22 @@ const post = {
             ctx.lineWidth = 2;
             ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
             
-            // Name (show ??? until they say "NAME'S SEQUOIA" at index 2, or if they've met before)
+            // Name (smaller)
             const nameLabel = sequoia.currentDialogue > 2 || sequoia.hasMetBefore ? 'SEQUOIA' : '???';
             ctx.fillStyle = themeColors.text;
-            ctx.font = 'bold 14px Courier New';
+            ctx.font = 'bold 12px Courier New';
             ctx.textAlign = 'left';
-            ctx.fillText(nameLabel, boxX + 10, boxY + 20);
+            ctx.fillText(nameLabel, boxX + 10, boxY + 18);
             
-            // Dialogue text - use appropriate dialogue set
+            // Dialogue text (tighter)
             ctx.fillStyle = '#cccccc';
-            ctx.font = '14px Courier New';
+            ctx.font = '12px Courier New';
             const currentDialogueSet = sequoia.hasMetBefore ? sequoia.randomFacts : sequoia.firstTimeDialogue;
             const dialogue = currentDialogueSet[sequoia.currentDialogue];
-            const lines = dialogue.match(/.{1,35}/g) || [dialogue];
+            const maxChars = isMobileDevice ? 30 : 35;
+            const lines = dialogue.match(new RegExp(`.{1,${maxChars}}`, 'g')) || [dialogue];
             lines.forEach((line, i) => {
-              ctx.fillText(line, boxX + 10, boxY + 45 + (i * 18));
+              ctx.fillText(line, boxX + 10, boxY + 38 + (i * 16));
             });
             
             // Continue prompt (more visible)

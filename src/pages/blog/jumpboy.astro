@@ -1775,13 +1775,13 @@ const post = {
             ctx.fillText(promptText, npcX, npcY - npc.size - 20);
           }
           
-          // Draw dialogue box
+          // Draw dialogue box (optimized/tighter)
           if (restStop.interacting) {
-            // Responsive dialogue box sizing
-            const boxWidth = Math.min(400, canvas.width - 40);
-            const boxHeight = isMobileDevice ? 110 : 100;
+            // Responsive dialogue box sizing (smaller)
+            const boxWidth = Math.min(350, canvas.width - 40);
+            const boxHeight = isMobileDevice ? 90 : 80;
             const boxX = canvas.width / 2 - boxWidth / 2;
-            const boxY = isMobileDevice ? canvas.height - 180 : canvas.height - 130; // Higher on mobile to avoid controls
+            const boxY = isMobileDevice ? canvas.height - 170 : canvas.height - 120; // Higher on mobile to avoid controls
             
             // Box background
             ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
@@ -1792,21 +1792,22 @@ const post = {
             ctx.lineWidth = 3;
             ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
             
-            // Name label - show ??? until name is revealed
+            // Name label (smaller)
             const nameLabel = theoInteractionCount >= 4 ? 'Theo' : '???';
             ctx.fillStyle = '#ffffff';
-            ctx.font = `bold ${14 * canvasScale}px 'Courier New', monospace`;
+            ctx.font = `bold ${12 * canvasScale}px 'Courier New', monospace`;
             ctx.textAlign = 'left';
-            ctx.fillText(nameLabel, boxX + 20, boxY + 20);
+            ctx.fillText(nameLabel, boxX + 15, boxY + 18);
             
-            // Dialogue text
+            // Dialogue text (tighter)
             ctx.fillStyle = '#cccccc';
-            ctx.font = `${15 * canvasScale}px 'Courier New', monospace`;
+            ctx.font = `${13 * canvasScale}px 'Courier New', monospace`;
             ctx.textAlign = 'left';
             const dialogue = restStopDialogues[restStop.dialogueIndex];
-            const lines = dialogue.match(/.{1,42}/g) || [dialogue];
+            const maxChars = isMobileDevice ? 35 : 42;
+            const lines = dialogue.match(new RegExp(`.{1,${maxChars}}`, 'g')) || [dialogue];
             lines.forEach((line, i) => {
-              ctx.fillText(line, boxX + 20, boxY + 45 + (i * 20));
+              ctx.fillText(line, boxX + 15, boxY + 38 + (i * 17));
             });
             
             // Continue prompt
