@@ -1,0 +1,1496 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const post = {
+  title: "A Maze",
+  date: "November 12, 2025",
+  content: `
+    Lost in the labyrinth...
+  `
+};
+---
+
+<BaseLayout>
+  <!-- Add meta viewport tag for better mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" slot="head" />
+
+  <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
+        <h1 class="text-3xl sm:text-4xl font-bold text-primary hover:text-white transition-colors duration-300">
+          A Maze
+        </h1>
+      </div>
+
+      <div class="relative w-full flex justify-center">
+        <canvas id="gameCanvas" class="w-full max-w-[600px]"></canvas>
+        <button 
+          id="startButton" 
+          class="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-8 py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 touch-none z-10"
+        >
+          Start Game
+        </button>
+        <div id="gameOver" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-6 sm:p-8 rounded-lg text-center backdrop-blur-sm border border-white/10 z-10">
+          <h2 class="text-xl sm:text-2xl mb-4 font-bold">Game Over</h2>
+          <p class="mb-4 text-lg">Exploration: <span id="explorationPercent" class="font-bold text-red-400">0%</span></p>
+          <p class="text-sm opacity-80">Press SPACE to Restart</p>
+        </div>
+      </div>
+      
+      <!-- Fire marker UI -->
+      <div class="mt-4 flex items-center space-x-2">
+        <span class="text-primary font-bold">Fires:</span>
+        <div class="flex space-x-1" id="fireIcons"></div>
+      </div>
+
+      <!-- Instructions -->
+      <div class="mt-4 text-primary/60 text-sm">
+        <p class="hidden md:block"><strong>WASD</strong>: Move | <strong>F</strong>: Drop Fire | <strong>E</strong>: Interact</p>
+        <p class="md:hidden">Use on-screen controls to play</p>
+      </div>
+    </div>
+
+    <!-- Mobile Battle Input -->
+    <div id="mobileBattleInput" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/95 p-4 rounded-lg border-2 border-white/20 z-50 w-[90%] max-w-md">
+      <input 
+        type="text" 
+        id="battleTextInput" 
+        class="w-full px-4 py-3 text-2xl text-center bg-white/10 border-2 border-white/30 rounded-lg text-white uppercase tracking-widest focus:outline-none focus:border-white/60"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="characters"
+        spellcheck="false"
+      />
+    </div>
+
+    <!-- Mobile Controls -->
+    <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm flex items-end justify-between px-4 pb-4 md:hidden z-50">
+      <div class="flex space-x-3">
+        <div class="flex flex-col space-y-2">
+          <button id="upBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+            ↑
+          </button>
+          <div class="flex space-x-2">
+            <button id="leftBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+              ←
+            </button>
+            <button id="downBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+              ↓
+            </button>
+            <button id="rightBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+              →
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col space-y-2">
+        <button id="fireBtn" class="w-16 h-16 rounded-lg bg-orange-500/90 border-2 border-orange-400 flex items-center justify-center text-white text-lg font-bold active:bg-orange-600 active:scale-95 transition-all shadow-lg shadow-orange-500/50 touch-none">
+          🔥
+        </button>
+        <button id="interactBtn" class="w-16 h-16 rounded-lg bg-blue-500/90 border-2 border-blue-400 flex items-center justify-center text-white text-lg font-bold active:bg-blue-600 active:scale-95 transition-all shadow-lg shadow-blue-500/50 touch-none">
+          E
+        </button>
+      </div>
+    </div>
+
+    <a 
+      href="/blog/secret-blog" 
+      class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
+    >
+      ← Back to Attic
+    </a>
+  </div>
+
+  <style>
+    .min-h-screen {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .max-w-3xl {
+      position: relative;
+      z-index: 1;
+    }
+
+    #gameCanvas {
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      touch-action: none;
+    }
+
+    :is(a, button):hover {
+      color: white !important;
+    }
+
+    /* Fire icon styles */
+    .fire-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .color-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .color-button:hover {
+      transform: scale(1.1);
+      border-color: white;
+    }
+
+    .color-button.selected {
+      border-color: white;
+      box-shadow: 0 0 10px currentColor;
+    }
+  </style>
+
+  <script>
+    // Game constants
+    const CELL_SIZE = 20;
+    const MAZE_WIDTH = 30;
+    const MAZE_HEIGHT = 30;
+    const PLAYER_SIZE = 16;
+    const BASE_SPOTLIGHT_RADIUS = 4; // Initial visibility radius
+    const MAX_FIRES = 5;
+    const FIRE_COLORS = ['#ff0000', '#0000ff', '#ffff00', '#ffffff', '#000000'];
+    const FIRE_NAMES = ['Red', 'Blue', 'Yellow', 'White', 'Black'];
+
+    // Game state
+    let canvas: HTMLCanvasElement;
+    let ctx: CanvasRenderingContext2D;
+    let isMobileDevice = false;
+    let maze: number[][];
+    let visited: boolean[][];
+    let player = {
+      x: 0,
+      y: 0,
+      cellX: 1,
+      cellY: 1
+    };
+    let lastMoveTime = 0;
+    const moveDelay = 150; // milliseconds between moves
+    let fires: Array<{x: number, y: number, color: string}> = [];
+    let deadEndsHit = 0;
+    let deadEndsVisited: Set<string> = new Set();
+    let npcs: Array<{x: number, y: number, dialogue: string[], currentDialogue: number, interacting: boolean, name: string}> = [];
+    let gameStarted = false;
+    let gameOver = false;
+    let keys: {[key: string]: boolean} = {};
+    let wasEPressed = false;
+    let fountain: {x: number, y: number, active: boolean} | null = null;
+    let sequoia: {x: number, y: number, firstTimeDialogue: string[], randomFacts: string[], currentDialogue: number, interacting: boolean, hasMetBefore: boolean} | null = null;
+    let mazeLevel = 1;
+    let mazeDifficulty = 1;
+    let spotlightRadius = BASE_SPOTLIGHT_RADIUS;
+    
+    // Battle system
+    let inBattle = false;
+    let battleMonster: {x: number, y: number, defeated: boolean, type: 'spiky' | 'thorny' | 'jagged'} | null = null;
+    let battleChallenge = '';
+    let battleInput = '';
+    let battleTimeLimit = 0;
+    let battleTimeRemaining = 0;
+    let battleStartTime = 0;
+    let monsters: Array<{x: number, y: number, defeated: boolean, type: 'spiky' | 'thorny' | 'jagged'}> = [];
+    let themeColors = {
+      background: '#000000',
+      wall: '#ffffff',
+      floor: '#333333',
+      player: '#ff0000',
+      text: '#ffffff'
+    };
+
+    // Initialize game
+    function init() {
+      canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+      ctx = canvas.getContext('2d')!;
+      
+      // Detect mobile
+      isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+      
+      // Optimize canvas size for mobile
+      const canvasSize = isMobileDevice ? Math.min(window.innerWidth - 32, 500) : 600;
+      canvas.width = canvasSize;
+      canvas.height = canvasSize;
+      
+      updateThemeColors();
+      
+      // Watch for theme changes
+      const themeObserver = new MutationObserver(() => {
+        updateThemeColors();
+      });
+      
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme', 'data-theme-mode']
+      });
+      
+      initFireUI();
+      
+      // Event listeners
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+      
+      const startButton = document.getElementById('startButton');
+      if (startButton) {
+        startButton.addEventListener('click', () => {
+          if (!gameStarted) {
+            startGame();
+            startButton.classList.add('hidden');
+          }
+        });
+      }
+      
+      requestAnimationFrame(gameLoop);
+    }
+
+    function updateThemeColors() {
+      const root = document.documentElement;
+      const theme = root.getAttribute('data-theme');
+      const mode = root.getAttribute('data-theme-mode');
+      
+      const computedStyle = getComputedStyle(root);
+      const primaryRgb = computedStyle.getPropertyValue('--color-primary').trim();
+      const secondaryRgb = computedStyle.getPropertyValue('--color-secondary').trim();
+      
+      const rgbToHex = (rgb: string) => {
+        const values = rgb.split(' ').map(v => parseInt(v));
+        return '#' + values.map(v => v.toString(16).padStart(2, '0')).join('');
+      };
+      
+      themeColors.text = rgbToHex(primaryRgb);
+      themeColors.background = rgbToHex(secondaryRgb);
+      themeColors.wall = themeColors.text;
+      themeColors.floor = theme === 'dark' ? '#1a1a1a' : '#e0e0e0';
+      themeColors.player = '#ff4444';
+    }
+
+    function initFireUI() {
+      const fireIcons = document.getElementById('fireIcons')!;
+      
+      // Create fire icons
+      for (let i = 0; i < MAX_FIRES; i++) {
+        const icon = document.createElement('div');
+        icon.className = 'fire-icon';
+        icon.style.backgroundColor = '#333';
+        icon.textContent = '🔥';
+        icon.style.opacity = '0.3';
+        fireIcons.appendChild(icon);
+      }
+    }
+
+    function updateFireUI() {
+      const icons = document.querySelectorAll('.fire-icon');
+      icons.forEach((icon, i) => {
+        if (i < fires.length) {
+          (icon as HTMLElement).style.opacity = '0.3';
+        } else {
+          (icon as HTMLElement).style.opacity = '1';
+        }
+      });
+    }
+
+    function startGame() {
+      gameStarted = true;
+      gameOver = false;
+      deadEndsHit = 0;
+      deadEndsVisited = new Set();
+      npcs = [];
+      wasEPressed = false;
+      
+      generateMaze();
+      player.cellX = 2;
+      player.cellY = 2;
+      player.x = player.cellX * CELL_SIZE;
+      player.y = player.cellY * CELL_SIZE;
+      
+      updateFireUI();
+      spawnMonsters();
+    }
+    
+    function nextLevel() {
+      mazeLevel++;
+      mazeDifficulty++;
+      
+      // Decrease spotlight radius each level (minimum 2)
+      spotlightRadius = Math.max(2, BASE_SPOTLIGHT_RADIUS - Math.floor(mazeLevel / 2));
+      
+      fires = [];
+      deadEndsHit = 0;
+      deadEndsVisited = new Set();
+      npcs = [];
+      fountain = null;
+      
+      generateMaze();
+      player.cellX = 2;
+      player.cellY = 2;
+      player.x = player.cellX * CELL_SIZE;
+      player.y = player.cellY * CELL_SIZE;
+      
+      updateFireUI();
+      spawnMonsters();
+    }
+
+    // Maze generation using recursive backtracking with 2-wide hallways
+    function generateMaze() {
+      // Initialize maze with walls
+      maze = Array(MAZE_HEIGHT).fill(0).map(() => Array(MAZE_WIDTH).fill(1));
+      visited = Array(MAZE_HEIGHT).fill(false).map(() => Array(MAZE_WIDTH).fill(false));
+      
+      // Start from (2, 2) to ensure 2-wide hallways fit
+      carvePath(2, 2);
+      
+      // Place fountain at a far corner
+      placeFountain();
+    }
+    
+    function spawnMonsters() {
+      monsters = [];
+      
+      // Only spawn monsters in Level 2+
+      if (mazeLevel < 2) return;
+      
+      const monsterCount = 3; // 3 monsters for Level 2
+      
+      for (let i = 0; i < monsterCount; i++) {
+        let attempts = 0;
+        let monsterX, monsterY;
+        
+        // Find a valid spawn location
+        do {
+          monsterX = Math.floor(Math.random() * (MAZE_WIDTH - 4)) + 2;
+          monsterY = Math.floor(Math.random() * (MAZE_HEIGHT - 4)) + 2;
+          attempts++;
+        } while (
+          (maze[monsterY][monsterX] === 1 || // Wall
+          (Math.abs(monsterX - player.cellX) < 5 && Math.abs(monsterY - player.cellY) < 5) || // Too close to player
+          monsters.some(m => Math.abs(m.x - monsterX) < 5 && Math.abs(m.y - monsterY) < 5)) && // Too close to other monsters
+          attempts < 100
+        );
+        
+        if (attempts < 100) {
+          // Assign different types to each monster
+          const types: Array<'spiky' | 'thorny' | 'jagged'> = ['spiky', 'thorny', 'jagged'];
+          const monsterType = types[i % types.length];
+          
+          monsters.push({
+            x: monsterX,
+            y: monsterY,
+            defeated: false,
+            type: monsterType
+          });
+        }
+      }
+    }
+    
+    function placeFountain() {
+      // Find the farthest open cell from start
+      let maxDist = 0;
+      let fountainX = 2;
+      let fountainY = 2;
+      
+      for (let y = 5; y < MAZE_HEIGHT - 5; y++) {
+        for (let x = 5; x < MAZE_WIDTH - 5; x++) {
+          if (maze[y][x] === 0) {
+            const dist = Math.sqrt((x - 2) * (x - 2) + (y - 2) * (y - 2));
+            if (dist > maxDist) {
+              maxDist = dist;
+              fountainX = x;
+              fountainY = y;
+            }
+          }
+        }
+      }
+      
+      // Create a 6x6 room for the fountain area
+      for (let dy = -3; dy <= 3; dy++) {
+        for (let dx = -3; dx <= 3; dx++) {
+          const nx = fountainX + dx;
+          const ny = fountainY + dy;
+          if (nx >= 0 && nx < MAZE_WIDTH && ny >= 0 && ny < MAZE_HEIGHT) {
+            maze[ny][nx] = 0;
+          }
+        }
+      }
+      
+      fountain = {
+        x: fountainX,
+        y: fountainY,
+        active: true
+      };
+      
+      // Place Sequoia in the room (only on first level)
+      if (mazeLevel === 1) {
+        sequoia = {
+          x: fountainX - 2,
+          y: fountainY - 2,
+          firstTimeDialogue: [
+            "HEY.",
+            "YOU LOOK LOST.",
+            "NAME'S SEQUOIA.",
+            "I'VE BEEN HERE A WHILE.",
+            "DOOR'S RIGHT THERE.",
+            "GETS DARKER EACH LEVEL.",
+            "GOOD LUCK."
+          ],
+          randomFacts: [
+            "DID YOU KNOW CROWS CAN REMEMBER FACES?",
+            "THEY HOLD GRUDGES TOO. FOR YEARS.",
+            "HUMMINGBIRDS CAN FLY BACKWARDS.",
+            "ONLY BIRD THAT CAN DO THAT.",
+            "OWLS CAN'T MOVE THEIR EYES.",
+            "THAT'S WHY THEY TURN THEIR HEADS SO MUCH.",
+            "PENGUINS PROPOSE WITH PEBBLES.",
+            "THEY FIND THE PERFECT ONE FOR THEIR MATE.",
+            "RAVENS CAN MIMIC HUMAN SPEECH.",
+            "BETTER THAN PARROTS SOMETIMES.",
+            "ALBATROSSES MATE FOR LIFE.",
+            "THEY CAN LIVE OVER 50 YEARS.",
+            "SWIFTS SLEEP WHILE FLYING.",
+            "THEY CAN STAY AIRBORNE FOR MONTHS.",
+            "FALCONS ARE THE FASTEST ANIMALS.",
+            "OVER 240 MPH IN A DIVE.",
+            "VULTURES HAVE STOMACH ACID STRONG ENOUGH TO DISSOLVE METAL.",
+            "NATURE'S CLEANUP CREW.",
+            "SOME BIRDS CAN SEE ULTRAVIOLET LIGHT.",
+            "THEY SEE A WHOLE DIFFERENT WORLD.",
+            "CHICKADEES REMEMBER WHERE THEY HID THOUSANDS OF SEEDS.",
+            "INCREDIBLE SPATIAL MEMORY.",
+            "I MISS WATCHING THEM.",
+            "THE WAY THEY MOVE. SO FREE.",
+            "THIS MAZE IS BEAUTIFUL TOO THOUGH.",
+            "IN ITS OWN WAY."
+          ],
+          currentDialogue: 0,
+          interacting: false,
+          hasMetBefore: false
+        };
+      }
+    }
+
+    function carvePath(x: number, y: number) {
+      // Carve a 2x2 area for wider hallways
+      for (let dy = 0; dy < 2; dy++) {
+        for (let dx = 0; dx < 2; dx++) {
+          if (y + dy < MAZE_HEIGHT && x + dx < MAZE_WIDTH) {
+            maze[y + dy][x + dx] = 0;
+            visited[y + dy][x + dx] = true;
+          }
+        }
+      }
+      
+      // Move in steps of 3 to create 2-wide hallways with 1-wide walls
+      const directions = [
+        [0, -3], [3, 0], [0, 3], [-3, 0]
+      ].sort(() => Math.random() - 0.5);
+      
+      for (const [dx, dy] of directions) {
+        const nx = x + dx;
+        const ny = y + dy;
+        
+        // Check if the destination is valid
+        if (nx > 0 && nx < MAZE_WIDTH - 2 && ny > 0 && ny < MAZE_HEIGHT - 2 && !visited[ny][nx]) {
+          // Carve the connecting hallway (2 cells wide)
+          if (dx !== 0) {
+            // Horizontal hallway
+            const hallwayX = x + (dx > 0 ? 2 : -1);
+            for (let i = 0; i < 2; i++) {
+              maze[y + i][hallwayX] = 0;
+            }
+          } else {
+            // Vertical hallway
+            const hallwayY = y + (dy > 0 ? 2 : -1);
+            for (let i = 0; i < 2; i++) {
+              maze[hallwayY][x + i] = 0;
+            }
+          }
+          carvePath(nx, ny);
+        }
+      }
+    }
+
+    function handleKeyDown(e: KeyboardEvent) {
+      // Handle battle input
+      if (inBattle) {
+        if (e.key.length === 1 && /[a-zA-Z]/.test(e.key)) {
+          battleInput += e.key.toUpperCase();
+        } else if (e.key === 'Backspace') {
+          battleInput = battleInput.slice(0, -1);
+        }
+        e.preventDefault();
+        return;
+      }
+      
+      keys[e.key.toLowerCase()] = true;
+      
+      if (e.key === ' ' && gameOver) {
+        startGame();
+        document.getElementById('gameOver')!.classList.add('hidden');
+      }
+      
+      if (e.key.toLowerCase() === 'f' && gameStarted && !gameOver && fires.length < MAX_FIRES) {
+        dropFire();
+      }
+    }
+
+    function handleKeyUp(e: KeyboardEvent) {
+      keys[e.key.toLowerCase()] = false;
+    }
+
+    function dropFire() {
+      // Get colors that haven't been used yet
+      const usedColors = fires.map(f => f.color);
+      const availableColors = FIRE_COLORS.filter(c => !usedColors.includes(c));
+      
+      if (availableColors.length > 0) {
+        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+        fires.push({
+          x: player.cellX,
+          y: player.cellY,
+          color: randomColor
+        });
+        updateFireUI();
+      }
+    }
+
+    function update() {
+      if (!gameStarted || gameOver) return;
+      
+      // Update battle if in battle
+      if (inBattle) {
+        updateBattle();
+        return; // Don't update movement during battle
+      }
+      
+      // Player movement (instant cell-to-cell)
+      const currentTime = Date.now();
+      
+      if (currentTime - lastMoveTime > moveDelay) {
+        let targetCellX = player.cellX;
+        let targetCellY = player.cellY;
+        let moved = false;
+        
+        if (keys['w']) {
+          targetCellY--;
+          moved = true;
+        } else if (keys['s']) {
+          targetCellY++;
+          moved = true;
+        }
+        
+        if (keys['a']) {
+          targetCellX--;
+          moved = true;
+        } else if (keys['d']) {
+          targetCellX++;
+          moved = true;
+        }
+        
+        // Check if target cell is valid and move instantly
+        if (moved && 
+            targetCellX >= 0 && targetCellX < MAZE_WIDTH && 
+            targetCellY >= 0 && targetCellY < MAZE_HEIGHT && 
+            maze[targetCellY][targetCellX] === 0) {
+          
+          player.cellX = targetCellX;
+          player.cellY = targetCellY;
+          player.x = targetCellX * CELL_SIZE;
+          player.y = targetCellY * CELL_SIZE;
+          lastMoveTime = currentTime;
+        }
+      }
+      
+      // Check for dead ends
+      checkDeadEnd();
+      
+      // Update NPC interactions
+      updateNPCInteraction();
+      
+      // Update Sequoia interaction
+      updateSequoiaInteraction();
+      
+      // Check fountain interaction
+      checkFountainInteraction();
+      
+      // Check for monster collisions
+      if (!inBattle) {
+        for (const monster of monsters) {
+          if (!monster.defeated) {
+            const dx = Math.abs(player.cellX - monster.x);
+            const dy = Math.abs(player.cellY - monster.y);
+            
+            if (dx <= 1 && dy <= 1) {
+              startBattle(monster);
+              break;
+            }
+          }
+        }
+      }
+      
+      // Update E key state at the end
+      wasEPressed = keys['e'];
+    }
+
+    function checkDeadEnd() {
+      const x = player.cellX;
+      const y = player.cellY;
+      let openSides = 0;
+      
+      if (x > 0 && maze[y][x-1] === 0) openSides++;
+      if (x < MAZE_WIDTH - 1 && maze[y][x+1] === 0) openSides++;
+      if (y > 0 && maze[y-1][x] === 0) openSides++;
+      if (y < MAZE_HEIGHT - 1 && maze[y+1][x] === 0) openSides++;
+      
+      if (openSides === 1) {
+        const key = `${x},${y}`;
+        if (!deadEndsVisited.has(key)) {
+          deadEndsVisited.add(key);
+          deadEndsHit++;
+          
+          // Spawn NPC after 2 dead ends
+          if (deadEndsHit >= 2) {
+            spawnNPC();
+          }
+        }
+      }
+    }
+
+    function spawnNPC() {
+      // Find a random open cell that's not near the player
+      let attempts = 0;
+      while (attempts < 100) {
+        const x = Math.floor(Math.random() * (MAZE_WIDTH - 2)) + 1;
+        const y = Math.floor(Math.random() * (MAZE_HEIGHT - 2)) + 1;
+        
+        if (maze[y][x] === 0) {
+          const dx = x - player.cellX;
+          const dy = y - player.cellY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Make sure NPC is not too close to player or other NPCs
+          if (distance > 5 && !npcs.some(npc => npc.x === x && npc.y === y)) {
+            const npcDialogues = [
+              ["I've been wandering for so long...", "Have you seen the way out?", "These walls all look the same."],
+              ["Oh! Another soul lost in here.", "I dropped my map ages ago.", "Good luck finding your way."],
+              ["The maze shifts, you know.", "Or maybe it's just my memory.", "Either way, we're stuck."],
+              ["I used to count the turns.", "Lost track around turn 47.", "Or was it 74?"],
+              ["Sometimes I hear voices.", "Other times, just echoes.", "Hard to tell the difference now."]
+            ];
+            
+            const randomDialogue = npcDialogues[Math.floor(Math.random() * npcDialogues.length)];
+            
+            npcs.push({
+              x,
+              y,
+              dialogue: randomDialogue,
+              currentDialogue: 0,
+              interacting: false,
+              name: `Wanderer ${npcs.length + 1}`
+            });
+            break;
+          }
+        }
+        attempts++;
+      }
+    }
+
+    function updateNPCInteraction() {
+      for (const npc of npcs) {
+        const dx = Math.abs(player.cellX - npc.x);
+        const dy = Math.abs(player.cellY - npc.y);
+        
+        if (dx <= 1 && dy <= 1) {
+          // Player is near NPC
+          if (keys['e'] && !wasEPressed) {
+            if (!npc.interacting) {
+              npc.interacting = true;
+              npc.currentDialogue = 0;
+            } else {
+              npc.currentDialogue++;
+              if (npc.currentDialogue >= npc.dialogue.length) {
+                npc.interacting = false;
+                npc.currentDialogue = 0;
+              }
+            }
+          }
+        } else {
+          npc.interacting = false;
+        }
+      }
+    }
+    
+    function updateSequoiaInteraction() {
+      if (!sequoia) return;
+      
+      const dx = Math.abs(player.cellX - sequoia.x);
+      const dy = Math.abs(player.cellY - sequoia.y);
+      
+      if (dx <= 1 && dy <= 1) {
+        if (keys['e'] && !wasEPressed) {
+          if (!sequoia.interacting) {
+            sequoia.interacting = true;
+            
+            // First time: show intro dialogue in order
+            // After that: pick a random fact
+            if (!sequoia.hasMetBefore) {
+              sequoia.currentDialogue = 0;
+            } else {
+              sequoia.currentDialogue = Math.floor(Math.random() * sequoia.randomFacts.length);
+            }
+          } else {
+            // First time: go through intro in order
+            if (!sequoia.hasMetBefore) {
+              sequoia.currentDialogue++;
+              
+              if (sequoia.currentDialogue >= sequoia.firstTimeDialogue.length) {
+                sequoia.interacting = false;
+                sequoia.currentDialogue = 0;
+                sequoia.hasMetBefore = true;
+              }
+            } else {
+              // After first time: show one random fact then close
+              sequoia.interacting = false;
+              sequoia.currentDialogue = 0;
+            }
+          }
+        }
+      } else {
+        sequoia.interacting = false;
+      }
+    }
+    
+    function startBattle(monster: {x: number, y: number, defeated: boolean}) {
+      inBattle = true;
+      battleMonster = monster;
+      
+      // Generate typing challenge (easier for Level 2)
+      const challenges = [
+        'SPIKE',
+        'MAZE',
+        'FIGHT',
+        'QUICK',
+        'TYPE',
+        'FAST',
+        'WIN'
+      ];
+      
+      battleChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+      battleInput = '';
+      battleTimeLimit = 5; // 5 seconds for Level 2
+      battleTimeRemaining = battleTimeLimit;
+      battleStartTime = Date.now();
+      
+      // Show mobile input if on mobile
+      if (isMobileDevice) {
+        const mobileInput = document.getElementById('mobileBattleInput');
+        const textInput = document.getElementById('battleTextInput') as HTMLInputElement;
+        if (mobileInput && textInput) {
+          mobileInput.classList.remove('hidden');
+          textInput.value = '';
+          textInput.focus();
+          
+          // Update battleInput as user types
+          textInput.oninput = () => {
+            battleInput = textInput.value.toUpperCase();
+          };
+        }
+      }
+    }
+    
+    function updateBattle() {
+      if (!inBattle) return;
+      
+      // Update timer
+      const elapsed = (Date.now() - battleStartTime) / 1000;
+      battleTimeRemaining = Math.max(0, battleTimeLimit - elapsed);
+      
+      // Check if time ran out
+      if (battleTimeRemaining <= 0) {
+        // Battle lost - game over
+        gameOver = true;
+        gameStarted = false;
+        inBattle = false;
+        battleMonster = null;
+        battleInput = '';
+        
+        // Hide mobile input
+        if (isMobileDevice) {
+          document.getElementById('mobileBattleInput')?.classList.add('hidden');
+        }
+        
+        // Show game over screen
+        document.getElementById('gameOver')!.classList.remove('hidden');
+        const gameOverText = document.getElementById('gameOver')!.querySelector('p');
+        if (gameOverText) {
+          gameOverText.textContent = 'Battle Lost! The monster got you.';
+        }
+        return;
+      }
+      
+      // Check if challenge completed
+      if (battleInput.toUpperCase() === battleChallenge) {
+        // Battle won!
+        if (battleMonster) {
+          battleMonster.defeated = true;
+        }
+        
+        // Show victory message briefly then close
+        setTimeout(() => {
+          inBattle = false;
+          battleMonster = null;
+          battleInput = '';
+          
+          // Hide mobile input
+          if (isMobileDevice) {
+            document.getElementById('mobileBattleInput')?.classList.add('hidden');
+          }
+        }, 1500);
+      }
+    }
+    
+    function drawBattle() {
+      // Pokemon-style battle screen
+      ctx.fillStyle = themeColors.background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Hide mobile input overlay on desktop (show in HTML instead)
+      if (!isMobileDevice) {
+        document.getElementById('mobileBattleInput')?.classList.add('hidden');
+      }
+      
+      // Draw monster (different types)
+      const monsterX = canvas.width / 2;
+      const monsterY = canvas.height / 3;
+      
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(monsterX, monsterY, 30, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Draw spikes based on monster type
+      if (battleMonster?.type === 'spiky') {
+        // Sharp spikes (6 large sharp spikes)
+        for (let i = 0; i < 6; i++) {
+          const angle = (i / 6) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(monsterX, monsterY);
+          ctx.lineTo(
+            monsterX + Math.cos(angle) * 50,
+            monsterY + Math.sin(angle) * 50
+          );
+          ctx.lineTo(
+            monsterX + Math.cos(angle + 0.5) * 30,
+            monsterY + Math.sin(angle + 0.5) * 30
+          );
+          ctx.closePath();
+          ctx.fill();
+        }
+      } else if (battleMonster?.type === 'thorny') {
+        // Many small thorns (16 small spikes)
+        for (let i = 0; i < 16; i++) {
+          const angle = (i / 16) * Math.PI * 2;
+          ctx.beginPath();
+          ctx.moveTo(monsterX, monsterY);
+          ctx.lineTo(
+            monsterX + Math.cos(angle) * 40,
+            monsterY + Math.sin(angle) * 40
+          );
+          ctx.lineTo(
+            monsterX + Math.cos(angle + 0.2) * 30,
+            monsterY + Math.sin(angle + 0.2) * 30
+          );
+          ctx.closePath();
+          ctx.fill();
+        }
+      } else if (battleMonster?.type === 'jagged') {
+        // Jagged irregular spikes (10 alternating lengths)
+        for (let i = 0; i < 10; i++) {
+          const angle = (i / 10) * Math.PI * 2;
+          const length = 35 + (i % 2) * 15;
+          ctx.beginPath();
+          ctx.moveTo(monsterX, monsterY);
+          ctx.lineTo(
+            monsterX + Math.cos(angle) * length,
+            monsterY + Math.sin(angle) * length
+          );
+          ctx.lineTo(
+            monsterX + Math.cos(angle + 0.3) * 30,
+            monsterY + Math.sin(angle + 0.3) * 30
+          );
+          ctx.closePath();
+          ctx.fill();
+        }
+      }
+      
+      // Check if battle is won
+      const battleWon = battleInput.toUpperCase() === battleChallenge;
+      
+      if (battleWon) {
+        // Victory message
+        ctx.fillStyle = themeColors.text;
+        ctx.font = 'bold 24px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('Victory!', canvas.width / 2, canvas.height / 2 - 40);
+        
+        // Monster defeat message
+        const defeatMessages = ['Aww man...', 'Oof!', 'You got me!', 'Too fast!', 'Dang it!'];
+        const message = defeatMessages[Math.floor(Math.random() * defeatMessages.length)];
+        ctx.font = '16px Courier New';
+        ctx.fillStyle = '#888888';
+        ctx.fillText(message, canvas.width / 2, canvas.height / 2 - 10);
+      } else {
+        // Challenge display
+        ctx.fillStyle = themeColors.text;
+        ctx.font = 'bold 20px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('Type the word:', canvas.width / 2, canvas.height / 2 - 20);
+        
+        // Target word
+        ctx.font = 'bold 32px Courier New';
+        ctx.fillText(battleChallenge, canvas.width / 2, canvas.height / 2 + 20);
+        
+        // User input
+        ctx.font = 'bold 28px Courier New';
+        ctx.fillStyle = battleInput.toUpperCase() === battleChallenge.substring(0, battleInput.length) ? '#00ff00' : '#ff0000';
+        ctx.fillText(battleInput, canvas.width / 2, canvas.height / 2 + 70);
+        
+        // Timer
+        ctx.fillStyle = battleTimeRemaining < 2 ? '#ff0000' : themeColors.text;
+        ctx.font = '18px Courier New';
+        ctx.fillText(`Time: ${battleTimeRemaining.toFixed(1)}s`, canvas.width / 2, canvas.height / 2 + 120);
+      }
+    }
+    
+    function checkFountainInteraction() {
+      if (!fountain || !fountain.active) return;
+      
+      const dx = Math.abs(player.cellX - fountain.x);
+      const dy = Math.abs(player.cellY - fountain.y);
+      
+      // Player is near door - can enter anytime
+      if (dx <= 2 && dy <= 2) {
+        if (keys['e'] && !wasEPressed) {
+          // Check if Level 3 exists
+          if (mazeLevel >= 2) {
+            // End of game
+            gameOver = true;
+            gameStarted = false;
+            document.getElementById('gameOver')!.classList.remove('hidden');
+            const gameOverText = document.getElementById('gameOver')!.querySelector('p');
+            if (gameOverText) {
+              gameOverText.textContent = 'Level 3 is not ready yet! Thanks for playing.';
+            }
+          } else {
+            // Go to next level
+            nextLevel();
+          }
+        }
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle = themeColors.background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      if (!gameStarted) {
+        ctx.fillStyle = themeColors.text;
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Navigate the maze...', canvas.width / 2, canvas.height / 2);
+        return;
+      }
+      
+      // Draw battle screen if in battle
+      if (inBattle) {
+        drawBattle();
+        return;
+      }
+      
+      // Draw maze with spotlight effect (check player area + fire areas)
+      const areasToCheck: Array<{minX: number, maxX: number, minY: number, maxY: number}> = [];
+      
+      // Add player spotlight area
+      areasToCheck.push({
+        minX: Math.max(0, player.cellX - spotlightRadius - 2),
+        maxX: Math.min(MAZE_WIDTH, player.cellX + spotlightRadius + 2),
+        minY: Math.max(0, player.cellY - spotlightRadius - 2),
+        maxY: Math.min(MAZE_HEIGHT, player.cellY + spotlightRadius + 2)
+      });
+      
+      // Add fire spotlight areas
+      for (const fire of fires) {
+        areasToCheck.push({
+          minX: Math.max(0, fire.x - spotlightRadius - 2),
+          maxX: Math.min(MAZE_WIDTH, fire.x + spotlightRadius + 2),
+          minY: Math.max(0, fire.y - spotlightRadius - 2),
+          maxY: Math.min(MAZE_HEIGHT, fire.y + spotlightRadius + 2)
+        });
+      }
+      
+      // Draw all cells in visible areas
+      const drawnCells = new Set<string>();
+      
+      for (const area of areasToCheck) {
+        for (let y = area.minY; y < area.maxY; y++) {
+          for (let x = area.minX; x < area.maxX; x++) {
+            const cellKey = `${x},${y}`;
+            if (drawnCells.has(cellKey)) continue;
+            drawnCells.add(cellKey);
+          const dx = x - player.cellX;
+          const dy = y - player.cellY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Check if in spotlight or near a fire
+          let visible = distance <= spotlightRadius;
+          
+          for (const fire of fires) {
+            const fdx = x - fire.x;
+            const fdy = y - fire.y;
+            const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+            if (fireDistance <= spotlightRadius) {
+              visible = true;
+              break;
+            }
+          }
+          
+          if (visible) {
+            ctx.fillStyle = maze[y][x] === 1 ? themeColors.wall : themeColors.floor;
+            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+          }
+          }
+        }
+      }
+      
+      // Draw fires
+      for (const fire of fires) {
+        ctx.fillStyle = fire.color;
+        ctx.beginPath();
+        ctx.arc(
+          fire.x * CELL_SIZE + CELL_SIZE / 2,
+          fire.y * CELL_SIZE + CELL_SIZE / 2,
+          6,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+        
+        // Glow effect
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = fire.color;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      
+      // Draw door
+      if (fountain && fountain.active) {
+        const dx = fountain.x - player.cellX;
+        const dy = fountain.y - player.cellY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        let visible = distance <= spotlightRadius;
+        
+        for (const fire of fires) {
+          const fdx = fountain.x - fire.x;
+          const fdy = fountain.y - fire.y;
+          const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fireDistance <= spotlightRadius) {
+            visible = true;
+            break;
+          }
+        }
+        
+        if (visible) {
+          // Draw door as a rectangle
+          const doorX = fountain.x * CELL_SIZE + CELL_SIZE / 2 - 12;
+          const doorY = fountain.y * CELL_SIZE + CELL_SIZE / 2 - 16;
+          
+          // Door frame (always green/ready)
+          ctx.fillStyle = '#8B4513'; // Brown door
+          ctx.fillRect(doorX, doorY, 24, 32);
+          
+          // Door details
+          ctx.strokeStyle = '#654321'; // Darker brown border
+          ctx.lineWidth = 2;
+          ctx.strokeRect(doorX, doorY, 24, 32);
+          
+          // Door handle
+          ctx.fillStyle = '#FFD700'; // Gold handle
+          ctx.fillRect(doorX + 18, doorY + 16, 3, 6);
+          
+          // Draw interaction prompt if player is near
+          const pdx = Math.abs(player.cellX - fountain.x);
+          const pdy = Math.abs(player.cellY - fountain.y);
+          
+          if (pdx <= 2 && pdy <= 2) {
+            ctx.fillStyle = themeColors.text;
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('[E] Enter Door', fountain.x * CELL_SIZE + CELL_SIZE / 2, fountain.y * CELL_SIZE - 20);
+          }
+        }
+      }
+      
+      // Draw NPCs
+      for (const npc of npcs) {
+        const dx = npc.x - player.cellX;
+        const dy = npc.y - player.cellY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Check if NPC is visible (in spotlight or near fire)
+        let visible = distance <= spotlightRadius;
+        
+        for (const fire of fires) {
+          const fdx = npc.x - fire.x;
+          const fdy = npc.y - fire.y;
+          const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fireDistance <= spotlightRadius) {
+            visible = true;
+            break;
+          }
+        }
+        
+        if (visible) {
+          // Draw NPC as a different colored square
+          ctx.fillStyle = '#00ffff';
+          ctx.fillRect(
+            npc.x * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2,
+            npc.y * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2,
+            PLAYER_SIZE,
+            PLAYER_SIZE
+          );
+          
+          // Draw interaction prompt if player is near
+          const pdx = Math.abs(player.cellX - npc.x);
+          const pdy = Math.abs(player.cellY - npc.y);
+          
+          if (pdx <= 1 && pdy <= 1 && !npc.interacting) {
+            ctx.fillStyle = themeColors.text;
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('[E] Talk', npc.x * CELL_SIZE + CELL_SIZE / 2, npc.y * CELL_SIZE - 5);
+          }
+          
+          // Draw dialogue box
+          if (npc.interacting) {
+            const boxWidth = 300;
+            const boxHeight = 100;
+            const boxX = canvas.width / 2 - boxWidth / 2;
+            const boxY = canvas.height - boxHeight - 20;
+            
+            // Box background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Box border
+            ctx.strokeStyle = themeColors.text;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // NPC name
+            ctx.fillStyle = themeColors.text;
+            ctx.font = 'bold 14px Courier New';
+            ctx.textAlign = 'left';
+            ctx.fillText(npc.name, boxX + 10, boxY + 20);
+            
+            // Dialogue text
+            ctx.fillStyle = '#cccccc';
+            ctx.font = '14px Courier New';
+            const dialogue = npc.dialogue[npc.currentDialogue];
+            const lines = dialogue.match(/.{1,35}/g) || [dialogue];
+            lines.forEach((line, i) => {
+              ctx.fillText(line, boxX + 10, boxY + 45 + (i * 18));
+            });
+            
+            // Continue prompt (more visible)
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('Press [E] to continue', boxX + boxWidth - 10, boxY + boxHeight - 10);
+          }
+        }
+      }
+      
+      // Draw monsters
+      for (const monster of monsters) {
+        if (monster.defeated) continue;
+        
+        const dx = monster.x - player.cellX;
+        const dy = monster.y - player.cellY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        let visible = distance <= spotlightRadius;
+        
+        for (const fire of fires) {
+          const fdx = monster.x - fire.x;
+          const fdy = monster.y - fire.y;
+          const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fireDistance <= spotlightRadius) {
+            visible = true;
+            break;
+          }
+        }
+        
+        if (visible) {
+          const monsterX = monster.x * CELL_SIZE + CELL_SIZE / 2;
+          const monsterY = monster.y * CELL_SIZE + CELL_SIZE / 2;
+          
+          // Draw red monster body
+          ctx.fillStyle = '#ff0000';
+          ctx.beginPath();
+          ctx.arc(monsterX, monsterY, 8, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Draw different spike patterns based on type
+          if (monster.type === 'spiky') {
+            // Sharp spikes (6 spikes, sharp)
+            for (let i = 0; i < 6; i++) {
+              const angle = (i / 6) * Math.PI * 2;
+              ctx.beginPath();
+              ctx.moveTo(monsterX, monsterY);
+              ctx.lineTo(
+                monsterX + Math.cos(angle) * 14,
+                monsterY + Math.sin(angle) * 14
+              );
+              ctx.lineTo(
+                monsterX + Math.cos(angle + 0.5) * 8,
+                monsterY + Math.sin(angle + 0.5) * 8
+              );
+              ctx.closePath();
+              ctx.fill();
+            }
+          } else if (monster.type === 'thorny') {
+            // Many small thorns (12 small spikes)
+            for (let i = 0; i < 12; i++) {
+              const angle = (i / 12) * Math.PI * 2;
+              ctx.beginPath();
+              ctx.moveTo(monsterX, monsterY);
+              ctx.lineTo(
+                monsterX + Math.cos(angle) * 10,
+                monsterY + Math.sin(angle) * 10
+              );
+              ctx.lineTo(
+                monsterX + Math.cos(angle + 0.3) * 8,
+                monsterY + Math.sin(angle + 0.3) * 8
+              );
+              ctx.closePath();
+              ctx.fill();
+            }
+          } else if (monster.type === 'jagged') {
+            // Jagged edges (8 irregular spikes)
+            for (let i = 0; i < 8; i++) {
+              const angle = (i / 8) * Math.PI * 2;
+              const length = 10 + (i % 2) * 4; // Alternating lengths
+              ctx.beginPath();
+              ctx.moveTo(monsterX, monsterY);
+              ctx.lineTo(
+                monsterX + Math.cos(angle) * length,
+                monsterY + Math.sin(angle) * length
+              );
+              ctx.lineTo(
+                monsterX + Math.cos(angle + 0.4) * 8,
+                monsterY + Math.sin(angle + 0.4) * 8
+              );
+              ctx.closePath();
+              ctx.fill();
+            }
+          }
+        }
+      }
+      
+      // Draw Sequoia
+      if (sequoia) {
+        const dx = sequoia.x - player.cellX;
+        const dy = sequoia.y - player.cellY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        let visible = distance <= spotlightRadius;
+        
+        for (const fire of fires) {
+          const fdx = sequoia.x - fire.x;
+          const fdy = sequoia.y - fire.y;
+          const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+          if (fireDistance <= spotlightRadius) {
+            visible = true;
+            break;
+          }
+        }
+        
+        if (visible) {
+          // Draw spade shape
+          const centerX = sequoia.x * CELL_SIZE + CELL_SIZE / 2;
+          const centerY = sequoia.y * CELL_SIZE + CELL_SIZE / 2;
+          
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          // Top point
+          ctx.moveTo(centerX, centerY - 8);
+          // Left curve
+          ctx.quadraticCurveTo(centerX - 8, centerY - 4, centerX - 6, centerY + 2);
+          // Bottom left
+          ctx.lineTo(centerX - 2, centerY + 2);
+          // Stem
+          ctx.lineTo(centerX - 2, centerY + 8);
+          ctx.lineTo(centerX + 2, centerY + 8);
+          ctx.lineTo(centerX + 2, centerY + 2);
+          // Bottom right
+          ctx.lineTo(centerX + 6, centerY + 2);
+          // Right curve
+          ctx.quadraticCurveTo(centerX + 8, centerY - 4, centerX, centerY - 8);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Draw interaction prompt if player is near
+          const pdx = Math.abs(player.cellX - sequoia.x);
+          const pdy = Math.abs(player.cellY - sequoia.y);
+          
+          if (pdx <= 1 && pdy <= 1 && !sequoia.interacting) {
+            ctx.fillStyle = themeColors.text;
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('[E] Talk', centerX, centerY - 15);
+          }
+          
+          // Draw dialogue box
+          if (sequoia.interacting) {
+            const boxWidth = 300;
+            const boxHeight = 100;
+            const boxX = canvas.width / 2 - boxWidth / 2;
+            const boxY = canvas.height - boxHeight - 20;
+            
+            // Box background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Box border
+            ctx.strokeStyle = themeColors.text;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Name (show ??? until they say "NAME'S SEQUOIA" at index 2, or if they've met before)
+            const nameLabel = sequoia.currentDialogue > 2 || sequoia.hasMetBefore ? 'SEQUOIA' : '???';
+            ctx.fillStyle = themeColors.text;
+            ctx.font = 'bold 14px Courier New';
+            ctx.textAlign = 'left';
+            ctx.fillText(nameLabel, boxX + 10, boxY + 20);
+            
+            // Dialogue text - use appropriate dialogue set
+            ctx.fillStyle = '#cccccc';
+            ctx.font = '14px Courier New';
+            const currentDialogueSet = sequoia.hasMetBefore ? sequoia.randomFacts : sequoia.firstTimeDialogue;
+            const dialogue = currentDialogueSet[sequoia.currentDialogue];
+            const lines = dialogue.match(/.{1,35}/g) || [dialogue];
+            lines.forEach((line, i) => {
+              ctx.fillText(line, boxX + 10, boxY + 45 + (i * 18));
+            });
+            
+            // Continue prompt (more visible)
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('Press [E] to continue', boxX + boxWidth - 10, boxY + boxHeight - 10);
+          }
+        }
+      }
+      
+      // Draw player
+      ctx.fillStyle = themeColors.player;
+      ctx.fillRect(
+        player.x + (CELL_SIZE - PLAYER_SIZE) / 2,
+        player.y + (CELL_SIZE - PLAYER_SIZE) / 2,
+        PLAYER_SIZE,
+        PLAYER_SIZE
+      );
+    }
+
+    let lastFrameTime = 0;
+    const targetFPS = 60;
+    const frameInterval = 1000 / targetFPS;
+    
+    function gameLoop(currentTime: number = 0) {
+      // Throttle to target FPS for better performance
+      const elapsed = currentTime - lastFrameTime;
+      
+      if (elapsed > frameInterval) {
+        lastFrameTime = currentTime - (elapsed % frameInterval);
+        update();
+        draw();
+      }
+      
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Mobile controls
+    const upBtn = document.getElementById('upBtn');
+    const downBtn = document.getElementById('downBtn');
+    const leftBtn = document.getElementById('leftBtn');
+    const rightBtn = document.getElementById('rightBtn');
+    const fireBtn = document.getElementById('fireBtn');
+    const interactBtn = document.getElementById('interactBtn');
+
+    if (upBtn && downBtn && leftBtn && rightBtn && fireBtn && interactBtn) {
+      upBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['w'] = true;
+      });
+      upBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys['w'] = false;
+      });
+
+      downBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['s'] = true;
+      });
+      downBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys['s'] = false;
+      });
+
+      leftBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['a'] = true;
+      });
+      leftBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys['a'] = false;
+      });
+
+      rightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['d'] = true;
+      });
+      rightBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        keys['d'] = false;
+      });
+
+      fireBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameStarted && !gameOver && fires.length < MAX_FIRES) {
+          dropFire();
+        }
+      });
+
+      interactBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys['e'] = true;
+        setTimeout(() => { keys['e'] = false; }, 100);
+      });
+    }
+
+    window.addEventListener('load', init);
+  </script>
+</BaseLayout>
+

@@ -510,14 +510,21 @@ const post = {
       itemModalCanvas.width = modalSize;
       itemModalCanvas.height = modalSize;
       
-      // Draw pointy hat on both canvases
+      // Draw pointy hat on both canvases (white hat with red pom-pom)
       function drawPointyHat(ctx: CanvasRenderingContext2D, width: number, height: number) {
+        // Main hat body (white)
         ctx.fillStyle = '#ffffff';
         ctx.beginPath();
         ctx.moveTo(width / 2, 0);
         ctx.lineTo(width, height);
         ctx.lineTo(0, height);
         ctx.closePath();
+        ctx.fill();
+        
+        // Red pom-pom on top
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(width / 2, 0, width * 0.12, 0, Math.PI * 2);
         ctx.fill();
       }
       
@@ -1339,6 +1346,19 @@ const post = {
             // Player jumps on monster with pointy hat
             createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
             
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
             // Check for Green's Gluttony drop from green monsters
             if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
               items.push({
@@ -1349,7 +1369,6 @@ const post = {
                 type: 'greensGluttony',
                 collected: false
               });
-              console.log('Green\'s Gluttony dropped from green monster');
               greensGluttonyDropCount++;
             }
             
@@ -1361,6 +1380,19 @@ const post = {
             // Player jumps on monster without pointy hat (normal behavior)
             createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
             
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
             // Check for Green's Gluttony drop from green monsters
             if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
               items.push({
@@ -1371,7 +1403,6 @@ const post = {
                 type: 'greensGluttony',
                 collected: false
               });
-              console.log('Green\'s Gluttony dropped from green monster');
               greensGluttonyDropCount++;
             }
             
@@ -1383,6 +1414,19 @@ const post = {
             // Player jumps up into monster from below with pointy hat
             createLandingParticles(player.x + player.width/2, player.y, monster.color);
             
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
             // Check for Green's Gluttony drop from green monsters
             if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
               items.push({
@@ -1393,7 +1437,6 @@ const post = {
                 type: 'greensGluttony',
                 collected: false
               });
-              console.log('Green\'s Gluttony dropped from green monster');
               greensGluttonyDropCount++;
             }
             
@@ -1455,25 +1498,7 @@ const post = {
         MOVE_SPEED = isMobileDevice ? mobileMoveSpeed : desktopMoveSpeed;
       }
 
-      // Spawn Pointy Hat if not collected and score is sufficient
-      if (!player.hasPointyHat && score >= POINTY_HAT_SCORE && !pointyHatSpawned) {
-        // Find a platform significantly higher than the player
-        const targetY = player.y - 500; // Adjusted to be higher
-        const platform = platforms.find(p => p.y <= targetY && p.y + PLATFORM_HEIGHT >= targetY);
-        if (platform) {
-          items.push({
-            x: platform.x + platform.width / 2 - 10, // Centered on the platform
-            y: platform.y - 20, // Slightly above the platform
-            width: 20,
-            height: 20,
-            type: 'pointyHat',
-            collected: false
-          });
-          console.log('Pointy Hat spawned on higher platform');
-          // Set the flag to prevent further spawning
-          pointyHatSpawned = true;
-        }
-      }
+      // Pointy Hat now drops from red monsters instead of spawning on platforms
     }
 
     // Generate new platforms at the top
@@ -1977,12 +2002,24 @@ const post = {
     }
 
     function drawPointyHat(x: number, y: number) {
-      ctx.fillStyle = themeColors.player;
+      // White hat with red pom-pom
+      const centerX = x + player.width / 2;
+      const topY = y - 15;
+      const bottomY = y + 5;
+      
+      // Main hat body (white)
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
-      ctx.moveTo(x + player.width / 2, y - 15);
-      ctx.lineTo(x + player.width + 5, y + 5);
-      ctx.lineTo(x - 5, y + 5);
+      ctx.moveTo(centerX, topY);
+      ctx.lineTo(x + player.width + 5, bottomY);
+      ctx.lineTo(x - 5, bottomY);
       ctx.closePath();
+      ctx.fill();
+      
+      // Red pom-pom on top
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(centerX, topY, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
