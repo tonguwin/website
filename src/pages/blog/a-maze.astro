@@ -5,7 +5,7 @@ const post = {
   title: "A Maze",
   date: "November 12, 2025",
   content: `
-    Lost in the labyrinth...
+    You finally made it to the labyrinth...
   `
 };
 ---
@@ -46,7 +46,7 @@ const post = {
       <!-- Instructions -->
       <div class="mt-4 text-primary/60 text-sm">
         <p class="hidden md:block"><strong>WASD</strong>: Move | <strong>F</strong>: Drop Fire | <strong>E</strong>: Interact</p>
-        <p class="md:hidden">Use on-screen controls to play</p>
+        <p class="md:hidden text-center"><strong>D-Pad</strong>: Move | <strong>💬</strong>: Interact | <strong>🔥</strong>: Drop Fire</p>
       </div>
     </div>
 
@@ -64,31 +64,45 @@ const post = {
     </div>
 
     <!-- Mobile Controls -->
-    <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-40 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm flex items-end justify-between px-4 pb-4 md:hidden z-50">
-      <div class="flex space-x-3">
-        <div class="flex flex-col space-y-2">
-          <button id="upBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+    <div id="mobileControls" class="fixed bottom-0 left-0 w-full bg-gradient-to-t from-black/80 via-black/50 to-transparent backdrop-blur-md flex items-end justify-between px-6 pb-6 pt-8 md:hidden z-50 pointer-events-none">
+      <!-- D-Pad Controls -->
+      <div class="pointer-events-auto">
+        <div class="relative w-[140px] h-[140px]">
+          <!-- Center circle for visual reference -->
+          <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/10 border border-white/20"></div>
+          
+          <!-- Up Button -->
+          <button id="upBtn" class="absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center text-white text-2xl font-bold active:bg-white/40 active:scale-95 transition-all touch-none shadow-lg">
             ↑
           </button>
-          <div class="flex space-x-2">
-            <button id="leftBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
-              ←
-            </button>
-            <button id="downBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
-              ↓
-            </button>
-            <button id="rightBtn" class="w-14 h-14 rounded-lg bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
-              →
-            </button>
-          </div>
+          
+          <!-- Down Button -->
+          <button id="downBtn" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center text-white text-2xl font-bold active:bg-white/40 active:scale-95 transition-all touch-none shadow-lg">
+            ↓
+          </button>
+          
+          <!-- Left Button -->
+          <button id="leftBtn" class="absolute left-0 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center text-white text-2xl font-bold active:bg-white/40 active:scale-95 transition-all touch-none shadow-lg">
+            ←
+          </button>
+          
+          <!-- Right Button -->
+          <button id="rightBtn" class="absolute right-0 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-lg bg-white/20 backdrop-blur-sm border-2 border-white/40 flex items-center justify-center text-white text-2xl font-bold active:bg-white/40 active:scale-95 transition-all touch-none shadow-lg">
+            →
+          </button>
         </div>
+        <div class="text-center mt-2 text-white/60 text-xs font-semibold">MOVE</div>
       </div>
-      <div class="flex flex-col space-y-2">
-        <button id="fireBtn" class="w-16 h-16 rounded-lg bg-orange-500/90 border-2 border-orange-400 flex items-center justify-center text-white text-lg font-bold active:bg-orange-600 active:scale-95 transition-all shadow-lg shadow-orange-500/50 touch-none">
-          🔥
+      
+      <!-- Action Buttons -->
+      <div class="pointer-events-auto flex flex-col space-y-3">
+        <button id="interactBtn" class="w-[70px] h-[70px] rounded-full bg-gradient-to-br from-blue-500 to-blue-600 border-3 border-blue-300/50 flex flex-col items-center justify-center text-white font-bold active:from-blue-600 active:to-blue-700 active:scale-95 transition-all shadow-xl shadow-blue-500/50 touch-none">
+          <span class="text-2xl">💬</span>
+          <span class="text-[10px] mt-1 opacity-90">INTERACT</span>
         </button>
-        <button id="interactBtn" class="w-16 h-16 rounded-lg bg-blue-500/90 border-2 border-blue-400 flex items-center justify-center text-white text-lg font-bold active:bg-blue-600 active:scale-95 transition-all shadow-lg shadow-blue-500/50 touch-none">
-          E
+        <button id="fireBtn" class="w-[70px] h-[70px] rounded-full bg-gradient-to-br from-orange-500 to-red-600 border-3 border-orange-300/50 flex flex-col items-center justify-center text-white font-bold active:from-orange-600 active:to-red-700 active:scale-95 transition-all shadow-xl shadow-orange-500/50 touch-none">
+          <span class="text-2xl">🔥</span>
+          <span class="text-[10px] mt-1 opacity-90">FIRE</span>
         </button>
       </div>
     </div>
@@ -125,15 +139,12 @@ const post = {
       color: white !important;
     }
 
-    /* Fire icon styles */
-    .fire-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
+    /* Fire icon canvas styles */
+    .fire-icon-canvas {
+      width: 40px;
+      height: 40px;
+      display: block;
+      transition: opacity 0.3s ease;
     }
 
     .color-button {
@@ -155,6 +166,54 @@ const post = {
       box-shadow: 0 0 10px currentColor;
     }
     
+    /* Mobile Control Enhancements */
+    #mobileControls button {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    #mobileControls button:active {
+      transform: scale(0.92);
+    }
+    
+    /* D-Pad button glow effect */
+    #upBtn, #downBtn, #leftBtn, #rightBtn {
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    }
+    
+    #upBtn:active, #downBtn:active, #leftBtn:active, #rightBtn:active {
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Action button animations */
+    #interactBtn {
+      animation: pulse-blue 2s ease-in-out infinite;
+    }
+    
+    #fireBtn {
+      animation: pulse-orange 2s ease-in-out infinite;
+      animation-delay: 0.5s;
+    }
+    
+    @keyframes pulse-blue {
+      0%, 100% {
+        box-shadow: 0 4px 20px rgba(59, 130, 246, 0.5);
+      }
+      50% {
+        box-shadow: 0 4px 30px rgba(59, 130, 246, 0.7);
+      }
+    }
+    
+    @keyframes pulse-orange {
+      0%, 100% {
+        box-shadow: 0 4px 20px rgba(249, 115, 22, 0.5);
+      }
+      50% {
+        box-shadow: 0 4px 30px rgba(249, 115, 22, 0.7);
+      }
+    }
+    
     /* Mobile optimizations */
     @media (max-width: 768px) {
       body {
@@ -166,19 +225,23 @@ const post = {
         height: auto !important;
         aspect-ratio: 1;
       }
+      
+      #mobileControls {
+        padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+      }
     }
   </style>
 
   <script>
     // Game constants
     const CELL_SIZE = 20;
-    const MAZE_WIDTH = 30;
-    const MAZE_HEIGHT = 30;
+    const MAZE_WIDTH = 60; // Doubled from 30
+    const MAZE_HEIGHT = 60; // Doubled from 30
     const PLAYER_SIZE = 16;
     const BASE_SPOTLIGHT_RADIUS = 4; // Initial visibility radius
     const MAX_FIRES = 5;
-    const FIRE_COLORS = ['#ff0000', '#0000ff', '#ffff00', '#ffffff', '#000000'];
-    const FIRE_NAMES = ['Red', 'Blue', 'Yellow', 'White', 'Black'];
+    const FIRE_COLORS = ['#ff0000', '#0000ff', '#ffff00', '#00ff00', '#9b59b6'];
+    const FIRE_NAMES = ['Red', 'Blue', 'Yellow', 'Green', 'Purple'];
 
     // Game state
     let canvas: HTMLCanvasElement;
@@ -207,6 +270,12 @@ const post = {
     let mazeLevel = 1;
     let mazeDifficulty = 1;
     let spotlightRadius = BASE_SPOTLIGHT_RADIUS;
+    
+    // Camera system
+    let camera = {
+      x: 0,
+      y: 0
+    };
     
     // Battle system
     let inBattle = false;
@@ -298,34 +367,98 @@ const post = {
         return '#' + values.map(v => v.toString(16).padStart(2, '0')).join('');
       };
       
+      const getLuminance = (rgb: string) => {
+        const values = rgb.split(' ').map(v => parseInt(v) / 255);
+        return 0.2126 * values[0] + 0.7152 * values[1] + 0.0722 * values[2];
+      };
+      
+      const backgroundLuminance = getLuminance(secondaryRgb);
+      const isDarkBackground = backgroundLuminance < 0.5;
+      
       themeColors.text = rgbToHex(primaryRgb);
       themeColors.background = rgbToHex(secondaryRgb);
-      themeColors.wall = themeColors.text;
-      themeColors.floor = theme === 'dark' ? '#1a1a1a' : '#e0e0e0';
+      
+      // High contrast walls - always visible
+      themeColors.wall = isDarkBackground ? '#ffffff' : '#000000';
+      
+      // Floor with strong contrast to background
+      if (isDarkBackground) {
+        // Dark background: use lighter floor
+        themeColors.floor = '#2a2a2a';
+      } else {
+        // Light background: use darker floor
+        themeColors.floor = '#d0d0d0';
+      }
+      
       themeColors.player = '#ff4444';
     }
 
     function initFireUI() {
       const fireIcons = document.getElementById('fireIcons')!;
+      fireIcons.innerHTML = ''; // Clear existing
       
-      // Create fire icons
+      // Create canvas elements for each fire slot
       for (let i = 0; i < MAX_FIRES; i++) {
-        const icon = document.createElement('div');
-        icon.className = 'fire-icon';
-        icon.style.backgroundColor = '#333';
-        icon.textContent = '🔥';
-        icon.style.opacity = '0.3';
-        fireIcons.appendChild(icon);
+        const canvas = document.createElement('canvas');
+        canvas.width = 40;
+        canvas.height = 40;
+        canvas.className = 'fire-icon-canvas';
+        canvas.style.opacity = '0.3';
+        fireIcons.appendChild(canvas);
+        
+        // Draw empty slot
+        const ctx = canvas.getContext('2d')!;
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.arc(20, 20, 15, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
 
     function updateFireUI() {
-      const icons = document.querySelectorAll('.fire-icon');
-      icons.forEach((icon, i) => {
-        if (i < fires.length) {
-          (icon as HTMLElement).style.opacity = '0.3';
+      const canvases = document.querySelectorAll('.fire-icon-canvas') as NodeListOf<HTMLCanvasElement>;
+      
+      canvases.forEach((canvas, i) => {
+        const ctx = canvas.getContext('2d')!;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Show fires that haven't been dropped yet (reverse logic)
+        if (i >= fires.length) {
+          // Draw available fire with glow
+          const fireColor = FIRE_COLORS[i];
+          const centerX = 20;
+          const centerY = 20;
+          const radius = 8;
+          
+          // Glow effect
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = fireColor;
+          
+          // Draw fire circle
+          ctx.fillStyle = fireColor;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Inner glow
+          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+          gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+          gradient.addColorStop(0.5, fireColor);
+          gradient.addColorStop(1, fireColor);
+          ctx.fillStyle = gradient;
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.shadowBlur = 0;
+          canvas.style.opacity = '1';
         } else {
-          (icon as HTMLElement).style.opacity = '1';
+          // Draw empty slot (fire has been used)
+          ctx.fillStyle = '#333';
+          ctx.beginPath();
+          ctx.arc(20, 20, 15, 0, Math.PI * 2);
+          ctx.fill();
+          canvas.style.opacity = '0.3';
         }
       });
     }
@@ -343,6 +476,10 @@ const post = {
       player.cellY = 2;
       player.x = player.cellX * CELL_SIZE;
       player.y = player.cellY * CELL_SIZE;
+      
+      // Initialize camera to player position
+      camera.x = player.x - canvas.width / 2;
+      camera.y = player.y - canvas.height / 2;
       
       updateFireUI();
       spawnMonsters();
@@ -367,6 +504,10 @@ const post = {
       player.x = player.cellX * CELL_SIZE;
       player.y = player.cellY * CELL_SIZE;
       
+      // Reset camera to player position
+      camera.x = player.x - canvas.width / 2;
+      camera.y = player.y - canvas.height / 2;
+      
       updateFireUI();
       spawnMonsters();
     }
@@ -388,9 +529,14 @@ const post = {
       monsters = [];
       
       // Only spawn monsters in Level 2+
-      if (mazeLevel < 2) return;
+      if (mazeLevel < 2) {
+        console.log('Level', mazeLevel, '- No monsters spawned');
+        return;
+      }
       
-      const monsterCount = 3; // 3 monsters for Level 2
+      // Increase monster count with each level
+      const monsterCount = 3 + (mazeLevel - 2) * 2; // 3 for level 2, 5 for level 3, 7 for level 4, etc.
+      console.log('Spawning', monsterCount, 'monsters for level', mazeLevel);
       
       for (let i = 0; i < monsterCount; i++) {
         let attempts = 0;
@@ -403,8 +549,8 @@ const post = {
           attempts++;
         } while (
           (maze[monsterY][monsterX] === 1 || // Wall
-          (Math.abs(monsterX - player.cellX) < 5 && Math.abs(monsterY - player.cellY) < 5) || // Too close to player
-          monsters.some(m => Math.abs(m.x - monsterX) < 5 && Math.abs(m.y - monsterY) < 5)) && // Too close to other monsters
+          (Math.abs(monsterX - player.cellX) < 10 && Math.abs(monsterY - player.cellY) < 10) || // Too close to player (increased from 5)
+          monsters.some(m => Math.abs(m.x - monsterX) < 8 && Math.abs(m.y - monsterY) < 8)) && // Too close to other monsters (increased from 5)
           attempts < 100
         );
         
@@ -419,8 +565,13 @@ const post = {
             defeated: false,
             type: monsterType
           });
+          console.log('Monster', i + 1, 'spawned at', monsterX, monsterY, 'type:', monsterType);
+        } else {
+          console.warn('Failed to spawn monster', i + 1, 'after 100 attempts');
         }
       }
+      
+      console.log('Total monsters spawned:', monsters.length);
     }
     
     function placeFountain() {
@@ -640,6 +791,12 @@ const post = {
         }
       }
       
+      // Update camera to follow player (smooth lerp)
+      const targetCameraX = player.x - canvas.width / 2;
+      const targetCameraY = player.y - canvas.height / 2;
+      camera.x += (targetCameraX - camera.x) * 0.1;
+      camera.y += (targetCameraY - camera.y) * 0.1;
+      
       // Check for dead ends
       checkDeadEnd();
       
@@ -799,47 +956,100 @@ const post = {
       }
     }
     
-    function startBattle(monster: {x: number, y: number, defeated: boolean}) {
+    // Monster dialogue and lore
+    const monsterDialogues = [
+      "I've been stuck here for years now...",
+      "The walls... they speak to me...",
+      "My name is Bob, and I can't let you pass!",
+      "Finally! Someone to talk to!",
+      "The maze... it changes when you're not looking...",
+      "I used to have a name... I think...",
+      "Turn back while you still can!",
+      "Do you hear the whispers too?",
+      "I'm so tired of being spiky...",
+      "The fires... they remember everything...",
+      "I guard this path with my life!",
+      "Please... just type the words..."
+    ];
+    
+    // Maze lore challenges - sentences from songs, poems, and maze mysteries
+    const mazeLoreChallenges = [
+      { text: "The walls have eyes that never sleep", time: 8 },
+      { text: "In circles we dance forever more", time: 8 },
+      { text: "Lost souls wander these endless halls", time: 8 },
+      { text: "The maze remembers every step you take", time: 9 },
+      { text: "Shadows whisper secrets in the dark", time: 8 },
+      { text: "Time stands still within these walls", time: 8 },
+      { text: "The path you seek is never found", time: 8 },
+      { text: "Ancient stones hold forgotten tales", time: 8 },
+      { text: "Every turn leads back to the start", time: 8 },
+      { text: "The guardian watches from the void", time: 8 },
+      { text: "Fires burn but give no warmth here", time: 8 },
+      { text: "The maze feeds on hope and fear", time: 8 },
+      { text: "Echoes of the lost fill the air", time: 8 },
+      { text: "No escape from this twisted dream", time: 8 },
+      { text: "The spikes grow sharper with each day", time: 9 }
+    ];
+    
+    let battlePhase: 'intro' | 'prepare' | 'challenge' = 'intro';
+    let battleDialogue = '';
+    
+    function startBattle(monster: {x: number, y: number, defeated: boolean, type: 'spiky' | 'thorny' | 'jagged'}) {
       inBattle = true;
       battleMonster = monster;
+      battlePhase = 'intro';
       
-      // Generate typing challenge (easier for Level 2)
-      const challenges = [
-        'SPIKE',
-        'MAZE',
-        'FIGHT',
-        'QUICK',
-        'TYPE',
-        'FAST',
-        'WIN'
-      ];
+      // Random intro dialogue
+      battleDialogue = monsterDialogues[Math.floor(Math.random() * monsterDialogues.length)];
       
-      battleChallenge = challenges[Math.floor(Math.random() * challenges.length)];
+      // Select a random lore challenge
+      const challenge = mazeLoreChallenges[Math.floor(Math.random() * mazeLoreChallenges.length)];
+      battleChallenge = challenge.text;
+      battleTimeLimit = challenge.time;
+      
       battleInput = '';
-      battleTimeLimit = 5; // 5 seconds for Level 2
-      battleTimeRemaining = battleTimeLimit;
-      battleStartTime = Date.now();
-      
-      // Show mobile input if on mobile
-      if (isMobileDevice) {
-        const mobileInput = document.getElementById('mobileBattleInput');
-        const textInput = document.getElementById('battleTextInput') as HTMLInputElement;
-        if (mobileInput && textInput) {
-          mobileInput.classList.remove('hidden');
-          textInput.value = '';
-          textInput.focus();
-          
-          // Update battleInput as user types
-          textInput.oninput = () => {
-            battleInput = textInput.value.toUpperCase();
-          };
-        }
-      }
+      battleTimeRemaining = 0;
+      battleStartTime = 0;
     }
     
     function updateBattle() {
       if (!inBattle) return;
       
+      // Phase 1: Intro dialogue (wait for E)
+      if (battlePhase === 'intro') {
+        if (keys['e'] && !wasEPressed) {
+          battlePhase = 'prepare';
+        }
+        return;
+      }
+      
+      // Phase 2: Prepare message (wait for E)
+      if (battlePhase === 'prepare') {
+        if (keys['e'] && !wasEPressed) {
+          battlePhase = 'challenge';
+          battleStartTime = Date.now();
+          battleTimeRemaining = battleTimeLimit;
+          
+          // Show mobile input if on mobile
+          if (isMobileDevice) {
+            const mobileInput = document.getElementById('mobileBattleInput');
+            const textInput = document.getElementById('battleTextInput') as HTMLInputElement;
+            if (mobileInput && textInput) {
+              mobileInput.classList.remove('hidden');
+              textInput.value = '';
+              textInput.focus();
+              
+              // Update battleInput as user types
+              textInput.oninput = () => {
+                battleInput = textInput.value.toLowerCase();
+              };
+            }
+          }
+        }
+        return;
+      }
+      
+      // Phase 3: Challenge (typing test)
       // Update timer
       const elapsed = (Date.now() - battleStartTime) / 1000;
       battleTimeRemaining = Math.max(0, battleTimeLimit - elapsed);
@@ -867,8 +1077,8 @@ const post = {
         return;
       }
       
-      // Check if challenge completed
-      if (battleInput.toUpperCase() === battleChallenge) {
+      // Check if challenge completed (case-insensitive)
+      if (battleInput.toLowerCase() === battleChallenge.toLowerCase()) {
         // Battle won!
         if (battleMonster) {
           battleMonster.defeated = true;
@@ -962,8 +1172,66 @@ const post = {
         }
       }
       
-      // Check if battle is won
-      const battleWon = battleInput.toUpperCase() === battleChallenge;
+      // Phase 1: Intro dialogue
+      if (battlePhase === 'intro') {
+        // Dialogue box
+        const boxWidth = Math.min(canvas.width - 60, 400);
+        const boxHeight = 100;
+        const boxX = canvas.width / 2 - boxWidth / 2;
+        const boxY = canvas.height - boxHeight - 40;
+        
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+        ctx.strokeStyle = themeColors.text;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+        
+        // Monster dialogue
+        ctx.fillStyle = themeColors.text;
+        ctx.font = '16px Courier New';
+        ctx.textAlign = 'center';
+        const words = battleDialogue.split(' ');
+        let line = '';
+        let y = boxY + 30;
+        
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > boxWidth - 40 && i > 0) {
+            ctx.fillText(line, canvas.width / 2, y);
+            line = words[i] + ' ';
+            y += 22;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, canvas.width / 2, y);
+        
+        // Continue prompt
+        ctx.font = '12px Arial';
+        ctx.fillStyle = '#888888';
+        ctx.fillText('[E] to continue', canvas.width / 2, boxY + boxHeight - 15);
+        return;
+      }
+      
+      // Phase 2: Prepare message
+      if (battlePhase === 'prepare') {
+        ctx.fillStyle = themeColors.text;
+        ctx.font = 'bold 24px Courier New';
+        ctx.textAlign = 'center';
+        ctx.fillText('Prepare yourself!', canvas.width / 2, canvas.height / 2 - 20);
+        
+        ctx.font = '16px Courier New';
+        ctx.fillStyle = '#888888';
+        ctx.fillText('Type the sentence to defeat the monster', canvas.width / 2, canvas.height / 2 + 10);
+        
+        ctx.font = '12px Arial';
+        ctx.fillText('[E] to start', canvas.width / 2, canvas.height / 2 + 50);
+        return;
+      }
+      
+      // Phase 3: Challenge
+      const battleWon = battleInput.toLowerCase() === battleChallenge.toLowerCase();
       
       if (battleWon) {
         // Victory message
@@ -981,23 +1249,56 @@ const post = {
       } else {
         // Challenge display
         ctx.fillStyle = themeColors.text;
-        ctx.font = 'bold 20px Courier New';
+        ctx.font = 'bold 16px Courier New';
         ctx.textAlign = 'center';
-        ctx.fillText('Type the word:', canvas.width / 2, canvas.height / 2 - 20);
+        ctx.fillText('Type this sentence:', canvas.width / 2, canvas.height / 2 - 60);
         
-        // Target word
-        ctx.font = 'bold 32px Courier New';
-        ctx.fillText(battleChallenge, canvas.width / 2, canvas.height / 2 + 20);
+        // Target sentence (wrap if needed)
+        ctx.font = 'bold 20px Courier New';
+        const maxWidth = canvas.width - 60;
+        const words = battleChallenge.split(' ');
+        let line = '';
+        let y = canvas.height / 2 - 20;
         
-        // User input
-        ctx.font = 'bold 28px Courier New';
-        ctx.fillStyle = battleInput.toUpperCase() === battleChallenge.substring(0, battleInput.length) ? '#00ff00' : '#ff0000';
-        ctx.fillText(battleInput, canvas.width / 2, canvas.height / 2 + 70);
+        for (let i = 0; i < words.length; i++) {
+          const testLine = line + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && i > 0) {
+            ctx.fillText(line, canvas.width / 2, y);
+            line = words[i] + ' ';
+            y += 28;
+          } else {
+            line = testLine;
+          }
+        }
+        ctx.fillText(line, canvas.width / 2, y);
+        
+        // User input (wrap if needed)
+        ctx.font = 'bold 18px Courier New';
+        const inputCorrect = battleInput.toLowerCase() === battleChallenge.toLowerCase().substring(0, battleInput.length);
+        ctx.fillStyle = inputCorrect ? '#00ff00' : '#ff0000';
+        
+        const inputWords = battleInput.split(' ');
+        let inputLine = '';
+        let inputY = canvas.height / 2 + 60;
+        
+        for (let i = 0; i < inputWords.length; i++) {
+          const testLine = inputLine + inputWords[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          if (metrics.width > maxWidth && i > 0) {
+            ctx.fillText(inputLine, canvas.width / 2, inputY);
+            inputLine = inputWords[i] + ' ';
+            inputY += 24;
+          } else {
+            inputLine = testLine;
+          }
+        }
+        ctx.fillText(inputLine, canvas.width / 2, inputY);
         
         // Timer
         ctx.fillStyle = battleTimeRemaining < 2 ? '#ff0000' : themeColors.text;
         ctx.font = '18px Courier New';
-        ctx.fillText(`Time: ${battleTimeRemaining.toFixed(1)}s`, canvas.width / 2, canvas.height / 2 + 120);
+        ctx.fillText(`Time: ${battleTimeRemaining.toFixed(1)}s`, canvas.width / 2, canvas.height - 40);
       }
     }
     
@@ -1033,10 +1334,88 @@ const post = {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       if (!gameStarted) {
-        ctx.fillStyle = themeColors.text;
-        ctx.font = '24px Arial';
+        // Smooth, ethereal floating text effect with multiple layers
+        const time = Date.now() / 1000;
+        
+        // Multiple sine waves for smooth, organic motion
+        const floatY = Math.sin(time * 0.5) * 8 + Math.sin(time * 0.3) * 4;
+        const floatX = Math.cos(time * 0.4) * 3;
+        
+        // Smooth breathing opacity
+        const breathe = 0.75 + Math.sin(time * 0.6) * 0.25;
+        
+        // Pulsing glow
+        const glowIntensity = 15 + Math.sin(time * 0.8) * 10;
+        
+        ctx.save();
+        
+        // Draw text with multiple layers for depth
+        const text = 'Your journey has led up to this moment.   Conquer the maze...';
+        const maxWidth = canvas.width - 80;
+        const lineHeight = 28;
+        const words = text.split(' ');
+        
+        // Calculate wrapped lines first
+        const lines: string[] = [];
+        let currentLine = '';
+        
+        ctx.font = '18px "Courier New", monospace';
+        for (let i = 0; i < words.length; i++) {
+          const testLine = currentLine + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && i > 0) {
+            lines.push(currentLine.trim());
+            currentLine = words[i] + ' ';
+          } else {
+            currentLine = testLine;
+          }
+        }
+        lines.push(currentLine.trim());
+        
+        // Calculate starting Y position to center all lines
+        const totalHeight = lines.length * lineHeight;
+        let startY = canvas.height / 2 - totalHeight / 2 + floatY;
+        
+        // Draw each line with individual character wave effect
         ctx.textAlign = 'center';
-        ctx.fillText('Navigate the maze...', canvas.width / 2, canvas.height / 2);
+        
+        lines.forEach((line, lineIndex) => {
+          const y = startY + lineIndex * lineHeight;
+          const chars = line.split('');
+          
+          // Calculate total width to center the line
+          const totalWidth = ctx.measureText(line).width;
+          let x = canvas.width / 2 - totalWidth / 2 + floatX;
+          
+          chars.forEach((char, charIndex) => {
+            // Individual character wave
+            const charWave = Math.sin(time * 2 + charIndex * 0.3 + lineIndex * 0.5) * 2;
+            const charOpacity = breathe + Math.sin(time * 1.5 + charIndex * 0.2) * 0.1;
+            
+            ctx.save();
+            ctx.globalAlpha = Math.max(0.5, Math.min(1, charOpacity));
+            
+            // Layered glow effect
+            ctx.shadowBlur = glowIntensity;
+            ctx.shadowColor = themeColors.text;
+            ctx.fillStyle = themeColors.text;
+            
+            // Draw character with slight wave
+            ctx.fillText(char, x, y + charWave);
+            
+            // Second layer for extra glow
+            ctx.shadowBlur = glowIntensity * 0.5;
+            ctx.fillText(char, x, y + charWave);
+            
+            ctx.restore();
+            
+            x += ctx.measureText(char).width;
+          });
+        });
+        
+        ctx.shadowBlur = 0;
+        ctx.restore();
         return;
       }
       
@@ -1094,20 +1473,28 @@ const post = {
           }
           
           if (visible) {
-            ctx.fillStyle = maze[y][x] === 1 ? themeColors.wall : themeColors.floor;
-            ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            const isWall = maze[y][x] === 1;
+            ctx.fillStyle = isWall ? themeColors.wall : themeColors.floor;
+            ctx.fillRect(x * CELL_SIZE - camera.x, y * CELL_SIZE - camera.y, CELL_SIZE, CELL_SIZE);
+            
+            // Add subtle border to floor cells for better path visibility
+            if (!isWall) {
+              ctx.strokeStyle = themeColors.background;
+              ctx.lineWidth = 1;
+              ctx.strokeRect(x * CELL_SIZE - camera.x, y * CELL_SIZE - camera.y, CELL_SIZE, CELL_SIZE);
+            }
           }
           }
         }
       }
       
-      // Draw fires
+      // Draw fires (with camera offset)
       for (const fire of fires) {
         ctx.fillStyle = fire.color;
         ctx.beginPath();
         ctx.arc(
-          fire.x * CELL_SIZE + CELL_SIZE / 2,
-          fire.y * CELL_SIZE + CELL_SIZE / 2,
+          fire.x * CELL_SIZE + CELL_SIZE / 2 - camera.x,
+          fire.y * CELL_SIZE + CELL_SIZE / 2 - camera.y,
           6,
           0,
           Math.PI * 2
@@ -1140,9 +1527,9 @@ const post = {
         }
         
         if (visible) {
-          // Draw door as a rectangle
-          const doorX = fountain.x * CELL_SIZE + CELL_SIZE / 2 - 12;
-          const doorY = fountain.y * CELL_SIZE + CELL_SIZE / 2 - 16;
+          // Draw door as a rectangle (with camera offset)
+          const doorX = fountain.x * CELL_SIZE + CELL_SIZE / 2 - 12 - camera.x;
+          const doorY = fountain.y * CELL_SIZE + CELL_SIZE / 2 - 16 - camera.y;
           
           // Door frame (always green/ready)
           ctx.fillStyle = '#8B4513'; // Brown door
@@ -1165,7 +1552,7 @@ const post = {
             ctx.fillStyle = themeColors.text;
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('[E] Enter Door', fountain.x * CELL_SIZE + CELL_SIZE / 2, fountain.y * CELL_SIZE - 20);
+            ctx.fillText('[E] Enter Door', fountain.x * CELL_SIZE + CELL_SIZE / 2 - camera.x, fountain.y * CELL_SIZE - 20 - camera.y);
           }
         }
       }
@@ -1190,11 +1577,11 @@ const post = {
         }
         
         if (visible) {
-          // Draw NPC as a different colored square
+          // Draw NPC as a different colored square (with camera offset)
           ctx.fillStyle = '#00ffff';
           ctx.fillRect(
-            npc.x * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2,
-            npc.y * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2,
+            npc.x * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2 - camera.x,
+            npc.y * CELL_SIZE + (CELL_SIZE - PLAYER_SIZE) / 2 - camera.y,
             PLAYER_SIZE,
             PLAYER_SIZE
           );
@@ -1207,7 +1594,7 @@ const post = {
             ctx.fillStyle = themeColors.text;
             ctx.font = '12px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('[E] Talk', npc.x * CELL_SIZE + CELL_SIZE / 2, npc.y * CELL_SIZE - 5);
+            ctx.fillText('[E] Talk', npc.x * CELL_SIZE + CELL_SIZE / 2 - camera.x, npc.y * CELL_SIZE - 5 - camera.y);
           }
           
           // Draw dialogue box (optimized size)
@@ -1252,28 +1639,31 @@ const post = {
       }
       
       // Draw monsters
-      for (const monster of monsters) {
-        if (monster.defeated) continue;
-        
-        const dx = monster.x - player.cellX;
-        const dy = monster.y - player.cellY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        let visible = distance <= spotlightRadius;
-        
-        for (const fire of fires) {
-          const fdx = monster.x - fire.x;
-          const fdy = monster.y - fire.y;
-          const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
-          if (fireDistance <= spotlightRadius) {
-            visible = true;
-            break;
+      if (monsters.length > 0 && mazeLevel >= 2) {
+        let visibleCount = 0;
+        for (const monster of monsters) {
+          if (monster.defeated) continue;
+          
+          const dx = monster.x - player.cellX;
+          const dy = monster.y - player.cellY;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          let visible = distance <= spotlightRadius;
+          
+          for (const fire of fires) {
+            const fdx = monster.x - fire.x;
+            const fdy = monster.y - fire.y;
+            const fireDistance = Math.sqrt(fdx * fdx + fdy * fdy);
+            if (fireDistance <= spotlightRadius) {
+              visible = true;
+              break;
+            }
           }
-        }
-        
-        if (visible) {
-          const monsterX = monster.x * CELL_SIZE + CELL_SIZE / 2;
-          const monsterY = monster.y * CELL_SIZE + CELL_SIZE / 2;
+          
+          if (visible) {
+            visibleCount++;
+            const monsterX = monster.x * CELL_SIZE + CELL_SIZE / 2 - camera.x;
+            const monsterY = monster.y * CELL_SIZE + CELL_SIZE / 2 - camera.y;
           
           // Draw red monster body
           ctx.fillStyle = '#ff0000';
@@ -1336,6 +1726,10 @@ const post = {
             }
           }
         }
+        }
+        if (visibleCount > 0) {
+          console.log('Drew', visibleCount, 'visible monsters out of', monsters.length, 'total');
+        }
       }
       
       // Draw Sequoia
@@ -1357,9 +1751,9 @@ const post = {
         }
         
         if (visible) {
-          // Draw spade shape
-          const centerX = sequoia.x * CELL_SIZE + CELL_SIZE / 2;
-          const centerY = sequoia.y * CELL_SIZE + CELL_SIZE / 2;
+          // Draw spade shape (with camera offset)
+          const centerX = sequoia.x * CELL_SIZE + CELL_SIZE / 2 - camera.x;
+          const centerY = sequoia.y * CELL_SIZE + CELL_SIZE / 2 - camera.y;
           
           ctx.fillStyle = '#ffffff';
           ctx.beginPath();
@@ -1434,11 +1828,11 @@ const post = {
         }
       }
       
-      // Draw player
+      // Draw player (always centered due to camera)
       ctx.fillStyle = themeColors.player;
       ctx.fillRect(
-        player.x + (CELL_SIZE - PLAYER_SIZE) / 2,
-        player.y + (CELL_SIZE - PLAYER_SIZE) / 2,
+        player.x + (CELL_SIZE - PLAYER_SIZE) / 2 - camera.x,
+        player.y + (CELL_SIZE - PLAYER_SIZE) / 2 - camera.y,
         PLAYER_SIZE,
         PLAYER_SIZE
       );

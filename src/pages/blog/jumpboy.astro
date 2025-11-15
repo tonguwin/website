@@ -1681,11 +1681,89 @@ const post = {
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       if (!gameStarted) {
-        // Draw title screen
-        ctx.fillStyle = themeColors.text;
-        ctx.font = `${24 * canvasScale}px Arial`;
+        // Smooth, ethereal floating text effect with multiple layers
+        const time = Date.now() / 1000;
+        
+        // Multiple sine waves for smooth, organic motion
+        const floatY = Math.sin(time * 0.5) * 8 + Math.sin(time * 0.3) * 4;
+        const floatX = Math.cos(time * 0.4) * 3;
+        
+        // Smooth breathing opacity
+        const breathe = 0.75 + Math.sin(time * 0.6) * 0.25;
+        
+        // Pulsing glow
+        const glowIntensity = 15 + Math.sin(time * 0.8) * 10;
+        
+        ctx.save();
+        
+        // Draw text with individual character wave effect
+        const text = 'Can you make it out, Jumpboy?';
+        const maxWidth = canvas.width - 80;
+        const fontSize = 24 * canvasScale;
+        
+        ctx.font = `${fontSize}px "Courier New", monospace`;
         ctx.textAlign = 'center';
-        ctx.fillText('Can you make it out, Jumpboy?', canvas.width / 2, canvas.height / 2);
+        
+        // Calculate wrapped lines
+        const lines: string[] = [];
+        const words = text.split(' ');
+        let currentLine = '';
+        
+        for (let i = 0; i < words.length; i++) {
+          const testLine = currentLine + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && i > 0) {
+            lines.push(currentLine.trim());
+            currentLine = words[i] + ' ';
+          } else {
+            currentLine = testLine;
+          }
+        }
+        lines.push(currentLine.trim());
+        
+        // Calculate starting Y position to center all lines
+        const lineHeight = fontSize * 1.4;
+        const totalHeight = lines.length * lineHeight;
+        let startY = canvas.height / 2 - totalHeight / 2 + floatY;
+        
+        // Draw each line with individual character wave effect
+        lines.forEach((line, lineIndex) => {
+          const y = startY + lineIndex * lineHeight;
+          const chars = line.split('');
+          
+          // Calculate total width to center the line
+          const totalWidth = ctx.measureText(line).width;
+          let x = canvas.width / 2 - totalWidth / 2 + floatX;
+          
+          chars.forEach((char, charIndex) => {
+            // Individual character wave
+            const charWave = Math.sin(time * 2 + charIndex * 0.3 + lineIndex * 0.5) * 2;
+            const charOpacity = breathe + Math.sin(time * 1.5 + charIndex * 0.2) * 0.1;
+            
+            ctx.save();
+            ctx.globalAlpha = Math.max(0.5, Math.min(1, charOpacity));
+            
+            // Layered glow effect
+            ctx.shadowBlur = glowIntensity;
+            ctx.shadowColor = themeColors.text;
+            ctx.fillStyle = themeColors.text;
+            
+            // Draw character with slight wave
+            ctx.fillText(char, x, y + charWave);
+            
+            // Second layer for extra glow
+            ctx.shadowBlur = glowIntensity * 0.5;
+            ctx.fillText(char, x, y + charWave);
+            
+            ctx.restore();
+            
+            x += ctx.measureText(char).width;
+          });
+        });
+        
+        ctx.shadowBlur = 0;
+        ctx.restore();
       } else {
         // Draw platforms
         ctx.fillStyle = themeColors.platform;

@@ -4,9 +4,10 @@ interface Props {
   date: string;
   preview: string;
   slug: string;
+  description?: string;
 }
 
-const { title, date, preview, slug } = Astro.props;
+const { title, date, preview, slug, description } = Astro.props;
 ---
 
 <article class="prose" data-aos="fade-up" data-aos-duration="1500">
@@ -16,6 +17,11 @@ const { title, date, preview, slug } = Astro.props;
       <p class="text-sm sm:text-base text-primary/80 leading-relaxed">
         {preview}
       </p>
+      {description && (
+        <p class="text-xs sm:text-sm text-primary/60 mt-2 leading-relaxed">
+          {description}
+        </p>
+      )}
       <div class="mt-4 text-xs sm:text-sm text-primary/60">
         Posted on {date}
       </div>
