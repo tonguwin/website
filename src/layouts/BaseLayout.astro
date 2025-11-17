@@ -314,7 +314,31 @@ import BaseHead from "../components/BaseHead.astro";
         <script type="text/javascript" src="https://unpkg.com/aos@2.3.1/dist/aos.js"
         ></script>
         <script type="text/javascript">
-          AOS.init();
+          // Initialize AOS after DOM is ready
+          window.addEventListener('load', function() {
+            // Detect mobile for optimized settings
+            const isMobile = window.innerWidth < 768;
+            
+            AOS.init({
+              duration: isMobile ? 600 : 1000,
+              once: false, // Allow re-animation on resize
+              mirror: false,
+              anchorPlacement: 'top-bottom',
+              offset: 0,
+              easing: 'ease-out-cubic',
+              disable: false,
+              disableMutationObserver: isMobile
+            });
+            
+            // Refresh AOS on window resize to recalculate positions
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+              clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(function() {
+                AOS.refresh();
+              }, 250);
+            });
+          });
         </script>
         
         <!-- Calcifer Companion Script -->

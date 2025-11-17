@@ -1,5 +1,8 @@
 ---
 // Define the array of projects directly in the frontmatter script.
+import BlossomingFlower from './BlossomingFlower.astro';
+import CSSFlowers from './CSSFlowers.astro';
+
 const otherprojects = [
   {
     "url": "https://www.baggu.com/",
@@ -93,6 +96,45 @@ function calculateAosDelay(index) {
           </div>
         </li>
       ))}
+      
+      <!-- CSS Flowers - Decorative element - DISABLED FOR NOW -->
+      <!-- <li class="flow-root h-full">
+        <CSSFlowers />
+      </li> -->
+
+      <!-- Blossoming Flower Animation - DISABLED FOR NOW -->
+      <!-- <li class="flow-root h-full flower-grid-spot">
+        <BlossomingFlower />
+      </li> -->
     </ul>
   </div>
 </section>
+
+<style>
+  /* Ensure flower is always in the far right on desktop and at the very bottom on mobile */
+  .flower-grid-spot {
+    /* On mobile (1 column), it will naturally be at the bottom */
+    order: 999;
+  }
+
+  @media (min-width: 640px) {
+    /* On tablet (2 columns), place it in the last position */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+
+  @media (min-width: 768px) {
+    /* On desktop (3 columns), place it in the last position */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* On large desktop (4 columns), place it in the last position (far right) */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+</style>

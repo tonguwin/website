@@ -1,0 +1,111 @@
+---
+// CSS Flowers Component - Decorative flowers to fill grid space
+---
+
+<div class="css-flowers-container">
+  <div class="flower flower-1"></div>
+  <div class="flower flower-2"></div>
+</div>
+
+<style>
+  .css-flowers-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .flower {
+    position: absolute;
+    background: rgb(var(--color-secondary));
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  /* First flower - cute simple star */
+  .flower-1 {
+    width: 80px;
+    aspect-ratio: 1;
+    background: rgb(var(--color-secondary));
+    clip-path: polygon(
+      50% 0%, 
+      61% 35%, 
+      98% 35%, 
+      68% 57%, 
+      79% 91%, 
+      50% 70%, 
+      21% 91%, 
+      32% 57%, 
+      2% 35%, 
+      39% 35%
+    );
+    top: 40%;
+    left: 30%;
+    transform: translate(-50%, -50%) rotate(15deg);
+    opacity: 0.8;
+  }
+
+  /* Second flower - solid center */
+  .flower-2 {
+    width: 50px;
+    aspect-ratio: 1;
+    --g: /37.02% 37.02% radial-gradient(currentColor calc(71% - 1px), #0000 71%) no-repeat;
+    mask: 
+      99.334% 58.132% var(--g),
+      57.511% 99.433% var(--g),
+      5.308% 72.419% var(--g),
+      14.868% 14.423% var(--g),
+      72.979% 5.593% var(--g),
+      radial-gradient(100% 100%, currentColor 25.476%, #0000 calc(25.476% + 1px));
+    top: 60%;
+    left: 70%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    opacity: 0.9;
+  }
+
+  /* Hover effects */
+  .css-flowers-container:hover .flower-1 {
+    transform: translate(-50%, -50%) rotate(30deg) scale(1.15);
+    opacity: 1;
+  }
+
+  .css-flowers-container:hover .flower-2 {
+    transform: translate(-50%, -50%) rotate(-20deg) scale(1.1);
+    opacity: 1;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .css-flowers-container {
+      min-height: 150px;
+      padding: 1.5rem;
+    }
+
+    .flower-1 {
+      width: 60px;
+      left: 33%;
+      top: 38%;
+    }
+
+    .flower-2 {
+      width: 32px;
+      left: 67%;
+      top: 62%;
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 641px) and (max-width: 1023px) {
+    .flower-1 {
+      width: 70px;
+    }
+
+    .flower-2 {
+      width: 42px;
+    }
+  }
+</style>
+
