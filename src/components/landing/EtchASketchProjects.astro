@@ -1,0 +1,822 @@
+---
+// Define the array of projects with image data
+const projects = [
+  {
+    "url": "https://www.baggu.com/",
+    "title": "BAGGU",
+    "description": "Manages a team of three, overseeing product setup and software development across all sales channels, focusing on operational efficiency and streamlined workflows.",
+    "logo": "BAGGU",
+    "hiddenContent": "Led cross-functional initiatives • Optimized checkout flow • Reduced cart abandonment by 23% • Implemented A/B testing framework • Built internal tools for inventory management"
+  },
+  {
+    "url": "https://shiphawk.com/",
+    "title": "ShipHawk",
+    "description": "Built a Looker dashboard with streamlined data from Fivetran that visualizes daily and weekly performance target metrics for the ShipHawk Product Team.",
+    "logo": "ShipHawk",
+    "hiddenContent": "Data visualization • SQL optimization • Real-time metrics • Team collaboration dashboard • Performance tracking • Custom reporting tools"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=v0yrY72n3tY",
+    "title": "TEDx Co-Director",
+    "description": "Coordinated a 10 team organization to host 2 virtual TEDx conferences with 80,000+ views featuring prominent speakers like Mayuko Inoue.",
+    "logo": "TEDx",
+    "hiddenContent": "Event management • Speaker coordination • Marketing campaigns • 80K+ views • Virtual production • Team leadership • Budget management"
+  },
+  {
+    "title": "Netflix Watch Party Project",
+    "description": "Conducted 25+ Netflix user interviews to identify key pain points; analyzed market trends and organizational needs to inform the implementation of a social integration feature.",
+    "logo": "Netflix",
+    "hiddenContent": "User research • 25+ interviews • Competitive analysis • Feature roadmap • Social integration strategy • Wireframing • Prototyping"
+  },
+  {
+    "url": "/case-study/accessories-copper",
+    "title": "Accessories Case Study - Copper",
+    "description": "Strategic analysis exploring business-expanding accessories that create meaningful impact and unlock new revenue opportunities through thoughtful product development.",
+    "badge": "New",
+    "logo": "Copper",
+    "hiddenContent": "Market research • Revenue modeling • Product strategy • Business case development • Go-to-market planning • Competitive landscape analysis"
+  }
+];
+---
+
+<section class="bg-primary">
+  <div class="px-8 2xl:max-w-7xl mx-auto py-27">
+    <!-- Section Header -->
+    <div class="space-y-2">
+      <div
+        class="h-0.5 bg-secondary"
+        data-aos="fade-up"
+        data-aos-duration="1000"
+      ></div>
+      <h3
+        class="text-secondary text-base font-medium"
+        data-aos="fade-up"
+        data-aos-duration="1500"
+      >
+        <span>main</span>
+        <span class="font-bold">experience + projects</span>
+      </h3>
+    </div>
+
+    <!-- Projects List -->
+    <div class="mt-20 space-y-16">
+      {projects.map((project, index) => {
+        const isEven = index % 2 === 0;
+        const delay = index * 150;
+        
+        return (
+          <div 
+            class="project-row"
+            data-aos="fade-up"
+            data-aos-duration="1000"
+            data-aos-delay={delay.toString()}
+          >
+            <div class={`project-content ${isEven ? '' : 'reverse'}`}>
+              
+              {/* Text Content Side */}
+              <div class="text-side">
+                <div class="flex items-start justify-between gap-4 mb-3">
+                  <h3 class="text-2xl font-bold text-secondary">
+                    {project.title}
+                  </h3>
+                  {project.badge && (
+                    <span class="inline-flex items-center rounded-full border border-secondary/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">
+                      {project.badge}
+                    </span>
+                  )}
+                </div>
+                <p class="text-base text-secondary leading-relaxed mb-4">
+                  {project.description}
+                </p>
+                {project.url && (
+                  <a href={project.url} class="inline-flex items-center gap-2 text-secondary hover:opacity-70 transition-opacity group">
+                    <span class="font-medium">View Project</span>
+                    <span class="text-lg transition-transform group-hover:translate-x-1 group-hover:-translate-y-1">↗</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Image Side with Eraser Bar */}
+              <div class="image-side">
+                <div class="image-container" data-project-index={index}>
+                  {/* Bottom Layer - Hidden Content */}
+                  <div class="bottom-layer">
+                    <div class="hidden-details">
+                      <p class="text-sm leading-relaxed">
+                        {project.hiddenContent}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Top Layer - Logo/Image */}
+                  <div class="top-layer">
+                    <canvas class="logo-canvas" data-logo={project.logo}></canvas>
+                  </div>
+
+                  {/* Distortion Layer - circular mask */}
+                  <div class="distortion-layer">
+                    <canvas class="distortion-canvas" data-container-index={index}></canvas>
+                  </div>
+
+                  {/* Custom Star Cursor */}
+                  <div class="cursor-star"></div>
+                  
+                  {/* Eraser Bar - at bottom edge */}
+                  <div class="eraser-bar">
+                    <div class="eraser-handle"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Minimal Project Row */
+  .project-row {
+    width: 100%;
+    border-bottom: 1px solid rgba(var(--color-secondary), 0.1);
+    padding-bottom: 4rem;
+  }
+
+  .project-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .project-content.reverse {
+    direction: rtl;
+  }
+
+  .project-content.reverse > * {
+    direction: ltr;
+  }
+
+  /* Text Side */
+  .text-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Image Side */
+  .image-side {
+    position: relative;
+  }
+
+  .image-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: rgb(var(--color-secondary));
+    border: 2px solid rgba(var(--color-secondary), 0.3);
+    border-radius: 4px;
+    overflow: visible;
+    cursor: none;
+  }
+
+  /* Custom star cursor */
+  .cursor-star {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    z-index: 100;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    background: rgb(var(--color-primary));
+    --g: /37.02% 37.02% radial-gradient(rgb(var(--color-primary)) calc(71% - 1px), transparent 71%) no-repeat;
+    mask: 
+      radial-gradient(100% 100%, #000 calc(30% - 1px), transparent 30%) subtract,
+      99.748% 55.018% var(--g),
+      60.6% 98.863% var(--g),
+      6.804% 75.181% var(--g),
+      12.703% 16.699% var(--g),
+      70.145% 4.238% var(--g);
+  }
+
+  .image-container:hover .cursor-star {
+    opacity: 1;
+  }
+
+  /* Heavy grain texture - multiple layers */
+  .image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 10;
+    mix-blend-mode: overlay;
+  }
+
+  /* Additional heavy noise layer */
+  .image-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 1px,
+        rgba(0, 0, 0, 0.05) 1px,
+        rgba(0, 0, 0, 0.05) 2px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 1px,
+        rgba(0, 0, 0, 0.05) 1px,
+        rgba(0, 0, 0, 0.05) 2px
+      ),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='turbulence' baseFrequency='1.5' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 11;
+    mix-blend-mode: multiply;
+  }
+
+  /* Top Layer - Logo */
+  .top-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(var(--color-secondary));
+    z-index: 2;
+    clip-path: inset(0 0 0 0);
+    transition: none;
+    will-change: clip-path;
+  }
+
+  .logo-canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* SVG filter container */
+  .filter-container {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: visible;
+  }
+
+  /* Distortion layer - only shows in circular area */
+  .distortion-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .image-container:hover .distortion-layer {
+    opacity: 1;
+  }
+
+  .distortion-layer canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Bottom Layer - Hidden Content */
+  .bottom-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgb(var(--color-secondary));
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .hidden-details {
+    text-align: center;
+  }
+
+  .hidden-details p {
+    color: rgb(var(--color-primary));
+  }
+
+  /* Ziplock Slider Bar - White with texture */
+  .eraser-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--color-primary)) 0%,
+      rgba(var(--color-primary), 0.95) 50%,
+      rgb(var(--color-primary)) 100%
+    );
+    border: 2px solid rgba(var(--color-secondary), 0.2);
+    border-radius: 0 0 4px 4px;
+    border-top: 3px solid rgba(var(--color-secondary), 0.15);
+    z-index: 50;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    box-shadow: 
+      0 -2px 8px rgba(0,0,0,0.15),
+      0 4px 16px rgba(0,0,0,0.2),
+      inset 0 1px 2px rgba(255,255,255,0.8),
+      inset 0 -1px 2px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: visible;
+    transition: all 0.2s ease;
+  }
+
+  /* Noise texture overlay */
+  .eraser-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.15;
+    pointer-events: none;
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* Track indicator line */
+  .eraser-bar::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    right: 12px;
+    height: 3px;
+    background: repeating-linear-gradient(
+      to right,
+      rgba(var(--color-secondary), 0.15) 0px,
+      rgba(var(--color-secondary), 0.15) 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    transform: translateY(-50%);
+    border-radius: 2px;
+  }
+
+  .eraser-bar:hover {
+    background: linear-gradient(
+      to bottom,
+      rgba(var(--color-primary), 1) 0%,
+      rgba(var(--color-primary), 0.98) 50%,
+      rgba(var(--color-primary), 1) 100%
+    );
+    box-shadow: 
+      0 -2px 12px rgba(0,0,0,0.2),
+      0 4px 20px rgba(0,0,0,0.25),
+      inset 0 1px 2px rgba(255,255,255,0.9),
+      inset 0 -1px 2px rgba(0,0,0,0.1);
+  }
+
+  .eraser-bar:active {
+    cursor: grabbing;
+    box-shadow: 
+      0 -1px 4px rgba(0,0,0,0.2),
+      0 2px 12px rgba(0,0,0,0.3),
+      inset 0 2px 4px rgba(0,0,0,0.15);
+    transform: translateY(1px);
+  }
+
+  /* Modern Ziplock Slider Handle */
+  .eraser-handle {
+    width: 60px;
+    height: 52px;
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-secondary), 1) 0%,
+      rgba(var(--color-secondary), 0.9) 50%,
+      rgba(var(--color-secondary), 1) 100%
+    );
+    border: 3px solid rgba(var(--color-primary), 0.3);
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 
+      0 6px 12px rgba(0,0,0,0.25),
+      0 2px 4px rgba(0,0,0,0.15),
+      inset 0 1px 2px rgba(255,255,255,0.1),
+      inset 0 -1px 2px rgba(0,0,0,0.3);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -6px;
+    cursor: grab;
+  }
+
+  /* Grip dots pattern */
+  .eraser-handle::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background-image: radial-gradient(
+      circle,
+      rgba(var(--color-primary), 0.25) 2px,
+      transparent 2px
+    );
+    background-size: 8px 8px;
+    background-position: 0 0, 4px 4px;
+  }
+
+  /* Pull tab indicator */
+  .eraser-handle::after {
+    content: '⟷';
+    position: absolute;
+    font-size: 18px;
+    color: rgba(var(--color-primary), 0.4);
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .eraser-handle:hover {
+    background: linear-gradient(
+      135deg,
+      rgba(var(--color-secondary), 1) 0%,
+      rgba(var(--color-secondary), 0.95) 50%,
+      rgba(var(--color-secondary), 1) 100%
+    );
+    border-color: rgba(var(--color-primary), 0.4);
+    box-shadow: 
+      0 8px 16px rgba(0,0,0,0.3),
+      0 3px 6px rgba(0,0,0,0.2),
+      inset 0 1px 2px rgba(255,255,255,0.15),
+      inset 0 -1px 2px rgba(0,0,0,0.3);
+    transform: translateY(-1px);
+  }
+
+  .eraser-bar:active .eraser-handle {
+    cursor: grabbing;
+    transform: scale(0.97) translateY(0px);
+    box-shadow: 
+      0 3px 8px rgba(0,0,0,0.3),
+      0 1px 3px rgba(0,0,0,0.2),
+      inset 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 1024px) {
+    .project-content {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .project-content.reverse {
+      direction: ltr;
+    }
+
+    .image-container {
+      aspect-ratio: 4/3;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-row {
+      padding-bottom: 3rem;
+    }
+
+    .project-content {
+      gap: 1.5rem;
+    }
+
+    .eraser-bar {
+      height: 36px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .eraser-handle {
+      width: 40px;
+      height: 42px;
+    }
+
+    .eraser-handle::after {
+      width: 24px;
+      height: 6px;
+      top: -6px;
+    }
+
+    .bottom-layer {
+      padding: 1rem;
+    }
+
+    .hidden-details p {
+      font-size: 0.75rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get theme colors
+    function getThemeColors() {
+      const root = document.documentElement;
+      const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
+      
+      if (primaryColor && primaryColor.includes(' ')) {
+        const [r, g, b] = primaryColor.split(' ').map(v => parseInt(v.trim()));
+        return { r, g, b };
+      }
+      return { r: 235, g: 235, b: 235 };
+    }
+
+    // Initialize logo canvases
+    const logoCanvases = document.querySelectorAll('.logo-canvas');
+    
+    logoCanvases.forEach((canvas) => {
+      const ctx = canvas.getContext('2d');
+      const logo = canvas.dataset.logo;
+      
+      // Set canvas size
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      // Draw sketchy logo with offset black
+      function drawSketchyLogo() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        const colors = getThemeColors();
+        
+        // Calculate offset black (slightly lighter than pure black)
+        const offsetR = Math.min(255, colors.r * 0.3);
+        const offsetG = Math.min(255, colors.g * 0.3);
+        const offsetB = Math.min(255, colors.b * 0.3);
+        
+        // Set sketch style - offset black
+        ctx.strokeStyle = `rgba(${offsetR}, ${offsetG}, ${offsetB}, 0.8)`;
+        ctx.fillStyle = `rgba(${offsetR}, ${offsetG}, ${offsetB}, 0.6)`;
+        ctx.lineWidth = 2.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        // Draw logo text in sketchy style
+        const fontSize = Math.min(canvas.width / logo.length * 1.2, canvas.height * 0.4);
+        ctx.font = `bold ${fontSize}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        // Create sketchy effect by drawing multiple slightly offset strokes
+        for (let i = 0; i < 5; i++) {
+          const jitterX = (Math.random() - 0.5) * 4;
+          const jitterY = (Math.random() - 0.5) * 4;
+          ctx.strokeText(logo, centerX + jitterX, centerY + jitterY);
+        }
+        
+        // Fill with slight transparency
+        ctx.fillText(logo, centerX, centerY);
+      }
+      
+      drawSketchyLogo();
+      
+      // Redraw on resize
+      window.addEventListener('resize', () => {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        drawSketchyLogo();
+      });
+    });
+    
+    // Initialize eraser bars and distortion effect
+    const imageContainers = document.querySelectorAll('.image-container');
+    
+    imageContainers.forEach((container, containerIndex) => {
+      const eraserBar = container.querySelector('.eraser-bar');
+      const topLayer = container.querySelector('.top-layer');
+      const eraserHandle = container.querySelector('.eraser-handle');
+      const logoCanvas = container.querySelector('.logo-canvas');
+      const distortionCanvas = container.querySelector('.distortion-canvas');
+      const cursorStar = container.querySelector('.cursor-star');
+      
+      let isDragging = false;
+      let currentPosition = 0; // 0 = fully visible, 1 = fully erased
+      let targetPosition = 0;
+      
+      // Setup distortion canvas
+      const distortCtx = distortionCanvas.getContext('2d');
+      distortionCanvas.width = container.offsetWidth;
+      distortionCanvas.height = container.offsetHeight;
+      
+      // Old-school mechanical eraser animation
+      function animateEraser() {
+        // Mechanical easing with resistance
+        const diff = targetPosition - currentPosition;
+        const resistance = 0.12; // Slower, more mechanical feel
+        currentPosition += diff * resistance;
+        
+        // Mechanical quantization - snap to grid for that old-school feel
+        const gridSize = 0.003; // Smaller steps for mechanical movement
+        const quantizedPosition = Math.round(currentPosition / gridSize) * gridSize;
+        
+        // Add mechanical jitter/vibration
+        const mechanicalJitter = (Math.random() - 0.5) * 0.004;
+        const finalPosition = quantizedPosition + mechanicalJitter;
+        
+        // Update eraser handle position
+        const barRect = eraserBar.getBoundingClientRect();
+        const handleX = finalPosition * (barRect.width - 32);
+        eraserHandle.style.transform = `translateX(${handleX}px)`;
+        
+        // Update clip-path with mechanical steps
+        const clipAmount = finalPosition * 100;
+        
+        // Add slight horizontal scan line effect during movement
+        const isMoving = Math.abs(diff) > 0.001;
+        if (isMoving) {
+          const scanlineOffset = Math.sin(Date.now() * 0.01) * 0.5;
+          topLayer.style.clipPath = `inset(0 0 0 ${clipAmount + scanlineOffset}%)`;
+        } else {
+          topLayer.style.clipPath = `inset(0 0 0 ${clipAmount}%)`;
+        }
+        
+        requestAnimationFrame(animateEraser);
+      }
+      
+      animateEraser();
+      
+      // Mouse/touch events for eraser
+      function startDrag(e) {
+        isDragging = true;
+        e.preventDefault();
+      }
+      
+      function drag(e) {
+        if (!isDragging) return;
+        
+        const rect = container.getBoundingClientRect();
+        const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const x = clientX - rect.left;
+        
+        // Update target position
+        targetPosition = Math.max(0, Math.min(1, x / rect.width));
+      }
+      
+      function stopDrag() {
+        isDragging = false;
+      }
+      
+      // Mouse events
+      eraserBar.addEventListener('mousedown', startDrag);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', stopDrag);
+      
+      // Touch events
+      eraserBar.addEventListener('touchstart', startDrag);
+      document.addEventListener('touchmove', drag);
+      document.addEventListener('touchend', stopDrag);
+      
+      // Click to jump
+      eraserBar.addEventListener('click', (e) => {
+        const rect = eraserBar.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        targetPosition = Math.max(0, Math.min(1, x / rect.width));
+      });
+
+      // Localized circular distortion effect
+      let mouseX = -1000;
+      let mouseY = -1000;
+      let isHovering = false;
+      const distortRadius = 90;
+      
+      container.addEventListener('mouseenter', () => {
+        isHovering = true;
+      });
+      
+      container.addEventListener('mouseleave', () => {
+        isHovering = false;
+        mouseX = -1000;
+        mouseY = -1000;
+      });
+      
+      container.addEventListener('mousemove', (e) => {
+        const rect = container.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+        
+        // Update star cursor position
+        cursorStar.style.left = mouseX + 'px';
+        cursorStar.style.top = mouseY + 'px';
+      });
+      
+      // Animate circular distortion
+      function animateDistortion() {
+        distortCtx.clearRect(0, 0, distortionCanvas.width, distortionCanvas.height);
+        
+        if (isHovering && mouseX > 0 && mouseY > 0) {
+          const time = Date.now() * 0.001;
+          
+          // Draw the original logo
+          distortCtx.drawImage(logoCanvas, 0, 0);
+          
+          // Get image data
+          const imageData = distortCtx.getImageData(0, 0, distortionCanvas.width, distortionCanvas.height);
+          const outputData = distortCtx.createImageData(distortionCanvas.width, distortionCanvas.height);
+          
+          // Apply distortion only in circular area
+          for (let y = 0; y < distortionCanvas.height; y++) {
+            for (let x = 0; x < distortionCanvas.width; x++) {
+              const dx = x - mouseX;
+              const dy = y - mouseY;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              const targetIdx = (y * distortionCanvas.width + x) * 4;
+              
+              if (distance < distortRadius) {
+                // Inside distortion circle - apply warping
+                const strength = Math.pow(1 - (distance / distortRadius), 1.5);
+                const angle = Math.atan2(dy, dx);
+                
+                // Whirlpool + wave distortion - INCREASED INTENSITY
+                const rotation = strength * 1.2 * Math.sin(time * 2);
+                const wave = Math.sin(distance * 0.2 - time * 4) * strength * 25;
+                
+                const newAngle = angle + rotation;
+                const newDistance = distance + wave;
+                
+                const sourceX = Math.round(mouseX + Math.cos(newAngle) * newDistance);
+                const sourceY = Math.round(mouseY + Math.sin(newAngle) * newDistance);
+                
+                if (sourceX >= 0 && sourceX < distortionCanvas.width && 
+                    sourceY >= 0 && sourceY < distortionCanvas.height) {
+                  const sourceIdx = (sourceY * distortionCanvas.width + sourceX) * 4;
+                  
+                  // Copy distorted pixel
+                  outputData.data[targetIdx] = imageData.data[sourceIdx];
+                  outputData.data[targetIdx + 1] = imageData.data[sourceIdx + 1];
+                  outputData.data[targetIdx + 2] = imageData.data[sourceIdx + 2];
+                  outputData.data[targetIdx + 3] = imageData.data[sourceIdx + 3];
+                } else {
+                  // Out of bounds - use original
+                  outputData.data[targetIdx] = imageData.data[targetIdx];
+                  outputData.data[targetIdx + 1] = imageData.data[targetIdx + 1];
+                  outputData.data[targetIdx + 2] = imageData.data[targetIdx + 2];
+                  outputData.data[targetIdx + 3] = imageData.data[targetIdx + 3];
+                }
+                
+                // Apply circular fade at edges
+                const edgeFade = Math.min(1, (distortRadius - distance) / 20);
+                outputData.data[targetIdx + 3] *= edgeFade;
+              } else {
+                // Outside circle - transparent
+                outputData.data[targetIdx] = 0;
+                outputData.data[targetIdx + 1] = 0;
+                outputData.data[targetIdx + 2] = 0;
+                outputData.data[targetIdx + 3] = 0;
+              }
+            }
+          }
+          
+          distortCtx.putImageData(outputData, 0, 0);
+        }
+        
+        requestAnimationFrame(animateDistortion);
+      }
+      
+      animateDistortion();
+      
+      // Handle resize
+      window.addEventListener('resize', () => {
+        distortionCanvas.width = container.offsetWidth;
+        distortionCanvas.height = container.offsetHeight;
+      });
+    });
+  });
+</script>
+
