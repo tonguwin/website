@@ -99,63 +99,137 @@ const features = [
       </div>
     </div>
 
-    <!-- Charmander at the very bottom -->
-    <div class="charmander-container">
-      <a href="/blog/the-attic" class="charmander-link" onclick="handleCharmander(event)">
-        <svg
-          version="1.1"
-          id="charmander"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 64 64"
-          xml:space="preserve"
-          width="120"
-          height="120"
-          class="charmander-svg"
-        >
-          <!-- Tail (moved to back) -->
-          <path d="M40,44 h10 v4 h-10 z" fill="#FFA726" />
-          <path d="M50,44 h2 v4 h-2 z" fill="#FFEB3B" />
-          <path d="M52,44 h2 v4 h-2 z" fill="#FF5722" />
+    <!-- Sleeping Sprites at the bottom -->
+    <div class="sprites-container">
+      <!-- Larvitar on the left - links to Gallery -->
+      <div class="larvitar-container">
+        <a href="/gallery" class="larvitar-link" onclick="handleLarvitar(event)">
+          <svg
+            version="1.1"
+            id="larvitar"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            width="100"
+            height="100"
+            class="larvitar-svg"
+          >
+            <!-- Back spikes -->
+            <path d="M44,28 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,32 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M50,36 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,40 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Horn -->
+            <path d="M28,4 h8 v4 h-8 z" fill="#9CB18C" />
+            <path d="M30,0 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Head -->
+            <path d="M20,8 h24 v20 h-24 z" fill="#A8C090" />
+            
+            <!-- Body -->
+            <path d="M16,28 h32 v24 h-32 z" fill="#A8C090" />
+            
+            <!-- Red belly diamond -->
+            <path d="M28,32 h8 v4 h-8 z" fill="#C65D4A" />
+            <path d="M26,36 h12 v6 h-12 z" fill="#C65D4A" />
+            <path d="M28,42 h8 v4 h-8 z" fill="#C65D4A" />
+            
+            <!-- Black diamond markings - both sides -->
+            <path d="M20,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            <path d="M40,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            
+            <!-- Eyes - Awake (visible on hover) -->
+            <g class="larvitar-eyes-awake">
+              <path d="M24,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <path d="M34,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <circle cx="27" cy="19" r="2" fill="#C44" />
+              <circle cx="37" cy="19" r="2" fill="#C44" />
+            </g>
+            
+            <!-- Eyes - Sleeping (visible by default) -->
+            <g class="larvitar-eyes-sleeping">
+              <path d="M24,18 h6 v2 h-6 z" fill="#2D2D2D" />
+              <path d="M34,18 h6 v2 h-6 z" fill="#2D2D2D" />
+            </g>
+            
+            <!-- Arms -->
+            <path d="M12,32 h4 v10 h-4 z" fill="#A8C090" />
+            <path d="M48,32 h4 v10 h-4 z" fill="#A8C090" />
+            
+            <!-- White claws on base body -->
+            <path d="M18,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M24,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M36,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M42,50 h4 v4 h-4 z" fill="#FFFFFF" />
+          </svg>
+          
+          <!-- Floating Z's for Larvitar -->
+          <div class="larvitar-zzz-container">
+            <span class="larvitar-z larvitar-z1">Z</span>
+            <span class="larvitar-z larvitar-z2">Z</span>
+            <span class="larvitar-z larvitar-z3">Z</span>
+          </div>
+        </a>
+      </div>
 
-          <!-- Charmander's Body -->
-          <path d="M20,30 h24 v24 h-24 z" fill="#FFA726" />
+      <!-- Charmander on the right - links to Attic -->
+      <div class="charmander-container">
+        <a href="/blog/the-attic" class="charmander-link" onclick="handleCharmander(event)">
+          <svg
+            version="1.1"
+            id="charmander"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 64 64"
+            xml:space="preserve"
+            width="120"
+            height="120"
+            class="charmander-svg"
+          >
+            <!-- Tail (moved to back) -->
+            <path d="M40,44 h10 v4 h-10 z" fill="#FFA726" />
+            <path d="M50,44 h2 v4 h-2 z" fill="#FFEB3B" />
+            <path d="M52,44 h2 v4 h-2 z" fill="#FF5722" />
 
-          <!-- Charmander's Head -->
-          <path d="M24,16 h16 v16 h-16 z" fill="#FFA726" />
+            <!-- Charmander's Body -->
+            <path d="M20,30 h24 v24 h-24 z" fill="#FFA726" />
 
-          <!-- Eyes - Awake (visible on hover) -->
-          <g class="eyes-awake">
-            <circle cx="28" cy="22" r="2" fill="#FFFFFF" />
-            <circle cx="36" cy="22" r="2" fill="#FFFFFF" />
-            <circle cx="28" cy="22" r="1" fill="#000000" />
-            <circle cx="36" cy="22" r="1" fill="#000000" />
-          </g>
+            <!-- Charmander's Head -->
+            <path d="M24,16 h16 v16 h-16 z" fill="#FFA726" />
 
-          <!-- Eyes - Sleeping (visible by default) -->
-          <g class="eyes-sleeping">
-            <path d="M26,22 h4 v1 h-4 z" fill="#000000" />
-            <path d="M34,22 h4 v1 h-4 z" fill="#000000" />
-          </g>
+            <!-- Eyes - Awake (visible on hover) -->
+            <g class="eyes-awake">
+              <circle cx="28" cy="22" r="2" fill="#FFFFFF" />
+              <circle cx="36" cy="22" r="2" fill="#FFFFFF" />
+              <circle cx="28" cy="22" r="1" fill="#000000" />
+              <circle cx="36" cy="22" r="1" fill="#000000" />
+            </g>
 
-          <!-- Mouth -->
-          <path d="M30,28 h4 v2 h-4 z" fill="#000000" />
+            <!-- Eyes - Sleeping (visible by default) -->
+            <g class="eyes-sleeping">
+              <path d="M26,22 h4 v1 h-4 z" fill="#000000" />
+              <path d="M34,22 h4 v1 h-4 z" fill="#000000" />
+            </g>
 
-          <!-- Belly -->
-          <path d="M26,36 h12 v12 h-12 z" fill="#FFE0B2" />
+            <!-- Mouth -->
+            <path d="M30,28 h4 v2 h-4 z" fill="#000000" />
 
-          <!-- Arms -->
-          <path d="M16,34 h4 v10 h-4 z" fill="#FFA726" />
-          <path d="M44,34 h4 v10 h-4 z" fill="#FFA726" />
-        </svg>
-        
-        <!-- Floating Z's -->
-        <div class="zzz-container">
-          <span class="z z1">Z</span>
-          <span class="z z2">Z</span>
-          <span class="z z3">Z</span>
-        </div>
-      </a>
+            <!-- Belly -->
+            <path d="M26,36 h12 v12 h-12 z" fill="#FFE0B2" />
+
+            <!-- Arms -->
+            <path d="M16,34 h4 v10 h-4 z" fill="#FFA726" />
+            <path d="M44,34 h4 v10 h-4 z" fill="#FFA726" />
+          </svg>
+          
+          <!-- Floating Z's -->
+          <div class="zzz-container">
+            <span class="z z1">Z</span>
+            <span class="z z2">Z</span>
+            <span class="z z3">Z</span>
+          </div>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -196,14 +270,105 @@ const features = [
         }
       }
 
-      /* Charmander container - at the very bottom of the page */
+      /* Sprites container - holds both Snorunt and Charmander */
+      .sprites-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 10px 20px 0px 20px;
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+
+      /* Larvitar container - left side */
+      .larvitar-container {
+        position: relative;
+      }
+
+      .larvitar-link {
+        position: relative;
+        display: block;
+        cursor: pointer;
+      }
+
+      .larvitar-svg {
+        transition: transform 0.3s ease-in-out;
+        animation: gentleBob 3.5s ease-in-out infinite;
+        animation-delay: 0.5s;
+      }
+
+      .larvitar-link:hover .larvitar-svg {
+        animation: shake 0.6s ease-in-out infinite;
+      }
+
+      /* Larvitar eye states */
+      .larvitar-eyes-sleeping {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-eyes-awake {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-link:hover .larvitar-eyes-sleeping {
+        opacity: 0;
+      }
+
+      .larvitar-link:hover .larvitar-eyes-awake {
+        opacity: 1;
+      }
+
+      /* Larvitar floating Z's */
+      .larvitar-zzz-container {
+        position: absolute;
+        top: -5px;
+        right: 60%;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-link:hover .larvitar-zzz-container {
+        opacity: 0;
+      }
+
+      .larvitar-z {
+        position: absolute;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        font-weight: bold;
+        color: rgb(var(--color-secondary));
+        opacity: 0;
+        animation: floatZ 3s ease-in-out infinite;
+      }
+
+      .larvitar-z1 {
+        left: 0px;
+        font-size: 10px;
+        animation-delay: 0.2s;
+      }
+
+      .larvitar-z2 {
+        left: 8px;
+        font-size: 14px;
+        animation-delay: 0.7s;
+      }
+
+      .larvitar-z3 {
+        left: 18px;
+        font-size: 18px;
+        animation-delay: 1.2s;
+      }
+
+      /* Larvitar dissipate on click */
+      .larvitar-svg.clicked {
+        animation: dissipate 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
+      }
+
+      /* Charmander container - right side */
       .charmander-container {
         position: relative;
-        display: flex;
-        justify-content: flex-end;
-        padding: 10px 20px 0px 20px; /* No bottom padding */
-        margin-top: 10px;
-        margin-bottom: 0; /* No bottom margin */
       }
 
       .charmander-link {
@@ -375,11 +540,32 @@ const features = [
 
       /* Mobile adjustments */
       @media (max-width: 640px) {
-        .charmander-container {
-          justify-content: center; /* Center on mobile */
-          padding: 5px 10px 0px 10px; /* No bottom padding */
+        .sprites-container {
+          padding: 5px 10px 0px 10px;
           margin-top: 5px;
-          margin-bottom: 0;
+          gap: 20px;
+        }
+
+        .larvitar-svg {
+          width: 70px;
+          height: 70px;
+        }
+
+        .larvitar-zzz-container {
+          top: -8px;
+          right: 50%;
+        }
+
+        .larvitar-z1 {
+          font-size: 8px;
+        }
+
+        .larvitar-z2 {
+          font-size: 11px;
+        }
+
+        .larvitar-z3 {
+          font-size: 14px;
         }
 
         .charmander-svg {
@@ -392,20 +578,20 @@ const features = [
         }
 
         .z {
-          font-family: 'Comic Sans MS', cursive, sans-serif; /* Ensure consistent font on mobile */
+          font-family: 'Comic Sans MS', cursive, sans-serif;
           font-weight: bold;
         }
 
         .z1 {
-          font-size: 10px; /* Smaller on mobile */
+          font-size: 10px;
         }
 
         .z2 {
-          font-size: 13px; /* Smaller on mobile */
+          font-size: 13px;
         }
 
         .z3 {
-          font-size: 16px; /* Smaller on mobile */
+          font-size: 16px;
         }
       }
     </style>
@@ -1217,14 +1403,16 @@ S     █         █       █         █
     </script>
     
     <script>
-      // Declare the function type globally
+      // Declare the function types globally
       declare global {
         interface Window {
           handleCharmander: (event: Event) => void;
+          handleLarvitar: (event: Event) => void;
         }
       }
 
       document.addEventListener('DOMContentLoaded', () => {
+        // Charmander click handler - goes to Attic
         window.handleCharmander = (event) => {
           event.preventDefault();
           const svg = document.getElementById('charmander');
@@ -1240,7 +1428,27 @@ S     █         █       █         █
             // Navigate after animation completes
             setTimeout(() => {
               window.location.href = '/blog/the-attic';
-            }, 800); // Faster transition
+            }, 800);
+          }
+        };
+
+        // Larvitar click handler - goes to Gallery
+        window.handleLarvitar = (event) => {
+          event.preventDefault();
+          const svg = document.getElementById('larvitar');
+          if (!svg.classList.contains('clicked')) {
+            svg.classList.add('clicked');
+            
+            // Smooth fade out of page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => {
+              document.body.style.opacity = '0';
+            }, 500);
+            
+            // Navigate after animation completes
+            setTimeout(() => {
+              window.location.href = '/gallery';
+            }, 800);
           }
         };
       });
