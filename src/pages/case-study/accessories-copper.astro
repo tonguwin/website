@@ -48,7 +48,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </p>
             </div>
 
-            <div class="physics-block bg-secondary/5 p-8 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="scout">
+            <div class="scout-hero bg-secondary/5 p-8 rounded-lg transition-all duration-200">
               <div class="flex flex-col lg:flex-row gap-8 items-center">
                 <div class="flex-1">
                   <div class="mb-4">
@@ -64,41 +64,75 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-              <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="customer-value">
-                <h4 class="text-lg font-semibold text-secondary mb-3">Customer Value</h4>
-                <ul class="text-secondary/90 leading-relaxed text-sm space-y-2">
-                  <li>• <span class="font-semibold">Extra cooking capacity</span> for Charlie owners (entertaining, hot pot dinners, camping)</li>
-                  <li>• <span class="font-semibold">Affordable entry point</span> for new customers ($200-500 vs $6k)</li>
-                  <li>• <span class="font-semibold">Connected experience</span> unified monitoring with Charlie app/screen</li>
-                </ul>
-              </div>
-              
-              <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="rationale">
-                <h4 class="text-lg font-semibold text-secondary mb-3">Rationale</h4>
-                <ul class="text-secondary/90 leading-relaxed text-sm space-y-2">
-                  <li>• <span class="font-semibold">Market gap:</span> <span class="font-semibold">Premium portable induction market</span> underserved - current options lack connectivity and battery power</li>
-                  <li>• <span class="font-semibold">Multiple use cases:</span> Different cooking scenarios need <span class="font-semibold">different price points and form factors</span></li>
-                  <li>• <span class="font-semibold">Strategic positioning:</span> Scout establishes Copper in <span class="font-semibold">portable market</span> while maintaining <span class="font-semibold">premium brand</span></li>
-                </ul>
-              </div>
-              
-              <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="cross-functional">
-                <h4 class="text-lg font-semibold text-secondary mb-3">Cross-Functional</h4>
-                <ul class="text-secondary/90 leading-relaxed text-sm space-y-2">
-                  <li>• <span class="font-semibold">Engineering:</span> Leverage existing <span class="font-semibold">Charlie battery technology</span></li>
-                  <li>• <span class="font-semibold">Operations:</span> <span class="font-semibold">Lower manufacturing costs</span> than full range</li>
-                  <li>• <span class="font-semibold">Design:</span> <span class="font-semibold">Compact form factor</span> while preserving intuitive Charlie interface/controls</li>
-                </ul>
-              </div>
-              
-              <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="success-metrics">
-                <h4 class="text-lg font-semibold text-secondary mb-3">Success Metrics</h4>
-                <ul class="text-secondary/90 leading-relaxed text-sm space-y-2">
-                  <li>• <span class="font-semibold">Market expansion:</span> Scout captures <span class="font-semibold">untapped segments</span> (renters, students, outdoor enthusiasts)</li>
-                  <li>• <span class="font-semibold">Conversion rate:</span> <span class="font-semibold">Scout-to-Charlie upgrades</span> vs. industry gateway product benchmarks</li>
-                  <li>• <span class="font-semibold">Ecosystem engagement:</span> <span class="font-semibold">% of Scout+Charlie owners</span> actively using both products</li>
-                </ul>
+            <!-- Scout Value Cards - Horizontal scroll on mobile, 4-col on desktop -->
+            <div class="scout-cards-container">
+              <div class="scout-cards">
+                <div class="scout-card">
+                  <div class="scout-card-accent"></div>
+                  <h4 class="scout-card-title">Why Customers Want It</h4>
+                  <div class="scout-card-content">
+                    <p class="scout-card-text">
+                      Scout gives Charlie owners an <span class="font-semibold">extra burner</span> for entertaining, hot pot nights, or camping trips.
+                    </p>
+                    <p class="scout-card-text">
+                      For everyone else, it's a <span class="font-semibold">$200–500 entry</span> into Copper's world—a taste of the premium experience without the $6k commitment.
+                    </p>
+                    <p class="scout-card-text">
+                      And because it syncs with the Charlie app, the whole <span class="font-semibold">ecosystem feels unified</span>.
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="scout-card">
+                  <div class="scout-card-accent"></div>
+                  <h4 class="scout-card-title">Why It Makes Sense</h4>
+                  <div class="scout-card-content">
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Premium portable induction is underserved.</span> Current options lack connectivity and battery backup—exactly where Copper excels.
+                    </p>
+                    <p class="scout-card-text">
+                      Scout fills that gap while creating accessible price points for renters, outdoor cooks, and anyone not ready for a full range.
+                    </p>
+                    <p class="scout-card-text">
+                      It plants Copper's flag in portable <span class="font-semibold">without diluting the premium brand</span>.
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="scout-card">
+                  <div class="scout-card-accent"></div>
+                  <h4 class="scout-card-title">How We Build It</h4>
+                  <div class="scout-card-content">
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Engineering</span> reuses Charlie's existing battery tech.
+                    </p>
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Operations</span> benefits from lower manufacturing complexity than a full range.
+                    </p>
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Design</span> keeps Scout compact while preserving Charlie's intuitive controls.
+                    </p>
+                    <p class="scout-card-text scout-card-text-note">
+                      The foundation already exists—Scout extends it.
+                    </p>
+                  </div>
+                </div>
+                
+                <div class="scout-card">
+                  <div class="scout-card-accent"></div>
+                  <h4 class="scout-card-title">How We Measure Success</h4>
+                  <div class="scout-card-content">
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Market expansion</span> — Track reach into new segments: renters, students, outdoor enthusiasts.
+                    </p>
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Conversion rates</span> — Measure Scout-to-Charlie upgrades against industry gateway benchmarks.
+                    </p>
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Ecosystem stickiness</span> — How many owners actively use both products together.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -107,7 +141,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 </h3>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="spike">
+                  <div class="alt-product-card bg-secondary/5 p-6 rounded-lg transition-all duration-200 hover:bg-secondary/10">
                     <div class="flex flex-col sm:flex-row gap-4 items-start">
                       <div class="flex-1">
                         <h4 class="text-2xl font-bold text-secondary mb-1">Charlie Probe - "Spike"</h4>
@@ -124,7 +158,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                     </div>
                   </div>
                   
-                  <div class="physics-block bg-secondary/5 p-6 rounded-lg cursor-grab active:cursor-grabbing transition-all duration-200" data-block-id="perch">
+                  <div class="alt-product-card bg-secondary/5 p-6 rounded-lg transition-all duration-200 hover:bg-secondary/10">
                     <div class="flex flex-col sm:flex-row gap-4 items-start">
                       <div class="flex-1">
                         <h4 class="text-2xl font-bold text-secondary mb-1">Copper Trivet - "Perch"</h4>
@@ -185,22 +219,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   </div>
 
   <style>
-    .physics-block {
-      position: relative;
-      will-change: transform;
-      user-select: none;
-    }
-    
-    .physics-block.dragging {
-      z-index: 1000;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-    
-    .physics-block:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
     .highlight {
       padding: 0.125rem 0.25rem;
       border-radius: 0.25rem;
@@ -215,218 +233,145 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
       background-color: rgb(113 63 18); /* amber-800 for dark mode */
       color: rgb(254 243 199); /* amber-100 for dark mode */
     }
-  </style>
 
-  <script>
-    class PhysicsSystem {
-      constructor() {
-        this.blocks = [];
-        this.connections = [];
-        this.isDragging = false;
-        this.draggedBlock = null;
-        this.animationId = null;
-        
-        this.init();
-      }
-      
-      init() {
-        // Get all physics blocks
-        const blockElements = document.querySelectorAll('.physics-block');
-        
-        blockElements.forEach((element, index) => {
-          const rect = element.getBoundingClientRect();
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-          
-          const block = {
-            element: element,
-            id: element.dataset.blockId,
-            index: index,
-            x: 0, // Relative to original position
-            y: 0, // Relative to original position
-            originalX: 0,
-            originalY: 0,
-            vx: 0,
-            vy: 0,
-            mass: 1,
-            isDragging: false,
-            // Store boundaries relative to the element's container
-            bounds: {
-              left: -50,
-              right: 50,
-              top: -30,
-              bottom: 30
-            }
-          };
-          
-          this.blocks.push(block);
-          this.setupBlockEvents(block);
-        });
-        
-        // Create string connections (each block connected to the next)
-        for (let i = 0; i < this.blocks.length - 1; i++) {
-          this.connections.push({
-            blockA: this.blocks[i],
-            blockB: this.blocks[i + 1],
-            restLength: this.getDistance(this.blocks[i], this.blocks[i + 1]),
-            stiffness: 0.1
-          });
-        }
-        
-        this.startPhysicsLoop();
-      }
-      
-      setupBlockEvents(block) {
-        let startX, startY, initialMouseX, initialMouseY, initialTouchX, initialTouchY;
-        
-        const onStart = (e) => {
-          this.isDragging = true;
-          this.draggedBlock = block;
-          block.isDragging = true;
-          block.element.classList.add('dragging');
-          
-          const rect = block.element.getBoundingClientRect();
-          startX = rect.left;
-          startY = rect.top;
-          
-          if (e.type === 'touchstart') {
-            initialTouchX = e.touches[0].clientX;
-            initialTouchY = e.touches[0].clientY;
-          } else {
-            initialMouseX = e.clientX;
-            initialMouseY = e.clientY;
-          }
-          
-          document.addEventListener('mousemove', onMove);
-          document.addEventListener('mouseup', onEnd);
-          document.addEventListener('touchmove', onMove, { passive: false });
-          document.addEventListener('touchend', onEnd);
-          e.preventDefault();
-        };
-        
-        const onMove = (e) => {
-          if (!this.isDragging || !block.isDragging) return;
-          
-          let deltaX, deltaY;
-          if (e.type === 'touchmove') {
-            deltaX = e.touches[0].clientX - initialTouchX;
-            deltaY = e.touches[0].clientY - initialTouchY;
-          } else {
-            deltaX = e.clientX - initialMouseX;
-            deltaY = e.clientY - initialMouseY;
-          }
-          
-          // Constrain movement within bounds
-          block.x = Math.max(block.bounds.left, Math.min(block.bounds.right, deltaX));
-          block.y = Math.max(block.bounds.top, Math.min(block.bounds.bottom, deltaY));
-          
-          // Apply transform relative to original position
-          block.element.style.transform = `translate(${block.x}px, ${block.y}px)`;
-          e.preventDefault();
-        };
-        
-        const onEnd = () => {
-          this.isDragging = false;
-          if (block.isDragging) {
-            block.isDragging = false;
-            block.element.classList.remove('dragging');
-          }
-          
-          document.removeEventListener('mousemove', onMove);
-          document.removeEventListener('mouseup', onEnd);
-          document.removeEventListener('touchmove', onMove);
-          document.removeEventListener('touchend', onEnd);
-        };
-        
-        block.element.addEventListener('mousedown', onStart);
-        block.element.addEventListener('touchstart', onStart, { passive: false });
-      }
-      
-      getDistance(blockA, blockB) {
-        const dx = blockA.x - blockB.x;
-        const dy = blockA.y - blockB.y;
-        return Math.sqrt(dx * dx + dy * dy);
-      }
-      
-      applyStringForces() {
-        this.connections.forEach(connection => {
-          const { blockA, blockB, restLength, stiffness } = connection;
-          
-          const dx = blockB.x - blockA.x;
-          const dy = blockB.y - blockA.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance === 0) return;
-          
-          const force = (distance - restLength) * stiffness;
-          const forceX = (dx / distance) * force;
-          const forceY = (dy / distance) * force;
-          
-          // Apply forces (Newton's third law)
-          if (!blockA.isDragging) {
-            blockA.vx += forceX / blockA.mass;
-            blockA.vy += forceY / blockA.mass;
-          }
-          
-          if (!blockB.isDragging) {
-            blockB.vx -= forceX / blockB.mass;
-            blockB.vy -= forceY / blockB.mass;
-          }
-        });
-      }
-      
-      applyDamping() {
-        this.blocks.forEach(block => {
-          if (!block.isDragging) {
-            block.vx *= 0.85; // Damping factor
-            block.vy *= 0.85;
-          }
-        });
-      }
-      
-      applyRestoring() {
-        this.blocks.forEach(block => {
-          if (!block.isDragging) {
-            const restoreForce = 0.05;
-            block.vx += (block.originalX - block.x) * restoreForce;
-            block.vy += (block.originalY - block.y) * restoreForce;
-          }
-        });
-      }
-      
-      updatePositions() {
-        this.blocks.forEach(block => {
-          if (!block.isDragging) {
-            block.x += block.vx;
-            block.y += block.vy;
-            
-            // Apply boundaries to keep blocks in their designated areas
-            block.x = Math.max(block.bounds.left, Math.min(block.bounds.right, block.x));
-            block.y = Math.max(block.bounds.top, Math.min(block.bounds.bottom, block.y));
-            
-            // Update DOM element position relative to original position
-            block.element.style.transform = `translate(${block.x}px, ${block.y}px)`;
-          }
-        });
-      }
-      
-      startPhysicsLoop() {
-        const animate = () => {
-          this.applyStringForces();
-          this.applyRestoring();
-          this.applyDamping();
-          this.updatePositions();
-          
-          this.animationId = requestAnimationFrame(animate);
-        };
-        
-        animate();
+    /* Scout Hero Block */
+    .scout-hero {
+      position: relative;
+    }
+
+    .scout-hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Scout Cards Container - Horizontal scroll on mobile */
+    .scout-cards-container {
+      margin: 2rem 0 3rem 0;
+      position: relative;
+    }
+
+    .scout-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+
+    /* Individual Card Styling */
+    .scout-card {
+      position: relative;
+      padding: 1.5rem;
+      padding-left: 1.75rem;
+      background: rgba(var(--color-secondary-rgb, 128, 128, 128), 0.03);
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .scout-card:hover {
+      background: rgba(var(--color-secondary-rgb, 128, 128, 128), 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* Left accent bar */
+    .scout-card-accent {
+      position: absolute;
+      left: 0;
+      top: 1rem;
+      bottom: 1rem;
+      width: 3px;
+      background: rgb(var(--color-secondary));
+      border-radius: 2px;
+      opacity: 0.4;
+      transition: opacity 0.3s ease, height 0.3s ease;
+    }
+
+    .scout-card:hover .scout-card-accent {
+      opacity: 0.8;
+    }
+
+    .scout-card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: rgb(var(--color-secondary));
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.01em;
+    }
+
+    .scout-card-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .scout-card-text {
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: rgb(var(--color-secondary));
+      opacity: 0.95;
+    }
+
+    .scout-card-text-note {
+      margin-top: 0.25rem;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    /* Alt product cards (Spike, Perch) */
+    .alt-product-card {
+      position: relative;
+    }
+
+    .alt-product-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Tablet: 2x2 grid */
+    @media (max-width: 1024px) {
+      .scout-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
       }
     }
-    
-    // Initialize physics system when DOM is loaded
-    document.addEventListener('DOMContentLoaded', () => {
-      new PhysicsSystem();
-    });
-  </script>
+
+    /* Mobile: Horizontal scroll */
+    @media (max-width: 640px) {
+      .scout-cards-container {
+        margin-left: -2rem;
+        margin-right: -2rem;
+        padding: 0 2rem;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .scout-cards-container::-webkit-scrollbar {
+        display: none;
+      }
+
+      .scout-cards {
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .scout-card {
+        min-width: 280px;
+        flex-shrink: 0;
+      }
+
+      .scout-card:last-child {
+        margin-right: 2rem;
+      }
+
+      .scout-card-title {
+        font-size: 0.9rem;
+      }
+
+      .scout-card-text {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
 </BaseLayout>
