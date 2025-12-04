@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import CardboardBox from "../../components/CardboardBox.astro";
 
 // Blog posts with explicit dates for easy management
 const posts = [
@@ -8,36 +7,36 @@ const posts = [
     title: "A Maze",
     date: "November 12, 2025",
     slug: "a-maze",
-    preview: "Lost in the labyrinth...",
-    description: "Navigate a roguelike maze with limited vision, drop colored fires to mark your path, and battle spiky monsters."
+    code: "MAZE_NAV",
+    description: "Navigate a roguelike maze with limited vision."
   },
   {
     title: "Jumpboy",
     date: "March 31, 2025",
     slug: "jumpboy",
-    preview: "You've fallen too far...",
-    description: "An endless vertical platformer where you jump higher and higher, dodging monsters and collecting power-ups."
+    code: "JUMP_EXE",
+    description: "An endless vertical platformer."
   },
   {
-    title: "2021 Recipe Guide to Home Cooking",
+    title: "Recipe Guide",
     date: "October 10, 2021",
     slug: "cooking-guide",
-    preview: "Anyone can cook.",
-    description: "A personal collection of recipes, cooking and grocery shopping tips."
+    code: "COOK_LOG",
+    description: "A personal collection of recipes."
   },
   {
     title: "Calcifer",
     date: "March 10, 2025",
     slug: "calcifer",
-    preview: "",
-    description: "A cozy fireplace companion that crackles and glows with the warmth of your screen."
+    code: "FIRE_SYS",
+    description: "A cozy fireplace companion."
   },
   {
-    title: "Welcome to the Attic",
+    title: "Welcome",
     date: "March 9, 2025",
     slug: "welcome",
-    preview: "",
-    description: "The first entry—a dusty corner where my experiments and curiosities come to life."
+    code: "INIT_001",
+    description: "The first entry."
   }
 ];
 
@@ -50,574 +49,657 @@ const sortedPosts = [...posts].sort((a, b) => {
 ---
 
 <BaseLayout>
-  <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
-    <div class="max-w-3xl mx-auto">
-      <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
-        <h1 class="attic-title">
-          <span class="attic-letter">T</span>
-          <span class="attic-letter">h</span>
-          <span class="attic-letter">e</span>
-          <span class="attic-space"> </span>
-          <span class="attic-letter">A</span>
-          <span class="attic-letter">t</span>
-          <span class="attic-letter">t</span>
-          <span class="attic-letter">i</span>
-          <span class="attic-letter">c</span>
-        </h1>
-        <button
-          id="sort-toggle"
-          class="flex items-center space-x-2 text-primary/60 hover:text-white transition-colors duration-300"
-        >
-          <span id="sort-text">Newest First</span>
-          <svg class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M7 13l5 5 5-5"/>
-          </svg>
-        </button>
+  <div class="terminal-container">
+    <!-- Scanline overlay -->
+    <div class="scanlines"></div>
+    
+    <!-- CRT screen effect -->
+    <div class="crt-overlay"></div>
+    
+    <!-- Matrix rain background -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Main content -->
+    <div class="terminal-content">
+      <!-- ASCII Header -->
+      <pre class="ascii-header" data-aos="fade-in" data-aos-duration="2000">
+ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ █  ▄▄▄▄▄ █▀▄▄▀█  THE  ▀▄▄▀█  ATTIC  ▄▄▄▄▄ █
+ █ █   █ █▄▀▀▄█▄▄▄▄▄▄▄▄█▄▀▀▄█▄▄▄▄▄▄▄█ █   █ █
+ █ █▄▄▄█ █ ▀▄▀ █▀▄▀▄▀▄▀█ ▀▄▀ █▀▄▀▄▀▄█ █▄▄▄█ █
+ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+      </pre>
+      
+      <!-- System status -->
+      <div class="system-status">
+        <span class="blink">█</span> SYSTEM ONLINE <span class="status-dot"></span>
+        <span class="timestamp" id="timestamp"></span>
       </div>
       
-      <div id="posts-container" class="boxes-container">
+      <!-- Terminal prompt -->
+      <div class="terminal-prompt">
+        <span class="prompt-symbol">root@attic:~$</span>
+        <span class="typing-text" id="typing-text"></span>
+        <span class="cursor">▌</span>
+      </div>
+      
+      <!-- File listing -->
+      <div class="file-listing">
+        <div class="listing-header">
+          <span class="col-perms">drwxr-xr-x</span>
+          <span class="col-size">SIZE</span>
+          <span class="col-date">MODIFIED</span>
+          <span class="col-name">FILENAME</span>
+        </div>
+        
         {sortedPosts.map((post, index) => (
-          <CardboardBox
-            title={post.title}
-            date={post.date}
-            slug={post.slug}
-            description={post.description}
-            index={index}
-          />
+          <a href={`/blog/${post.slug}`} class="file-entry" data-index={index} data-title={post.title}>
+            <span class="col-perms">-rw-r--r--</span>
+            <span class="col-size">{Math.floor(Math.random() * 900 + 100)}K</span>
+            <span class="col-date">{post.date.split(' ').slice(0, 2).join(' ')}</span>
+            <span class="col-name">
+              <span class="encrypted-name">[ENCRYPTED] ████████.log</span>
+              <span class="decrypted-name">{post.code}_{post.slug}.exe</span>
+            </span>
+            <div class="file-description">
+              <span class="desc-arrow">→</span>
+              <span class="desc-text">{post.description}</span>
+            </div>
+            <div class="glitch-bar"></div>
+          </a>
         ))}
       </div>
-    </div>
-
-    <!-- Gastly at the very bottom (matching Charmander layout) -->
-    <div class="gastly-container">
-      <a href="/" class="gastly-link">
-        <svg
-          id="gastly"
-          class="gastly-svg"
-          viewBox="0 0 64 64"
-          xmlns="http://www.w3.org/2000/svg"
-          width="120"
-          height="120"
-        >
-          <!-- Gas effect (outer) -->
-          <circle cx="32" cy="32" r="24" fill="#2D1F3D" opacity="0.4">
-            <animate attributeName="r" values="24;26;24" dur="4s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.4;0.5;0.4" dur="4s" repeatCount="indefinite" />
-          </circle>
-
-          <!-- Main body -->
-          <circle cx="32" cy="32" r="20" fill="#382B4A">
-            <animate attributeName="r" values="20;21;20" dur="3s" repeatCount="indefinite" />
-          </circle>
-
-          <!-- Eyes -->
-          <g transform="translate(20,24)">
-            <!-- Left eye -->
-            <circle cx="0" cy="0" r="6" fill="white" opacity="0.9" />
-            <circle cx="0" cy="0" r="3" fill="#2D1F3D">
-              <animate attributeName="r" values="3;3.2;3" dur="3s" repeatCount="indefinite" />
-            </circle>
-
-            <!-- Right eye -->
-            <circle cx="24" cy="0" r="6" fill="white" opacity="0.9" />
-            <circle cx="24" cy="0" r="3" fill="#2D1F3D">
-              <animate attributeName="r" values="3;3.2;3" dur="3s" repeatCount="indefinite" />
-            </circle>
-          </g>
-
-          <!-- Mouth (subtle, like Charmander's) -->
-          <path
-            d="M30,36 C31,37 33,37 34,36"
-            fill="none"
-            stroke="white"
-            stroke-width="1"
-            stroke-linecap="round"
-            opacity="0.7"
-          />
-
-          <!-- Gas particles -->
-          <g opacity="0.4">
-            <circle cx="16" cy="32" r="3" fill="#2D1F3D">
-              <animate attributeName="cx" values="16;14;16" dur="4s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="32;30;32" dur="4s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0.6;0.4" dur="4s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="48" cy="32" r="3" fill="#2D1F3D">
-              <animate attributeName="cx" values="48;50;48" dur="4.5s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="32;34;32" dur="4.5s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0.6;0.4" dur="4.5s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="32" cy="16" r="3" fill="#2D1F3D">
-              <animate attributeName="cy" values="16;14;16" dur="5s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0.6;0.4" dur="5s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="32" cy="48" r="3" fill="#2D1F3D">
-              <animate attributeName="cy" values="48;50;48" dur="3.5s" repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0.4;0.6;0.4" dur="3.5s" repeatCount="indefinite" />
-            </circle>
-          </g>
-        </svg>
-      </a>
+      
+      <!-- Error messages that glitch in -->
+      <div class="error-messages">
+        <p class="error-line" id="error-1">WARNING: Memory corruption detected in sector 7G</p>
+        <p class="error-line" id="error-2">ERROR: Ghost process running on port 666</p>
+        <p class="error-line" id="error-3">ALERT: Unknown entity accessing /dev/soul</p>
+      </div>
+      
+      <!-- Exit prompt -->
+      <div class="exit-section">
+        <a href="/" class="exit-link">
+          <span class="exit-prompt">root@attic:~$</span>
+          <span class="exit-command">cd /home</span>
+          <span class="exit-hint">[PRESS TO ESCAPE]</span>
+        </a>
+      </div>
     </div>
   </div>
-
-  <style>
-    /* Add stars in the background */
-    .min-h-screen {
-      position: relative;
-      overflow: hidden;
-    }
-
-    .min-h-screen::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(2px 2px at 20px 30px, #ff000010 0%, #00ff0010 50%, #0000ff10 100%, transparent),
-        radial-gradient(2px 2px at 40px 70px, #ff00ff10 0%, #00ffff10 50%, #ffff0010 100%, transparent),
-        radial-gradient(2px 2px at 50px 160px, #ff800010 0%, #80ff0010 50%, #0080ff10 100%, transparent),
-        radial-gradient(2px 2px at 90px 40px, #ff008010 0%, #00ff8010 50%, #8000ff10 100%, transparent),
-        radial-gradient(2px 2px at 130px 80px, #ff400010 0%, #40ff0010 50%, #0040ff10 100%, transparent),
-        radial-gradient(2px 2px at 160px 120px, #ff004010 0%, #00ff4010 50%, #4000ff10 100%, transparent),
-        radial-gradient(2px 2px at 200px 30px, #ffc00010 0%, #c0ff0010 50%, #00c0ff10 100%, transparent),
-        radial-gradient(2px 2px at 240px 70px, #ff00c010 0%, #00ffc010 50%, #c000ff10 100%, transparent),
-        radial-gradient(2px 2px at 280px 160px, #ff600010 0%, #60ff0010 50%, #0060ff10 100%, transparent),
-        radial-gradient(2px 2px at 320px 40px, #ff006010 0%, #00ff6010 50%, #6000ff10 100%, transparent),
-        radial-gradient(2px 2px at 360px 80px, #ffa00010 0%, #a0ff0010 50%, #00a0ff10 100%, transparent),
-        radial-gradient(2px 2px at 400px 120px, #ff00a010 0%, #00ffa010 50%, #a000ff10 100%, transparent),
-        radial-gradient(2px 2px at 440px 30px, #ff200010 0%, #20ff0010 50%, #0020ff10 100%, transparent),
-        radial-gradient(2px 2px at 480px 70px, #ff002010 0%, #00ff2010 50%, #2000ff10 100%, transparent),
-        radial-gradient(2px 2px at 520px 160px, #ffe00010 0%, #e0ff0010 50%, #00e0ff10 100%, transparent),
-        radial-gradient(2px 2px at 560px 40px, #ff00e010 0%, #00ffe010 50%, #e000ff10 100%, transparent);
-      background-repeat: repeat;
-      background-size: 600px 600px;
-      animation: starGlow 8s ease-in-out infinite;
-      opacity: 0.4;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    @keyframes starGlow {
-      0% {
-        opacity: 0.3;
-        filter: hue-rotate(0deg) brightness(1);
-      }
-      25% {
-        opacity: 0.5;
-        filter: hue-rotate(90deg) brightness(1.2);
-      }
-      50% {
-        opacity: 0.4;
-        filter: hue-rotate(180deg) brightness(1);
-      }
-      75% {
-        opacity: 0.6;
-        filter: hue-rotate(270deg) brightness(1.3);
-      }
-      100% {
-        opacity: 0.3;
-        filter: hue-rotate(360deg) brightness(1);
-      }
-    }
-
-    /* Ensure content stays above the stars */
-    .max-w-3xl {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Spooky Floating Title */
-    .attic-title {
-      font-size: 3rem;
-      font-weight: bold;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 0.1em;
-      display: flex;
-      cursor: default;
-      filter: drop-shadow(0 0 20px rgba(var(--color-primary), 0.3));
-    }
-
-    .attic-letter {
-      display: inline-block;
-      color: rgb(var(--color-primary));
-      animation: float 3s ease-in-out infinite;
-      transition: all 0.3s ease;
-      text-shadow: 
-        0 0 10px rgba(var(--color-primary), 0.5),
-        0 0 20px rgba(var(--color-primary), 0.3),
-        2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .attic-letter:nth-child(1) { animation-delay: 0s; }
-    .attic-letter:nth-child(2) { animation-delay: 0.1s; }
-    .attic-letter:nth-child(3) { animation-delay: 0.2s; }
-    .attic-letter:nth-child(5) { animation-delay: 0.3s; }
-    .attic-letter:nth-child(6) { animation-delay: 0.4s; }
-    .attic-letter:nth-child(7) { animation-delay: 0.5s; }
-    .attic-letter:nth-child(8) { animation-delay: 0.6s; }
-    .attic-letter:nth-child(9) { animation-delay: 0.7s; }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      25% {
-        transform: translateY(-8px) rotate(1deg);
-      }
-      50% {
-        transform: translateY(-4px) rotate(-1deg);
-      }
-      75% {
-        transform: translateY(-10px) rotate(0.5deg);
-      }
-    }
-
-    .attic-letter:hover {
-      transform: translateY(-15px) scale(1.2) rotate(5deg) !important;
-      color: white;
-      text-shadow: 
-        0 0 20px rgba(255, 255, 255, 0.8),
-        0 0 40px rgba(var(--color-primary), 0.6),
-        3px 3px 6px rgba(0, 0, 0, 0.7);
-      filter: drop-shadow(0 0 30px rgba(var(--color-primary), 0.8));
-    }
-
-    .attic-space {
-      width: 0.5em;
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 640px) {
-      .attic-title {
-        font-size: 2rem;
-      }
-    }
-
-    /* Boxes Container - horizontal scrolling grid */
-    .boxes-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 3rem 2rem;
-      padding: 2rem 0;
-      max-width: 100%;
-    }
-
-    /* Vertical stack on mobile */
-    @media (max-width: 768px) {
-      .boxes-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 3rem;
-        padding: 2rem 1rem;
-      }
-    }
-
-    /* Tablet grid adjustments */
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .boxes-container {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 4rem 2.5rem;
-      }
-    }
-
-    /* Large desktop */
-    @media (min-width: 1025px) {
-      .boxes-container {
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 5rem 3rem;
-      }
-    }
-
-    /* Gastly container - matching Charmander's positioning */
-    .gastly-container {
-      position: relative;
-      display: flex;
-      justify-content: flex-end;
-      padding: 10px 20px 0px 20px;
-      margin-top: 10px;
-      margin-bottom: 0;
-    }
-
-    .gastly-link {
-      position: relative;
-      display: block;
-      cursor: pointer;
-    }
-
-    .gastly-svg {
-      filter: drop-shadow(0 0 12px rgba(45, 31, 61, 0.2));
-      transition: transform 0.3s ease-in-out;
-      animation: gentleFloat 3s ease-in-out infinite;
-    }
-
-    /* Gentle floating animation (like Charmander's bob) */
-    @keyframes gentleFloat {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-8px);
-      }
-    }
-
-    /* Shake on hover (matching Charmander's shake) */
-    @keyframes shake {
-      0% {
-        transform: translate(0, 0) rotate(0deg);
-      }
-      10% {
-        transform: translate(-1px, -1px) rotate(-1deg);
-      }
-      20% {
-        transform: translate(1px, 1px) rotate(1deg);
-      }
-      30% {
-        transform: translate(-1px, 1px) rotate(-1deg);
-      }
-      40% {
-        transform: translate(1px, -1px) rotate(1deg);
-      }
-      50% {
-        transform: translate(-1px, -1px) rotate(-1deg);
-      }
-      60% {
-        transform: translate(1px, 1px) rotate(1deg);
-      }
-      70% {
-        transform: translate(-1px, 1px) rotate(-1deg);
-      }
-      80% {
-        transform: translate(1px, -1px) rotate(1deg);
-      }
-      90% {
-        transform: translate(-0.5px, -0.5px) rotate(-0.5deg);
-      }
-    }
-
-    .gastly-link:hover .gastly-svg {
-      animation: shake 0.6s ease-in-out infinite;
-    }
-
-    /* Smoother dissipation effect on click (matching Charmander) */
-    .gastly-svg.clicked {
-      animation: vanish 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      pointer-events: none;
-    }
-
-    @keyframes vanish {
-      0% {
-        transform: scale(1) translateY(0) rotate(0deg);
-        opacity: 1;
-        filter: drop-shadow(0 0 12px rgba(45, 31, 61, 0.2));
-      }
-      30% {
-        transform: scale(1.1) translateY(-5px) rotate(5deg);
-        opacity: 0.8;
-        filter: drop-shadow(0 0 20px rgba(45, 31, 61, 0.4)) blur(2px);
-      }
-      100% {
-        transform: scale(0.3) translateY(-30px) rotate(180deg);
-        opacity: 0;
-        filter: drop-shadow(0 0 30px rgba(45, 31, 61, 0)) blur(10px);
-      }
-    }
-
-    /* Mobile adjustments - center Gastly */
-    @media (max-width: 640px) {
-      .gastly-container {
-        justify-content: center;
-        padding: 5px 10px 0px 10px;
-        margin-top: 5px;
-        margin-bottom: 0;
-      }
-
-      .gastly-svg {
-        width: 80px;
-        height: 80px;
-      }
-    }
-
-    /* Update hover effects to use white */
-    :is(a, button):hover {
-      color: white !important;
-    }
-
-    .bg-primary\/5:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-  </style>
-
-  <script>
-    let isNewestFirst = true;
-    const postsContainer = document.getElementById('posts-container');
-    const sortToggle = document.getElementById('sort-toggle');
-    const sortText = document.getElementById('sort-text');
-    const posts = Array.from(postsContainer.children);
-    const arrow = sortToggle.querySelector('svg');
-
-    sortToggle.addEventListener('click', () => {
-      isNewestFirst = !isNewestFirst;
-      
-      // Update UI
-      sortText.textContent = isNewestFirst ? 'Newest First' : 'Oldest First';
-      arrow.style.transform = isNewestFirst ? 'rotate(0deg)' : 'rotate(180deg)';
-
-      // Sort posts
-      posts.reverse().forEach(post => {
-        postsContainer.appendChild(post);
-      });
-    });
-
-    // Gastly click handler (matching Charmander's smooth transition)
-    const gastlyLink = document.querySelector('.gastly-link');
-    const gastly = document.getElementById('gastly');
-    
-    if (gastlyLink && gastly) {
-      gastlyLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        if (!gastly.classList.contains('clicked')) {
-          gastly.classList.add('clicked');
-          
-          // Smooth fade out of page
-          document.body.style.transition = 'opacity 0.3s ease-out';
-          setTimeout(() => {
-            document.body.style.opacity = '0';
-          }, 500);
-          
-          // Navigate after animation completes
-          setTimeout(() => {
-            window.location.href = '/';
-          }, 800);
-        }
-      });
-    }
-
-    // Initialize cardboard boxes
-    const boxes = document.querySelectorAll('.cardboard-box-wrapper');
-    
-    boxes.forEach((wrapper) => {
-      const box = wrapper.querySelector('.cardboard-box');
-      const dustCanvas = wrapper.querySelector('.dust-canvas');
-      const slug = wrapper.dataset.slug;
-      
-      if (!dustCanvas) return;
-      
-      const ctx = dustCanvas.getContext('2d');
-      dustCanvas.width = wrapper.offsetWidth;
-      dustCanvas.height = 300;
-      
-      // Dust particles
-      let particles = [];
-      let isHovering = false;
-      let animationFrame = null;
-      
-      class DustParticle {
-        constructor() {
-          this.reset();
-        }
-        
-        reset() {
-          this.x = dustCanvas.width / 2 + (Math.random() - 0.5) * 100;
-          this.y = 50 + Math.random() * 30;
-          this.size = 2 + Math.random() * 3;
-          this.speedY = -0.8 - Math.random() * 1.2;
-          this.speedX = (Math.random() - 0.5) * 0.8;
-          this.opacity = 0.6 + Math.random() * 0.4;
-          this.life = 1;
-          this.maxLife = 80 + Math.random() * 40;
-          this.age = 0;
-        }
-        
-        update() {
-          this.y += this.speedY;
-          this.x += this.speedX;
-          this.age++;
-          this.life = 1 - (this.age / this.maxLife);
-          
-          // Fade out as it rises
-          if (this.life <= 0 || this.y < -20) {
-            if (isHovering) {
-              this.reset();
-            }
-          }
-        }
-        
-        draw() {
-          const alpha = this.life * this.opacity;
-          // Spooky gray/white dust
-          ctx.fillStyle = `rgba(180, 180, 180, ${alpha})`;
-          ctx.shadowBlur = 4;
-          ctx.shadowColor = `rgba(180, 180, 180, ${alpha * 0.5})`;
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-        }
-      }
-      
-      // Create particles
-      for (let i = 0; i < 40; i++) {
-        particles.push(new DustParticle());
-      }
-      
-      // Animate dust
-      function animateDust() {
-        ctx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
-        
-        if (isHovering) {
-          particles.forEach(particle => {
-            particle.update();
-            particle.draw();
-          });
-          animationFrame = requestAnimationFrame(animateDust);
-        }
-      }
-      
-      // Hover events
-      wrapper.addEventListener('mouseenter', () => {
-        isHovering = true;
-        // Reset all particles
-        particles.forEach(p => p.reset());
-        // Start animation
-        if (animationFrame) cancelAnimationFrame(animationFrame);
-        animateDust();
-      });
-      
-      wrapper.addEventListener('mouseleave', () => {
-        isHovering = false;
-        // Let particles fade out naturally
-        setTimeout(() => {
-          if (!isHovering) {
-            ctx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-          }
-        }, 1000);
-      });
-      
-      // Click handler - dive into box
-      wrapper.addEventListener('click', () => {
-        // Zoom into the box
-        wrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-        wrapper.style.transform = 'scale(3) translateY(-50px)';
-        wrapper.style.opacity = '0';
-        
-        // Fade out page
-        document.body.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => {
-          document.body.style.opacity = '0';
-        }, 300);
-        
-        // Navigate
-        setTimeout(() => {
-          window.location.href = `/blog/${slug}`;
-        }, 800);
-      });
-    });
-  </script>
 </BaseLayout>
+
+<style>
+  /* Base terminal container */
+  .terminal-container {
+    min-height: 100vh;
+    background: #0a0a0a;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Courier New', 'Monaco', monospace;
+  }
+
+  /* Matrix canvas */
+  #matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  /* Scanline effect */
+  .scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* CRT overlay effect */
+  .crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.2) 80%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  /* Main content */
+  .terminal-content {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #00ff41;
+  }
+
+  /* ASCII Header */
+  .ascii-header {
+    font-size: 0.5rem;
+    line-height: 1.2;
+    color: #00ff41;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+    animation: flicker 4s infinite;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  @media (min-width: 640px) {
+    .ascii-header {
+      font-size: 0.7rem;
+    }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.8; }
+    94% { opacity: 1; }
+    97% { opacity: 0.9; }
+    98% { opacity: 1; }
+  }
+
+  /* System status */
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #00ff41;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+  }
+
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #00ff41;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 5px #00ff41; }
+    50% { box-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
+  }
+
+  .timestamp {
+    margin-left: auto;
+    opacity: 0.7;
+  }
+
+  /* Terminal prompt */
+  .terminal-prompt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .prompt-symbol {
+    color: #ff6b6b;
+  }
+
+  .typing-text {
+    color: #00ff41;
+  }
+
+  .cursor {
+    color: #00ff41;
+    animation: blink 0.7s step-end infinite;
+  }
+
+  /* File listing */
+  .file-listing {
+    margin-bottom: 2rem;
+  }
+
+  .listing-header {
+    display: grid;
+    grid-template-columns: 100px 60px 100px 1fr;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: #666;
+    border-bottom: 1px solid #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .file-entry {
+    display: grid;
+    grid-template-columns: 100px 60px 100px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: #00ff41;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+  }
+
+  .file-entry:hover {
+    background: rgba(0, 255, 65, 0.1);
+    border-left-color: #00ff41;
+  }
+
+  .col-perms {
+    color: #666;
+    font-size: 0.75rem;
+  }
+
+  .col-size {
+    color: #ff6b6b;
+    text-align: right;
+  }
+
+  .col-date {
+    color: #ffd93d;
+  }
+
+  .col-name {
+    position: relative;
+  }
+
+  .encrypted-name {
+    color: #ff6b6b;
+    transition: opacity 0.3s ease;
+  }
+
+  .decrypted-name {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    color: #00ff41;
+    transition: opacity 0.3s ease;
+  }
+
+  .file-entry:hover .encrypted-name {
+    opacity: 0;
+  }
+
+  .file-entry:hover .decrypted-name {
+    opacity: 1;
+    animation: decrypt 0.5s ease-out;
+  }
+
+  @keyframes decrypt {
+    0% {
+      opacity: 0;
+      transform: translateX(-10px);
+      filter: blur(4px);
+    }
+    50% {
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+  }
+
+  .file-description {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #666;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .file-entry:hover .file-description {
+    max-height: 50px;
+    opacity: 1;
+  }
+
+  .desc-arrow {
+    color: #00ff41;
+  }
+
+  .glitch-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #00ff41;
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .file-entry:hover .glitch-bar {
+    animation: glitchBar 0.3s ease-out forwards;
+  }
+
+  @keyframes glitchBar {
+    0% {
+      opacity: 1;
+      transform: scaleX(0);
+      top: 50%;
+    }
+    50% {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scaleX(1);
+      top: 0;
+    }
+  }
+
+  /* Error messages */
+  .error-messages {
+    margin: 2rem 0;
+    font-size: 0.75rem;
+  }
+
+  .error-line {
+    color: #ff6b6b;
+    opacity: 0;
+    padding: 0.25rem 0;
+    animation: errorGlitch 8s infinite;
+  }
+
+  #error-1 { animation-delay: 0s; }
+  #error-2 { animation-delay: 3s; }
+  #error-3 { animation-delay: 6s; }
+
+  @keyframes errorGlitch {
+    0%, 10% { opacity: 0; transform: translateX(0); }
+    11% { opacity: 1; transform: translateX(-5px); }
+    12% { transform: translateX(5px); }
+    13% { transform: translateX(-3px); }
+    14%, 25% { transform: translateX(0); opacity: 1; }
+    26%, 100% { opacity: 0; }
+  }
+
+  /* Exit section */
+  .exit-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #333;
+  }
+
+  .exit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00ff41;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .exit-link:hover {
+    background: rgba(0, 255, 65, 0.1);
+  }
+
+  .exit-prompt {
+    color: #ff6b6b;
+  }
+
+  .exit-command {
+    color: #00ff41;
+  }
+
+  .exit-hint {
+    color: #666;
+    font-size: 0.7rem;
+    margin-left: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .exit-link:hover .exit-hint {
+    opacity: 1;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .terminal-content {
+      padding: 1rem;
+    }
+
+    .listing-header {
+      display: none;
+    }
+
+    .file-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 1rem;
+      border: 1px solid #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .col-perms {
+      display: none;
+    }
+
+    .col-size {
+      text-align: left;
+      font-size: 0.7rem;
+    }
+
+    .col-date {
+      font-size: 0.7rem;
+    }
+
+    .file-description {
+      max-height: none;
+      opacity: 0.7;
+    }
+
+    .system-status {
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+    }
+
+    .ascii-header {
+      font-size: 0.35rem;
+    }
+  }
+
+  /* Glitch effect on random intervals */
+  @keyframes glitch {
+    0%, 95%, 100% {
+      transform: translate(0);
+      filter: none;
+    }
+    96% {
+      transform: translate(-2px, 1px);
+      filter: hue-rotate(90deg);
+    }
+    97% {
+      transform: translate(2px, -1px);
+      filter: hue-rotate(-90deg);
+    }
+    98% {
+      transform: translate(-1px, -1px);
+      filter: hue-rotate(180deg);
+    }
+    99% {
+      transform: translate(1px, 1px);
+      filter: hue-rotate(0deg);
+    }
+  }
+
+  .terminal-content {
+    animation: glitch 10s infinite;
+  }
+</style>
+
+<script>
+  // Matrix rain effect
+  const canvas = document.getElementById('matrix-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+  const charArray = chars.split('');
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops: number[] = [];
+  
+  for (let i = 0; i < columns; i++) {
+    drops[i] = Math.random() * -100;
+  }
+  
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#00ff41';
+    ctx.font = `${fontSize}px monospace`;
+    
+    for (let i = 0; i < drops.length; i++) {
+      const char = charArray[Math.floor(Math.random() * charArray.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  
+  setInterval(drawMatrix, 50);
+  
+  // Timestamp update
+  function updateTimestamp() {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+    const el = document.getElementById('timestamp');
+    if (el) el.textContent = timestamp;
+  }
+  
+  updateTimestamp();
+  setInterval(updateTimestamp, 1000);
+  
+  // Typing effect
+  const commands = [
+    'ls -la /var/memories/',
+    'cat forgotten_dreams.txt',
+    'find . -name "*.secret"',
+    'grep -r "hope" /dev/null',
+    'echo "Welcome to the void..."'
+  ];
+  
+  let commandIndex = 0;
+  let charIndex = 0;
+  const typingEl = document.getElementById('typing-text');
+  
+  function typeCommand() {
+    if (charIndex < commands[commandIndex].length) {
+      if (typingEl) {
+        typingEl.textContent += commands[commandIndex][charIndex];
+      }
+      charIndex++;
+      setTimeout(typeCommand, 50 + Math.random() * 100);
+    } else {
+      setTimeout(() => {
+        if (typingEl) typingEl.textContent = '';
+        charIndex = 0;
+        commandIndex = (commandIndex + 1) % commands.length;
+        setTimeout(typeCommand, 1000);
+      }, 3000);
+    }
+  }
+  
+  setTimeout(typeCommand, 2000);
+  
+  // File entry click handler
+  const fileEntries = document.querySelectorAll('.file-entry');
+  fileEntries.forEach(entry => {
+    entry.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = (entry as HTMLAnchorElement).href;
+      
+      // Glitch effect before navigation
+      document.body.style.animation = 'none';
+      document.body.offsetHeight; // Trigger reflow
+      document.body.style.animation = 'screenGlitch 0.5s ease-out';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease';
+      }, 300);
+      
+      setTimeout(() => {
+        window.location.href = href;
+      }, 600);
+    });
+  });
+  
+  // Add screen glitch keyframes dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes screenGlitch {
+      0% { filter: none; transform: translate(0); }
+      20% { filter: hue-rotate(90deg) saturate(2); transform: translate(-5px, 2px); }
+      40% { filter: hue-rotate(-90deg) saturate(0.5); transform: translate(5px, -2px); }
+      60% { filter: hue-rotate(180deg) brightness(1.5); transform: translate(-3px, -3px); }
+      80% { filter: invert(1); transform: translate(3px, 3px); }
+      100% { filter: none; transform: translate(0); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Resize handler
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
