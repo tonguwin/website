@@ -36,3 +36,23 @@ import "../styles/global.css";
 <!-- HTML in your document's head -->
 <link rel="preconnect" href="https://rsms.me/" />
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+<!-- Amplitude Analytics -->
+<script src="https://cdn.amplitude.com/script/12fef355dd33bd798771c8b1f90efbec.js"></script>
+<script>
+  window.amplitude.add(window.sessionReplay.plugin({sampleRate: 1}));
+  window.amplitude.init('12fef355dd33bd798771c8b1f90efbec', {
+    "fetchRemoteConfig": true,
+    "autocapture": {
+      "attribution": true,
+      "fileDownloads": true,
+      "formInteractions": true,
+      "pageViews": true,
+      "sessions": true,
+      "elementInteractions": true,
+      "networkTracking": true,
+      "webVitals": true,
+      "frustrationInteractions": true
+    }
+  });
+</script>
