@@ -115,6 +115,7 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
       url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity: 0.5;
     mix-blend-mode: overlay;
+    pointer-events: none; /* Allow clicks to pass through */
   }
 
   .box-content {
@@ -159,6 +160,7 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     transform-origin: top center;
     transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 5;
+    pointer-events: none; /* Allow clicks/touches to pass through to wrapper */
   }
 
   .lid-content {
@@ -184,6 +186,7 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
     opacity: 0.4;
     mix-blend-mode: overlay;
+    pointer-events: none; /* Allow clicks to pass through */
   }
 
   /* Flap lines */
@@ -266,6 +269,18 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     /* Reduce dust canvas size for performance */
     .dust-canvas {
       height: 200px;
+    }
+
+    /* Improve touch targets on mobile */
+    .cardboard-box-wrapper {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Show description by default on mobile since no hover */
+    .box-description {
+      opacity: 0.7;
+      transform: translateY(0);
     }
   }
 

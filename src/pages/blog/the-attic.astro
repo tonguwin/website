@@ -623,10 +623,20 @@ const sortedPosts = [...posts].sort((a, b) => {
         }, 1000);
       });
       
-      // Click handler - dive into box
-      wrapper.addEventListener('click', () => {
+      // Click/Touch handler - dive into box
+      let isNavigating = false;
+      
+      function handleBoxNavigation(e) {
+        // Prevent double-firing and default behavior
+        if (isNavigating) return;
+        isNavigating = true;
+        
+        if (e.type === 'touchend') {
+          e.preventDefault();
+        }
+        
         // Zoom into the box
-        wrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+        wrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease';
         wrapper.style.transform = 'scale(3) translateY(-50px)';
         wrapper.style.opacity = '0';
         
@@ -640,7 +650,11 @@ const sortedPosts = [...posts].sort((a, b) => {
         setTimeout(() => {
           window.location.href = `/blog/${slug}`;
         }, 800);
-      });
+      }
+      
+      // Add both click and touch handlers
+      wrapper.addEventListener('click', handleBoxNavigation);
+      wrapper.addEventListener('touchend', handleBoxNavigation);
     });
   </script>
 </BaseLayout>
