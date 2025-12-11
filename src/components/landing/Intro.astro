@@ -1,0 +1,90 @@
+---
+import { otherprojects } from "../../data/otherprojects.json";
+---
+
+<section class="bg-primary">
+  <div class="px-8 2xl:max-w-7xl mx-auto py-16 sm:py-20">
+    <div class="max-w-5xl mx-auto">
+      <h2 
+        class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-secondary leading-tight tracking-tight text-left intro-text"
+        data-aos="fade-up"
+        data-aos-duration="1200"
+      >
+        Product manager at <a 
+          href="https://baggu.com" 
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:opacity-70 transition-opacity duration-300"
+        >BAGGU</a>, crafting and optimizing seamless e-commerce for a growing brand and its community<span class="flower" aria-hidden="true"></span>
+      </h2>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Control text width for consistent two-line wrap */
+  .intro-text {
+    max-width: 45ch; /* Roughly 45 characters per line for balanced wrapping */
+  }
+
+  /* CSS Star Flower */
+  .flower {
+    display: inline-block;
+    width: 0.6em; /* Slightly bigger */
+    aspect-ratio: 1;
+    margin-left: 0.02em; /* Closer to the word */
+    vertical-align: -0.05em; /* Slightly higher */
+    transform: translateY(0.1em); /* Fine-tuned positioning */
+    background: currentColor;
+    --g: /37.02% 37.02% radial-gradient(currentColor calc(71% - 1px), transparent 71%) no-repeat;
+    mask: 
+      radial-gradient(100% 100%, #000 calc(30% - 1px), transparent 30%) subtract, /* Larger center hole */
+      99.748% 55.018% var(--g),
+      60.6% 98.863% var(--g),
+      6.804% 75.181% var(--g),
+      12.703% 16.699% var(--g),
+      70.145% 4.238% var(--g);
+  }
+
+  /* Smooth link hover */
+  h2 a {
+    text-decoration: none;
+    position: relative;
+  }
+  
+  h2 a::after {
+    content: '';
+    position: absolute;
+    bottom: 0.1em;
+    left: 0;
+    right: 0;
+    height: 0.08em;
+    background: currentColor;
+    opacity: 0.3;
+    transition: opacity 0.3s ease;
+  }
+  
+  h2 a:hover::after {
+    opacity: 0.6;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 640px) {
+    h2 {
+      font-size: 1.5rem;
+      line-height: 1.4;
+    }
+    
+    .flower {
+      width: 0.5em; /* Proportionally bigger on mobile too */
+      transform: translateY(0.08em); /* Adjust for smaller text */
+    }
+  }
+  
+  @media (min-width: 641px) and (max-width: 768px) {
+    h2 {
+      font-size: 1.875rem;
+      line-height: 1.35;
+    }
+  }
+</style>

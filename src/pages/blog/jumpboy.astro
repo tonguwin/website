@@ -1,0 +1,2285 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const post = {
+  title: "Jumpboy",
+  date: "March 11, 2025",
+  content: `
+    Make it out, boy.
+  `
+};
+---
+
+<BaseLayout>
+  <!-- Add meta viewport tag for better mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" slot="head" />
+
+  <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
+    <div class="max-w-3xl mx-auto">
+      <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
+        <h1 class="text-3xl sm:text-4xl font-bold text-primary hover:text-white transition-colors duration-300">
+          Jumpboy
+        </h1>
+      </div>
+
+      <div class="relative w-full flex justify-center">
+        <canvas id="gameCanvas" class="w-full max-w-[600px]"></canvas>
+        <button 
+          id="startButton" 
+          class="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-8 py-4 rounded-lg transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 touch-none z-10"
+        >
+          Start Game
+        </button>
+        <div id="gameOver" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/90 text-white p-6 sm:p-8 rounded-lg text-center backdrop-blur-sm border border-white/10 z-10">
+          <h2 class="text-xl sm:text-2xl mb-4 font-bold">Game Over</h2>
+          <p class="mb-4 text-lg">Score: <span id="score" class="font-bold text-red-400">0</span></p>
+          <p class="text-sm opacity-80">Tap Jump to Restart</p>
+        </div>
+      </div>
+      
+      <!-- Score display below the canvas -->
+      <div id="scoreDisplay" class="mt-4 text-xl font-bold text-primary">
+        Score: <span id="scoreValue">0</span>
+      </div>
+
+      <!-- Items section -->
+      <div id="itemsSection" class="mt-4 flex justify-end">
+        <div id="pointyHatItem" class="hidden w-8 h-8 relative cursor-pointer">
+          <canvas id="pointyHatCanvas" class="w-full h-full"></canvas>
+        </div>
+        <div id="greensGluttonyItem" class="hidden w-8 h-8 relative cursor-pointer ml-2">
+          <canvas id="greensGluttonyCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Item Modal -->
+      <div id="itemModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div class="bg-black/80 p-6 rounded-lg max-w-sm w-full">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-white" id="itemModalTitle">Pointy Hat</h3>
+            <button id="closeModal" class="text-white hover:text-gray-300">✕</button>
+          </div>
+          <div class="flex items-center justify-center mb-4">
+            <canvas id="itemModalCanvas" class="w-16 h-16"></canvas>
+          </div>
+          <p class="text-white text-center" id="itemModalDescription">A white oversized birthday hat. Seems like a lame birthday.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div id="mobileControls" class="fixed bottom-0 left-0 w-full h-36 bg-gradient-to-t from-black/60 via-black/40 to-transparent backdrop-blur-sm flex items-end justify-between px-4 pb-4 sm:px-8 sm:pb-6 md:hidden z-50">
+      <div class="flex space-x-3 sm:space-x-4">
+        <button id="leftBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+          ←
+        </button>
+        <button id="rightBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-white text-3xl font-bold active:bg-white/30 active:scale-95 transition-all touch-none">
+          →
+        </button>
+      </div>
+      <button id="jumpBtn" class="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-red-500/90 border-2 border-red-400 flex items-center justify-center text-white text-lg sm:text-xl font-bold active:bg-red-600 active:scale-95 transition-all shadow-lg shadow-red-500/50 touch-none">
+        JUMP
+      </button>
+    </div>
+
+    <a 
+      href="/blog/the-attic" 
+      class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
+    >
+      ← Back to Blog
+    </a>
+  </div>
+
+  <style>
+    .min-h-screen {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .max-w-3xl {
+      position: relative;
+      z-index: 1;
+      padding-bottom: 140px; /* Add padding to prevent overlap with mobile controls */
+    }
+
+    #gameCanvas {
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      touch-action: none; /* Prevent default touch behaviors */
+    }
+
+    /* Update hover effects to use white */
+    .prose :is(a, button):hover {
+      color: white !important;
+    }
+
+    /* Mobile Controls Styles */
+    #mobileControls {
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+
+    #mobileControls button {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Score display optimization for mobile */
+    #scoreDisplay {
+      font-size: 18px;
+      padding: 8px 0;
+    }
+
+    /* Item section optimization */
+    #itemsSection {
+      min-height: 40px;
+      align-items: center;
+    }
+
+    /* Game over modal optimization */
+    #gameOver {
+      max-width: 90%;
+      padding: 1.5rem;
+    }
+
+    #gameOver h2 {
+      font-size: 1.5rem;
+    }
+
+    /* Item modal optimization */
+    #itemModal > div {
+      margin: 1rem;
+    }
+
+    /* Hide mobile controls on desktop */
+    @media (min-width: 768px) {
+      #mobileControls {
+        display: none !important;
+      }
+      
+      .max-w-3xl {
+        padding-bottom: 0;
+      }
+    }
+
+    /* Very small mobile screens */
+    @media (max-width: 400px) {
+      #scoreDisplay {
+        font-size: 16px;
+      }
+      
+      #gameOver {
+        padding: 1rem;
+      }
+      
+      #gameOver h2 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+
+  <script>
+    // Game constants
+    const GRAVITY = 0.5;
+    const JUMP_FORCE = -12;
+    let MOVE_SPEED = 4;
+    const PLATFORM_HEIGHT = 12;
+    const PLATFORM_WIDTH = 100;
+    const MONSTER_SIZE = 30;
+    const LARGE_MONSTER_SIZE = 40;
+    const SMALL_MONSTER_SIZE = 20;
+    const PLAYER_SIZE = 20;
+    const SCREEN_SCROLL_THRESHOLD = 0.7;
+    const ADVANCED_MONSTER_SCORE = 200;
+    const FAST_MONSTER_SCORE = 400;
+    const HYBRID_MONSTER_SCORE = 1000;
+    const ULTIMATE_MONSTER_SCORE = 900;
+    const PLATFORM_SPACING = 60;  // Reduced from 80 to 60
+    const EASY_PLATFORM_SPACING = 50;  // Reduced from 60 to 50
+    const MIN_PLATFORMS = 12;  // Increased from 15 to 20
+    const PLATFORM_BUFFER = 5;  // Increased from 3 to 5
+    const MAX_JUMP_DISTANCE = 200;  // Maximum horizontal distance between platforms
+    const MONSTER_SPAWN_CHANCE = 0.4;
+    const EASY_MONSTER_SPAWN_CHANCE = 0.2;
+    const VERY_EASY_MONSTER_SPAWN_CHANCE = 0.05;
+    const MAX_PARTICLES = 80;
+    const PARTICLE_LIFETIME = 1;
+    const PARTICLE_DECAY = 0.02;
+    const CYAN_DUPLICATION_CHANCE = 0.45;
+    const DOUBLE_JUMP_UNLOCK_SCORE = 700;
+    const CUTSCENE_DURATION = 3000;
+    const RAINBOW_COLORS = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#8f00ff'];
+    const EASY_MODE_THRESHOLD = 300;
+    const BRITTLE_PLATFORM_SCORE = 350;
+    const BRITTLE_PLATFORM_CHANCE = 0.45;
+    const BRITTLE_PLATFORM_BREAK_TIME = 1500;
+    const POINTY_HAT_SCORE = 200;
+    const GREENS_GLUTTONY_DROP_CHANCE = 0.20; // 20% drop chance from green monsters
+    const PLAYER_ENLARGED_SIZE = 40; // Same size as green monster (LARGE_MONSTER_SIZE)
+    const ENLARGED_MOVE_SPEED = 1.5; // Slower movement speed when enlarged
+    const PLAYER_GLUTTONY_SIZE = 35; // Slightly larger than red monster
+    const REST_STOP_SCORE = 500; // Score when rest stop appears (after green monsters at 400)
+
+    // Device-specific speed adjustments
+    let isMobileDevice = false;
+    let speedMultiplier = 1.0;
+    let mobileMoveSpeed = 3;
+    let desktopMoveSpeed = 4;
+    let mobileMonsterSpeedMultiplier = 0.8;
+    let desktopMonsterSpeedMultiplier = 1.0;
+    let canvasScale = 1.0;
+
+    // Additional variables for growth animation
+    let growthStartTime = 0;
+    let growthProgress = 0;
+    let isGrowing = false;
+    const GROWTH_DURATION = 1500; // 1.5 seconds for the growth animation
+
+    // Type definitions
+    interface Particle {
+      x: number;
+      y: number;
+      color: string;
+      size: number;
+      speedX: number;
+      speedY: number;
+      life: number;
+      decay: number;
+      update(): void;
+      draw(ctx: CanvasRenderingContext2D): void;
+    }
+
+    interface Platform {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      type?: 'normal' | 'brittle' | 'rest';
+      breakTimer?: number;
+    }
+    
+    interface RestStop {
+      platform: Platform;
+      npc: {
+        x: number;
+        y: number;
+        size: number;
+        hornOffset: number; // For animation
+        swordFloat: number; // For sword animation
+      };
+      active: boolean;
+      interacting: boolean;
+      dialogueIndex: number;
+      dialogueTimer: number;
+    }
+
+    interface Monster {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      direction: number;
+      type: 'basic' | 'advanced' | 'fast' | 'hybrid';
+      color: string;
+      speed: number;
+      verticalSpeed?: number;
+      verticalDirection?: number;
+      hasDuplicated: boolean;
+    }
+
+    interface Player {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      velocityY: number;
+      velocityX: number;
+      isJumping: boolean;
+      hasDoubleJump: boolean;  // Unlocked ability flag
+      doubleJumpUsed: boolean;  // Track if double jump was used
+      wasJumping: boolean;
+      isInCutscene: boolean;
+      rainbowTimer: number;
+      currentRainbowIndex: number;
+      hasPointyHat: boolean;  // New property for the pointy hat
+      hasGreensGluttony: boolean;  // Initialize Green's Gluttony
+      isEnlarged: boolean;  // Track if player is enlarged
+    }
+
+    interface Item {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      type: 'pointyHat' | 'greensGluttony';
+      collected: boolean;
+    }
+
+    interface GameKeys {
+      left?: boolean;
+      right?: boolean;
+      [key: string]: boolean | undefined;
+    }
+
+    // Particle system
+    class Particle implements Particle {
+      constructor(x: number, y: number, color: string) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = (Math.random() - 0.5) * 4;
+        this.speedY = (Math.random() - 0.5) * 4;
+        this.life = 1;
+        this.decay = 0.02 + Math.random() * 0.02;
+      }
+
+      update(): void {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.life -= this.decay;
+      }
+
+      draw(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.life;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // Theme colors
+    let themeColors = {
+      background: '#000000',
+      platform: '#333333',
+      brittlePlatform: '#222222',
+      player: '#ffffff',
+      text: '#ffffff'
+    };
+
+    // Function to update theme colors based on current theme
+    function updateThemeColors() {
+      const root = document.documentElement;
+      const currentTheme = root.getAttribute('data-theme') || 'light';
+      const themeMode = root.getAttribute('data-theme-mode') || 'light';
+      
+      // Get computed colors from CSS variables
+      const computedStyle = getComputedStyle(root);
+      const primaryRGB = computedStyle.getPropertyValue('--color-primary').trim();
+      const secondaryRGB = computedStyle.getPropertyValue('--color-secondary').trim();
+      
+      // Convert RGB values to hex
+      function rgbToHex(rgb: string): string {
+        const values = rgb.split(' ').map(v => parseInt(v.trim()));
+        if (values.length === 3) {
+          return '#' + values.map(v => {
+            const hex = v.toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+          }).join('');
+        }
+        return '#000000';
+      }
+      
+      const primaryHex = rgbToHex(primaryRGB);
+      const secondaryHex = rgbToHex(secondaryRGB);
+      
+      // Set colors based on theme (inverted for Attic aesthetic)
+      themeColors.background = primaryHex; // Background uses primary
+      themeColors.text = secondaryHex; // Text uses secondary
+      themeColors.player = secondaryHex; // Player uses secondary
+      
+      // Platform colors - slightly lighter/darker than background
+      if (themeMode === 'light') {
+        // Light mode (classic dark Jumpboy)
+        themeColors.platform = '#333333';
+        themeColors.brittlePlatform = '#222222';
+      } else {
+        // Dark mode (light Jumpboy)
+        themeColors.platform = adjustBrightness(primaryHex, -15);
+        themeColors.brittlePlatform = adjustBrightness(primaryHex, -25);
+      }
+    }
+    
+    // Helper function to adjust color brightness
+    function adjustBrightness(hex: string, percent: number): string {
+      const num = parseInt(hex.replace('#', ''), 16);
+      const r = Math.min(255, Math.max(0, (num >> 16) + percent));
+      const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + percent));
+      const b = Math.min(255, Math.max(0, (num & 0x0000FF) + percent));
+      return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+    }
+
+    // Game state
+    let canvas: HTMLCanvasElement;
+    let ctx: CanvasRenderingContext2D;
+    let player: Player = {
+      x: 0,
+      y: 0,
+      width: PLAYER_SIZE,
+      height: PLAYER_SIZE,
+      velocityY: 0,
+      velocityX: 0,
+      isJumping: false,
+      hasDoubleJump: false,  // Unlocked ability flag
+      doubleJumpUsed: false,  // Track if double jump was used
+      wasJumping: false,
+      isInCutscene: false,
+      rainbowTimer: 0,
+      currentRainbowIndex: 0,
+      hasPointyHat: false,  // Initialize pointy hat
+      hasGreensGluttony: false,  // Initialize Green's Gluttony
+      isEnlarged: false  // Track if player is enlarged
+    };
+
+    let platforms: Platform[] = [];
+    let monsters: Monster[] = [];
+    let items: Item[] = [];  // New array for items
+    let particles: Particle[] = [];
+    let score = 0;
+    let gameOver = false;
+    let gameStarted = false;
+    let keys: GameKeys = {};
+    let cameraY = 0;
+    let titleFlicker = true;
+    let flickerTimer = 0;
+    let lastTime = 0;
+    let frameCount = 0;
+    let fps = 0;
+    let cutsceneStartTime = 0;
+    let currentDialogue = 0;
+    let pointyHatCutsceneStartTime = 0;
+    let restStop: RestStop | null = null;
+    let restStopCreated = false;
+    let theoInteractionCount = 0; // Track how many times player talked to Theo
+    let skipMonsterCleanupThisFrame = false; // Skip cleanup on frames where monsters are generated
+    
+    // Rest stop NPC (Theo) dialogue lines
+    const restStopDialogues = [
+      // First 3 interactions - mysterious
+      "...",
+      "The climb never ends, does it?",
+      "You should keep moving.",
+      // 4th interaction - reveals name
+      "...I suppose I should introduce myself.",
+      "My name is Theo.",
+      "I've been here... a long time.",
+      // Subsequent interactions
+      "Too long, perhaps.",
+      "I used to be like you, always climbing.",
+      "Now I just... wait.",
+      "These swords? Memories of battles.",
+      "Or maybe just decoration. I forget.",
+      "You should keep going.",
+      "Don't end up like me.",
+      "Tired. So tired.",
+      "But someone has to guard this place.",
+      "Safe from the monsters, at least.",
+      "For now.",
+      "Still here? The exit is up, not down.",
+      "I wonder what's at the top...",
+      "If there even is a top."
+    ];
+    let pointyHatCutscenePhase = 0;
+    let greensGluttonyCutsceneStartTime = 0;
+    let greensGluttonyCutscenePhase = 0;
+
+    // Add a flag to track if the pointy hat has been spawned
+    let pointyHatSpawned = false;
+
+    // Add a counter for Green's Gluttony drops
+    let greensGluttonyDropCount = 0;
+
+    // Initialize item display
+    function initItemDisplay() {
+      const pointyHatCanvas = document.getElementById('pointyHatCanvas') as HTMLCanvasElement;
+      const pointyHatCtx = pointyHatCanvas.getContext('2d')!;
+      const itemModalCanvas = document.getElementById('itemModalCanvas') as HTMLCanvasElement;
+      const itemModalCtx = itemModalCanvas.getContext('2d')!;
+      
+      // Set canvas sizes with mobile scaling
+      const itemSize = isMobileDevice ? 24 : 32;
+      const modalSize = isMobileDevice ? 48 : 64;
+      
+      pointyHatCanvas.width = itemSize;
+      pointyHatCanvas.height = itemSize;
+      itemModalCanvas.width = modalSize;
+      itemModalCanvas.height = modalSize;
+      
+      // Draw pointy hat on both canvases (white hat with red pom-pom)
+      function drawPointyHat(ctx: CanvasRenderingContext2D, width: number, height: number) {
+        // Main hat body (white)
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(width / 2, 0);
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Red pom-pom on top
+        ctx.fillStyle = '#ff0000';
+        ctx.beginPath();
+        ctx.arc(width / 2, 0, width * 0.12, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      drawPointyHat(pointyHatCtx, itemSize, itemSize);
+      drawPointyHat(itemModalCtx, modalSize, modalSize);
+      
+      // Add Green's Gluttony Canvas
+      const greensGluttonyCanvas = document.getElementById('greensGluttonyCanvas') as HTMLCanvasElement;
+      if (greensGluttonyCanvas) {
+        const greensGluttonyCtx = greensGluttonyCanvas.getContext('2d')!;
+        greensGluttonyCanvas.width = itemSize;
+        greensGluttonyCanvas.height = itemSize;
+        
+        // Draw green orb
+        drawGreenOrb(greensGluttonyCtx, itemSize, itemSize);
+      }
+      
+      // Add click handlers with touch support
+      const pointyHatItem = document.getElementById('pointyHatItem');
+      const greensGluttonyItem = document.getElementById('greensGluttonyItem');
+      const itemModal = document.getElementById('itemModal');
+      const closeModal = document.getElementById('closeModal');
+      
+      if (pointyHatItem && greensGluttonyItem && itemModal && closeModal) {
+        const showModal = (title: string, description: string, type: string) => {
+          const itemModalTitle = document.getElementById('itemModalTitle');
+          const itemModalDescription = document.getElementById('itemModalDescription');
+          const itemModalCanvas = document.getElementById('itemModalCanvas') as HTMLCanvasElement;
+          const itemModalCtx = itemModalCanvas.getContext('2d')!;
+          
+          if (itemModalTitle && itemModalDescription) {
+            itemModalTitle.textContent = title;
+            itemModalDescription.textContent = description;
+            
+            // Clear previous drawing
+            itemModalCtx.clearRect(0, 0, modalSize, modalSize);
+            
+            // Draw appropriate item
+            if (type === 'pointyHat') {
+              drawPointyHat(itemModalCtx, modalSize, modalSize);
+            } else if (type === 'greensGluttony') {
+              drawGreenOrb(itemModalCtx, modalSize, modalSize);
+            }
+            
+            itemModal.classList.remove('hidden');
+          }
+        };
+        
+        const hideModal = () => itemModal.classList.add('hidden');
+        
+        pointyHatItem.addEventListener('click', () => {
+          showModal('Pointy Hat', 'A white oversized birthday hat. Seems like a lame birthday.', 'pointyHat');
+        });
+        
+        pointyHatItem.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          showModal('Pointy Hat', 'A white oversized birthday hat. Seems like a lame birthday.', 'pointyHat');
+        });
+        
+        greensGluttonyItem.addEventListener('click', () => {
+          showModal('Green\'s Gluttony', 'A small glowing green orb. It makes you feel... hungry.', 'greensGluttony');
+        });
+        
+        greensGluttonyItem.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          showModal('Green\'s Gluttony', 'A small glowing green orb. It makes you feel... hungry.', 'greensGluttony');
+        });
+        
+        closeModal.addEventListener('click', hideModal);
+        closeModal.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          hideModal();
+        });
+      }
+    }
+    
+    // Draw Green Orb function
+    function drawGreenOrb(ctx: CanvasRenderingContext2D, width: number, height: number) {
+      // Create gradient for glowing effect
+      const gradient = ctx.createRadialGradient(
+        width/2, height/2, 0,
+        width/2, height/2, width/2
+      );
+      gradient.addColorStop(0, '#00ff00');
+      gradient.addColorStop(0.7, '#00aa00');
+      gradient.addColorStop(1, '#007700');
+      
+      // Draw the orb
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(width/2, height/2, width/2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Add highlight
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.beginPath();
+      ctx.arc(width/3, height/3, width/6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Update item display
+    function updateItemDisplay() {
+      const pointyHatItem = document.getElementById('pointyHatItem');
+      const greensGluttonyItem = document.getElementById('greensGluttonyItem');
+      
+      if (pointyHatItem) {
+        if (player.hasPointyHat) {
+          pointyHatItem.classList.remove('hidden');
+        } else {
+          pointyHatItem.classList.add('hidden');
+        }
+      }
+      
+      if (greensGluttonyItem) {
+        if (player.hasGreensGluttony) {
+          greensGluttonyItem.classList.remove('hidden');
+        } else {
+          greensGluttonyItem.classList.add('hidden');
+        }
+      }
+    }
+
+    // Initialize game
+    function init() {
+      canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+      ctx = canvas.getContext('2d')!;
+      
+      // Initialize theme colors
+      updateThemeColors();
+      
+      // Watch for theme changes
+      const themeObserver = new MutationObserver(() => {
+        updateThemeColors();
+      });
+      
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme', 'data-theme-mode']
+      });
+      
+      // Initialize item display
+      initItemDisplay();
+      
+      // Detect mobile device and set appropriate settings
+      isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+      
+      // Set canvas size based on device for better responsiveness
+      if (isMobileDevice) {
+        speedMultiplier = 1.0; // Slightly slower for better control
+        MOVE_SPEED = mobileMoveSpeed;
+        
+        // Make canvas fill available width on mobile
+        const maxWidth = Math.min(window.innerWidth - 32, 600); // 32px for padding
+        canvasScale = maxWidth / 600;
+        canvas.width = maxWidth;
+        canvas.height = maxWidth; // Square canvas
+      } else {
+        speedMultiplier = 0.7;
+        MOVE_SPEED = desktopMoveSpeed;
+        canvasScale = 1.0;
+        canvas.width = 600;
+        canvas.height = 600;
+      }
+      
+      // Set initial player position
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 100;
+      
+      // Generate initial platforms
+      generatePlatforms();
+      
+      // Start game loop with timestamp
+      requestAnimationFrame(gameLoop);
+      
+      // Event listeners
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('keyup', handleKeyUp);
+      
+      // Start button click handler
+      const startButton = document.getElementById('startButton');
+      if (startButton) {
+        startButton.addEventListener('click', () => {
+          if (!gameStarted) {
+            resetGame();
+            startButton.classList.add('hidden');
+          }
+        });
+      }
+
+      // Add window resize handler
+      window.addEventListener('resize', handleResize);
+      
+      // Add canvas tap for mobile Theo interaction
+      canvas.addEventListener('touchstart', (e) => {
+        if (!isMobileDevice || !restStop || !restStop.active) return;
+        
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const canvasX = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const canvasY = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        
+        // Calculate NPC position
+        const npcX = restStop.platform.x + restStop.npc.x;
+        const npcY = restStop.platform.y + restStop.npc.y;
+        
+        // Check if tap is near Theo
+        const tapDistance = Math.abs(canvasX - npcX) + Math.abs(canvasY - npcY);
+        if (tapDistance < 100) {
+          // Simulate E key press for interaction
+          keys['e'] = true;
+          setTimeout(() => { keys['e'] = false; }, 100);
+        }
+      });
+    }
+
+    // Handle window resize with debouncing
+    let resizeTimeout: number | undefined;
+    function handleResize() {
+      // Debounce resize events
+      if (resizeTimeout) clearTimeout(resizeTimeout);
+      
+      resizeTimeout = window.setTimeout(() => {
+        const wasMobile = isMobileDevice;
+        isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+        
+        // Only resize if device type changed or on mobile
+        if (wasMobile !== isMobileDevice || isMobileDevice) {
+          if (isMobileDevice) {
+            const maxWidth = Math.min(window.innerWidth - 32, 600);
+            canvasScale = maxWidth / 600;
+            canvas.width = maxWidth;
+            canvas.height = maxWidth;
+          } else {
+            canvasScale = 1.0;
+            canvas.width = 600;
+            canvas.height = 600;
+          }
+          
+          // Adjust player position proportionally
+          const oldX = player.x;
+          const oldY = player.y;
+          player.x = (oldX / canvas.width) * canvas.width;
+          player.y = (oldY / canvas.height) * canvas.height;
+        }
+      }, 250); // Wait 250ms after last resize event
+    }
+
+    // Handle key down events
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'ArrowLeft') keys.left = true;
+      else if (e.key === 'ArrowRight') keys.right = true;
+      else keys[e.key] = true;
+      
+      if (e.key === ' ') {
+        e.preventDefault();
+        if (!gameStarted || gameOver) {
+          resetGame();
+        }
+      }
+    }
+
+    // Handle key up events
+    function handleKeyUp(e: KeyboardEvent) {
+      if (e.key === 'ArrowLeft') keys.left = false;
+      else if (e.key === 'ArrowRight') keys.right = false;
+      else keys[e.key] = false;
+    }
+
+    // Generate platforms with optimized spacing
+    // Create rest stop - called when score reaches threshold
+    function createRestStop(highestPlatformY: number) {
+      if (restStopCreated) return [];
+      
+      const restPlatformWidth = canvas.width - 40; // Nearly full screen width
+      const restPlatformY = highestPlatformY - 120; // Closer to previous platforms
+      
+      const restPlatform: Platform = {
+        x: 20, // Small margin from edges
+        y: restPlatformY,
+        width: restPlatformWidth,
+        height: PLATFORM_HEIGHT,
+        type: 'rest'
+      };
+      
+      const newPlatforms = [restPlatform];
+      
+      // Add a transition platform before rest stop (easier to reach)
+      newPlatforms.push({
+        x: canvas.width / 2 - PLATFORM_WIDTH / 2,
+        y: highestPlatformY - 60,
+        width: PLATFORM_WIDTH,
+        height: PLATFORM_HEIGHT,
+        type: 'normal'
+      });
+      
+      // Create ladder platforms above rest stop
+      const ladderPlatformWidth = 60;
+      const ladderSpacing = 80;
+      for (let i = 1; i <= 5; i++) {
+        const ladderX = restPlatform.x + (i % 2 === 0 ? restPlatformWidth - ladderPlatformWidth - 20 : 20);
+        newPlatforms.push({
+          x: ladderX,
+          y: restPlatformY - (i * ladderSpacing),
+          width: ladderPlatformWidth,
+          height: PLATFORM_HEIGHT,
+          type: 'normal'
+        });
+      }
+      
+      // Create NPC data (store reference to platform, calculate position when drawing)
+      restStop = {
+        platform: restPlatform,
+        npc: {
+          x: restPlatformWidth / 2, // Relative to platform (center)
+          y: -40, // Relative to platform (above it)
+          size: 30,
+          hornOffset: 0,
+          swordFloat: 0
+        },
+        active: true,
+        interacting: false,
+        dialogueIndex: 0,
+        dialogueTimer: 0
+      };
+      
+      restStopCreated = true;
+      return newPlatforms;
+    }
+    
+    function generatePlatforms() {
+      platforms = [];
+      monsters = [];
+      items = [];  // Reset items
+      
+      // Bottom platform
+      platforms.push({
+        x: canvas.width / 2 - PLATFORM_WIDTH / 2,
+        y: canvas.height - 60,
+        width: PLATFORM_WIDTH,
+        height: PLATFORM_HEIGHT,
+        type: 'normal'
+      });
+      
+      // Generate random platforms with optimized spacing
+      let lastPlatformX = canvas.width / 2;  // Track last platform position
+      for (let i = 0; i < MIN_PLATFORMS; i++) {
+        // Use easier spacing for first 300 points
+        const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
+        const y = canvas.height - 100 - i * spacing;
+        
+        // Calculate safe x position range based on last platform
+        const minX = Math.max(50, lastPlatformX - MAX_JUMP_DISTANCE);
+        const maxX = Math.min(canvas.width - PLATFORM_WIDTH - 50, lastPlatformX + MAX_JUMP_DISTANCE);
+        const x = minX + Math.random() * (maxX - minX);
+        
+        // Update last platform position
+        lastPlatformX = x + PLATFORM_WIDTH / 2;
+        
+        // Determine platform type based on score
+        const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
+        
+        platforms.push({
+          x: x,
+          y: y,
+          width: PLATFORM_WIDTH,
+          height: PLATFORM_HEIGHT,
+          type: platformType
+        });
+        
+        // Add monsters with optimized spawn chance (but not on rest platforms)
+        const isRestPlatform = platformType === 'rest';
+        
+        if (!isRestPlatform) {
+          let spawnChance;
+          if (score < 100) {
+            spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
+          } else if (score < EASY_MODE_THRESHOLD) {
+            spawnChance = EASY_MONSTER_SPAWN_CHANCE;
+          } else {
+            spawnChance = MONSTER_SPAWN_CHANCE;
+          }
+          
+          if (Math.random() < spawnChance) {
+            const monsterType = determineMonsterType();
+            if (monsterType) {
+              monsters.push(createMonster(x, y, monsterType));
+            }
+          }
+        }
+      }
+    }
+
+    // Determine monster type based on score
+    function determineMonsterType() {
+      if (score >= HYBRID_MONSTER_SCORE) {
+        // At 1000+, spawn cyan monsters
+        return 'hybrid';
+      } else if (score >= 900) {
+        // At 900+, spawn red and green monsters together
+        const redMonster = createMonster(0, 0, 'basic');
+        const greenMonster = createMonster(0, 0, 'advanced');
+        monsters.push(redMonster, greenMonster);
+        return null;
+      } else if (score >= 600) {
+        // At 600+, spawn yellow monsters
+        return 'fast';
+      } else if (score >= 400) {
+        // At 400+, spawn green monsters
+        return 'advanced';
+      } else if (score >= 200) {
+        // At 200+, spawn red monsters
+        return 'basic';
+      } else {
+        // Below 200, no monsters
+        return null;
+      }
+    }
+
+    // Create monster with specific type
+    function createMonster(x: number, y: number, type: Monster['type']): Monster {
+      const baseX = x + PLATFORM_WIDTH / 2;
+      const baseY = y - MONSTER_SIZE;
+      
+      const baseMonster = {
+        hasDuplicated: false
+      };
+      
+      // Apply device-specific speed multiplier
+      const monsterSpeedMultiplier = isMobileDevice ? mobileMonsterSpeedMultiplier : desktopMonsterSpeedMultiplier;
+      
+      switch(type) {
+        case 'hybrid':
+          return {
+            ...baseMonster,
+            x: baseX - MONSTER_SIZE / 2,
+            y: baseY,
+            width: MONSTER_SIZE,
+            height: MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'hybrid',
+            color: '#00ffff',
+            speed: 2 * monsterSpeedMultiplier,
+            verticalSpeed: 0,
+            verticalDirection: 0
+          };
+        case 'fast':
+          return {
+            ...baseMonster,
+            x: baseX - SMALL_MONSTER_SIZE / 2,
+            y: baseY,
+            width: SMALL_MONSTER_SIZE,
+            height: SMALL_MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'fast',
+            color: '#ffff00',
+            speed: 4 * monsterSpeedMultiplier
+          };
+        case 'advanced':
+          return {
+            ...baseMonster,
+            x: baseX - LARGE_MONSTER_SIZE / 2,
+            y: baseY,
+            width: LARGE_MONSTER_SIZE,
+            height: LARGE_MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'advanced',
+            color: '#00ff00',
+            speed: 1 * monsterSpeedMultiplier,
+            verticalSpeed: 0,
+            verticalDirection: 0
+          };
+        default:
+          return {
+            ...baseMonster,
+            x: baseX - MONSTER_SIZE / 2,
+            y: baseY,
+            width: MONSTER_SIZE,
+            height: MONSTER_SIZE,
+            direction: Math.random() < 0.5 ? -1 : 1,
+            type: 'basic',
+            color: '#ff0000',
+            speed: 2 * monsterSpeedMultiplier
+          };
+      }
+    }
+
+    // Update game state
+    function update() {
+      if (!gameStarted || gameOver) return;
+      
+      // Update item display
+      updateItemDisplay();
+      
+      // Update flicker timer
+      if (!gameStarted) {
+        flickerTimer++;
+        if (flickerTimer >= 30) {
+          titleFlicker = !titleFlicker;
+          flickerTimer = 0;
+        }
+      }
+
+      // Rest stop will be created in generateNewPlatforms when score is reached
+      
+      // Check for cutscene trigger before handling cutscene
+      if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
+        player.isInCutscene = true;
+        cutsceneStartTime = Date.now();
+        currentDialogue = 0;
+      }
+
+      // Handle cutscene
+      if (player.isInCutscene) {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - cutsceneStartTime;
+
+        // Update rainbow effect
+        if (elapsedTime > CUTSCENE_DURATION) {
+          player.rainbowTimer++;
+          if (player.rainbowTimer >= 5) { // Change color every 5 frames
+            player.currentRainbowIndex = (player.currentRainbowIndex + 1) % RAINBOW_COLORS.length;
+            player.rainbowTimer = 0;
+            
+            // Apply rainbow effect to score display
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            if (scoreDisplay) {
+              scoreDisplay.style.color = RAINBOW_COLORS[player.currentRainbowIndex];
+            }
+          }
+        }
+
+        // End cutscene after both dialogues
+        if (elapsedTime > CUTSCENE_DURATION * 2) {
+          player.isInCutscene = false;
+          player.hasDoubleJump = true;  // Unlock double jump
+          
+          // Reset score display color (CSS class handles theme color)
+          const scoreDisplay = document.getElementById('scoreDisplay');
+          if (scoreDisplay) {
+            scoreDisplay.style.color = '';
+          }
+        }
+      }
+      
+      // Handle pointy hat cutscene
+      if (pointyHatCutscenePhase > 0) {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - pointyHatCutsceneStartTime;
+        
+        // End cutscene after both dialogues
+        if (elapsedTime > CUTSCENE_DURATION * 2) {
+          pointyHatCutscenePhase = 0;
+        }
+      }
+      
+      // Handle Green's Gluttony cutscene
+      if (greensGluttonyCutscenePhase > 0) {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - greensGluttonyCutsceneStartTime;
+        
+        // End cutscene after both dialogues
+        if (elapsedTime > CUTSCENE_DURATION * 2) {
+          greensGluttonyCutscenePhase = 0;
+        }
+      }
+      
+      // Player movement
+      if (keys.left) player.velocityX = -MOVE_SPEED;
+      else if (keys.right) player.velocityX = MOVE_SPEED;
+      else player.velocityX = 0;
+      
+      // Apply horizontal movement
+      player.x += player.velocityX;
+      
+      // Keep player in bounds
+      if (player.x < 0) player.x = 0;
+      if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+      
+      // Simplified jump logic
+      if (keys[' '] && !player.isJumping) {
+        // First jump
+        player.velocityY = JUMP_FORCE;
+        player.isJumping = true;
+        player.doubleJumpUsed = false; // Reset double jump when jumping from ground
+      } else if (keys[' '] && player.isJumping && player.hasDoubleJump && !player.doubleJumpUsed && !keys.wasSpacePressed) {
+        // Second jump (air jump) - only if not already used
+        player.velocityY = JUMP_FORCE;
+        player.doubleJumpUsed = true; // Mark double jump as used
+      }
+      
+      // Track space key state to prevent holding space
+      keys.wasSpacePressed = keys[' '];
+      
+      // Handle rest stop interaction
+      if (restStop && restStop.active) {
+        // Calculate absolute NPC position from platform
+        const npcAbsoluteX = restStop.platform.x + restStop.npc.x;
+        const npcAbsoluteY = restStop.platform.y + restStop.npc.y;
+        
+        const distanceToNPC = Math.abs(player.x - npcAbsoluteX) + Math.abs(player.y - npcAbsoluteY);
+        
+        // Check if player is near NPC (within interaction range)
+        if (distanceToNPC < 80) {
+          // Press E to interact
+          if (keys['e'] && !keys.wasEPressed) {
+            if (!restStop.interacting) {
+              restStop.interacting = true;
+              theoInteractionCount++;
+              
+              // Select dialogue based on interaction count
+              if (theoInteractionCount <= 3) {
+                // First 3 times: show early dialogues in order
+                restStop.dialogueIndex = theoInteractionCount - 1;
+              } else if (theoInteractionCount <= 6) {
+                // 4th-6th time: show name reveal dialogues in order
+                restStop.dialogueIndex = theoInteractionCount - 1;
+              } else {
+                // After that: random from remaining dialogues
+                restStop.dialogueIndex = 6 + Math.floor(Math.random() * (restStopDialogues.length - 6));
+              }
+              
+              restStop.dialogueTimer = Date.now();
+            } else {
+              // Continue to next dialogue or exit
+              if (theoInteractionCount <= 6) {
+                // During intro phase, advance sequentially
+                restStop.interacting = false;
+              } else if (Math.random() < 0.3) {
+                restStop.interacting = false;
+              } else {
+                // Random dialogue after intro
+                restStop.dialogueIndex = 6 + Math.floor(Math.random() * (restStopDialogues.length - 6));
+                restStop.dialogueTimer = Date.now();
+              }
+            }
+          }
+        } else {
+          // Exit interaction if player moves away
+          restStop.interacting = false;
+        }
+        
+        // Animate NPC - gentle bobbing and sword floating
+        restStop.npc.hornOffset = Math.sin(Date.now() / 1500) * 4; // Slower, more pronounced bob
+        restStop.npc.swordFloat = Math.sin(Date.now() / 1200) * 8; // Vertical sword float
+      }
+      
+      // Track E key state
+      keys.wasEPressed = keys['e'];
+      
+      // Apply gravity
+      player.velocityY += GRAVITY;
+      player.y += player.velocityY;
+      
+      // Screen scrolling
+      const scrollThreshold = canvas.height * SCREEN_SCROLL_THRESHOLD;
+      
+      
+      if (player.y < scrollThreshold) {
+        const scrollAmount = scrollThreshold - player.y;
+        cameraY += scrollAmount;
+        player.y += scrollAmount;
+        
+        // Move platforms and monsters with camera
+        platforms.forEach(platform => {
+          platform.y += scrollAmount;
+        });
+        
+        monsters.forEach(monster => {
+          monster.y += scrollAmount;
+        });
+        
+        // Move items with camera
+        items.forEach(item => {
+          item.y += scrollAmount;
+        });
+        
+        // Rest stop platform moves with camera like other platforms
+        // NPC position will be calculated relative to platform when drawing
+        
+        // Generate new platforms if needed
+        const highestPlatform = Math.min(...platforms.map(p => p.y));
+        if (highestPlatform > 0) {
+          generateNewPlatforms();
+        }
+      }
+      
+      // Platform collision
+      player.isJumping = true;
+      for (let i = platforms.length - 1; i >= 0; i--) {
+        const platform = platforms[i];
+        if (player.y + player.height > platform.y &&
+            player.y < platform.y + platform.height &&
+            player.x + player.width > platform.x &&
+            player.x < platform.x + platform.width) {
+          if (player.velocityY > 0) {
+            player.y = platform.y - player.height;
+            player.velocityY = 0;
+            player.isJumping = false;
+            player.doubleJumpUsed = false; // Reset double jump when landing
+            
+            // Only create landing particles if we were previously jumping
+            if (player.wasJumping) {
+              createLandingParticles(player.x + player.width/2, player.y + player.height, '#333');
+            }
+            player.wasJumping = false;
+            
+            // Handle brittle platform
+            if (platform.type === 'brittle') {
+              // Start break timer if not already started
+              if (!platform.breakTimer) {
+                platform.breakTimer = Date.now();
+              }
+              
+              // Check if platform should break
+              if (platform.breakTimer && Date.now() - platform.breakTimer > BRITTLE_PLATFORM_BREAK_TIME) {
+                // Create breaking particles
+                createLandingParticles(platform.x + platform.width/2, platform.y, '#888');
+                // Remove the platform
+                platforms.splice(i, 1);
+                // Make player fall
+                player.isJumping = true;
+                continue;
+              }
+            }
+            
+            // Check for cutscene trigger
+            if (score >= DOUBLE_JUMP_UNLOCK_SCORE && !player.hasDoubleJump && !player.isInCutscene) {
+              player.isInCutscene = true;
+              cutsceneStartTime = Date.now();
+              currentDialogue = 0;
+            }
+          }
+        } else if (platform.type === 'brittle' && platform.breakTimer) {
+          // Reset break timer when player is not on the platform
+          platform.breakTimer = undefined;
+        }
+      }
+      
+      // Item collection
+      for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+        if (!item.collected && 
+            player.y + player.height > item.y &&
+            player.y < item.y + item.height &&
+            player.x + player.width > item.x &&
+            player.x < item.x + item.width) {
+          
+          // Collect the item
+          item.collected = true;
+          
+          // Handle different item types
+          if (item.type === 'pointyHat') {
+            player.hasPointyHat = true;
+            // Start pointy hat cutscene
+            pointyHatCutsceneStartTime = Date.now();
+            pointyHatCutscenePhase = 1;
+            // Create collection particles
+            createLandingParticles(item.x + item.width/2, item.y + item.height/2, '#ffffff');
+          } else if (item.type === 'greensGluttony') {
+            player.hasGreensGluttony = true;
+            
+            // Start growth animation instead of instantly changing size
+            isGrowing = true;
+            growthStartTime = Date.now();
+            growthProgress = 0;
+            
+            // Start Green's Gluttony cutscene
+            greensGluttonyCutsceneStartTime = Date.now();
+            greensGluttonyCutscenePhase = 1;
+            // Create collection particles
+            createLandingParticles(item.x + item.width/2, item.y + item.height/2, '#00ff00');
+          }
+          
+          // Remove the item
+          items.splice(i, 1);
+        }
+      }
+      
+      // Update growth animation
+      if (isGrowing) {
+        const currentTime = Date.now();
+        growthProgress = (currentTime - growthStartTime) / GROWTH_DURATION;
+        
+        if (growthProgress >= 1) {
+          // Animation complete
+          growthProgress = 1;
+          isGrowing = false;
+          // Set final size
+          player.width = PLAYER_GLUTTONY_SIZE;
+          player.height = PLAYER_GLUTTONY_SIZE;
+          player.isEnlarged = true;
+        } else {
+          // Calculate interpolated size during animation
+          const startSize = PLAYER_SIZE;
+          const endSize = PLAYER_GLUTTONY_SIZE;
+          const currentSize = startSize + (endSize - startSize) * easeInOutQuad(growthProgress);
+          
+          // Update player size
+          player.width = currentSize;
+          player.height = currentSize;
+        }
+      }
+      
+      // Monster collision and movement
+      for (let i = monsters.length - 1; i >= 0; i--) {
+        let monster = monsters[i];
+        
+        // Move monster based on type
+        updateMonster(monster);
+        
+        // Check collision with player
+        if (player.y + player.height > monster.y &&
+            player.y < monster.y + monster.height &&
+            player.x + player.width > monster.x &&
+            player.x < monster.x + monster.width) {
+          
+          // Check if player is above the monster and has pointy hat
+          if (player.velocityY > 0 && player.y + player.height < monster.y + monster.height / 2 && player.hasPointyHat) {
+            // Player jumps on monster with pointy hat
+            createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
+            
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
+            // Check for Green's Gluttony drop from green monsters
+            if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'greensGluttony',
+                collected: false
+              });
+              greensGluttonyDropCount++;
+            }
+            
+            monsters.splice(i, 1);
+            // Apply jump force when killing monster
+            player.velocityY = JUMP_FORCE;
+            player.isJumping = true;
+          } else if (player.velocityY > 0 && player.y + player.height < monster.y + monster.height / 2) {
+            // Player jumps on monster without pointy hat (normal behavior)
+            createLandingParticles(player.x + player.width/2, player.y + player.height, monster.color);
+            
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
+            // Check for Green's Gluttony drop from green monsters
+            if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'greensGluttony',
+                collected: false
+              });
+              greensGluttonyDropCount++;
+            }
+            
+            monsters.splice(i, 1);
+            // Apply jump force when killing monster
+            player.velocityY = JUMP_FORCE;
+            player.isJumping = true;
+          } else if (player.velocityY < 0 && player.y > monster.y + monster.height / 2 && player.hasPointyHat) {
+            // Player jumps up into monster from below with pointy hat
+            createLandingParticles(player.x + player.width/2, player.y, monster.color);
+            
+            // Check for Pointy Hat drop from red monsters (45% chance)
+            if (monster.type === 'basic' && Math.random() < 0.45 && !player.hasPointyHat && !pointyHatSpawned) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'pointyHat',
+                collected: false
+              });
+              pointyHatSpawned = true;
+            }
+            
+            // Check for Green's Gluttony drop from green monsters
+            if (monster.type === 'advanced' && Math.random() < GREENS_GLUTTONY_DROP_CHANCE && !player.hasGreensGluttony && greensGluttonyDropCount < 2) {
+              items.push({
+                x: monster.x + monster.width / 2 - 10,
+                y: monster.y,
+                width: 20,
+                height: 20,
+                type: 'greensGluttony',
+                collected: false
+              });
+              greensGluttonyDropCount++;
+            }
+            
+            monsters.splice(i, 1);
+            // Apply downward force when killing monster
+            player.velocityY = 2;
+          } else {
+            // Player hits monster from the side
+            gameOver = true;
+            document.getElementById('gameOver').classList.remove('hidden');
+          }
+        }
+      }
+      
+      // Update particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        if (particles[i].life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      // Update previous jump state
+      player.wasJumping = player.isJumping;
+      
+      // Update score
+      score = Math.floor((cameraY + canvas.height - player.y) / 10);
+      document.getElementById('score').textContent = score.toString();
+      document.getElementById('scoreValue').textContent = score.toString();
+      
+      // Clean up off-screen monsters and particles (after camera scroll)
+      // Skip cleanup on frames where new monsters were just generated
+      if (!skipMonsterCleanupThisFrame) {
+        const screenBottom = cameraY + canvas.height;
+        
+        // Keep monsters that are on screen or just off screen (within buffer zone)
+        // Only remove monsters that are way below the screen (fell off)
+        // Don't remove monsters above - they'll scroll into view
+        monsters = monsters.filter(monster => {
+          return monster.y <= screenBottom + 400; // Keep if not too far below screen
+        });
+      }
+      
+      // Reset flag for next frame
+      skipMonsterCleanupThisFrame = false;
+      
+      particles = particles.filter(particle => particle.life > 0);
+      
+      // Check if player fell
+      if (player.y > canvas.height) {
+        gameOver = true;
+        document.getElementById('gameOver').classList.remove('hidden');
+      }
+
+      // Apply movement speed changes based on items
+      if (player.isEnlarged) {
+        MOVE_SPEED = ENLARGED_MOVE_SPEED;
+      } else {
+        MOVE_SPEED = isMobileDevice ? mobileMoveSpeed : desktopMoveSpeed;
+      }
+
+      // Pointy Hat now drops from red monsters instead of spawning on platforms
+    }
+
+    // Generate new platforms at the top
+    function generateNewPlatforms() {
+      skipMonsterCleanupThisFrame = true; // Don't clean up newly created monsters this frame
+      const highestPlatform = Math.min(...platforms.map(p => p.y));
+      const newPlatforms = [];
+      
+      // Check if we should create the rest stop
+      if (score >= REST_STOP_SCORE && !restStopCreated) {
+        const restStopPlatforms = createRestStop(highestPlatform);
+        platforms.push(...restStopPlatforms);
+        return; // Don't generate regular platforms this cycle
+      }
+      
+      // Use easier spacing for first 300 points
+      const spacing = score < EASY_MODE_THRESHOLD ? EASY_PLATFORM_SPACING : PLATFORM_SPACING;
+      
+      // Get the last platform's position
+      let lastPlatformX = platforms[platforms.length - 1].x + PLATFORM_WIDTH / 2;
+      
+      // Determine spawn chance based on score
+      let spawnChance;
+      if (score < 100) {
+        spawnChance = VERY_EASY_MONSTER_SPAWN_CHANCE;
+      } else if (score < EASY_MODE_THRESHOLD) {
+        spawnChance = EASY_MONSTER_SPAWN_CHANCE;
+      } else {
+        spawnChance = MONSTER_SPAWN_CHANCE;
+      }
+      
+      // Generate more platforms at once
+      for (let i = 0; i < PLATFORM_BUFFER; i++) {
+        // Calculate safe x position range based on last platform
+        const minX = Math.max(50, lastPlatformX - MAX_JUMP_DISTANCE);
+        const maxX = Math.min(canvas.width - PLATFORM_WIDTH - 50, lastPlatformX + MAX_JUMP_DISTANCE);
+        const x = minX + Math.random() * (maxX - minX);
+        const y = highestPlatform - spacing - i * spacing;
+        
+        // Update last platform position
+        lastPlatformX = x + PLATFORM_WIDTH / 2;
+        
+        // Determine platform type based on score
+        const platformType = score >= BRITTLE_PLATFORM_SCORE && Math.random() < BRITTLE_PLATFORM_CHANCE ? 'brittle' : 'normal';
+        
+        newPlatforms.push({
+          x: x,
+          y: y,
+          width: PLATFORM_WIDTH,
+          height: PLATFORM_HEIGHT,
+          type: platformType
+        });
+        
+        // Add monsters with adjusted spawn chance
+        if (Math.random() < spawnChance) {
+          const monsterType = determineMonsterType();
+          if (monsterType) {
+            monsters.push(createMonster(x, y, monsterType));
+          }
+        }
+      }
+      
+      platforms.push(...newPlatforms);
+      
+      // Remove platforms that are too far below the screen
+      const screenBottom = cameraY + canvas.height;
+      platforms = platforms.filter(platform => platform.y < screenBottom + 200);
+    }
+
+    // Optimize particle system
+    function createLandingParticles(x: number, y: number, color: string) {
+      // Dynamic max particles based on device
+      const maxParticles = isMobileDevice ? 40 : MAX_PARTICLES;
+      
+      // Limit total particles and remove oldest ones more aggressively
+      if (particles.length >= maxParticles) {
+        particles.splice(0, 8); // Remove more particles at once
+      }
+      
+      // Create fewer particles on mobile
+      const particleCount = isMobileDevice ? 4 : 6; // Reduced particle count
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle(x, y, color));
+      }
+    }
+
+    // Optimize monster movement
+    function updateMonster(monster: Monster) {
+      // Cache frequently used values
+      const playerX = player.x;
+      const playerY = player.y;
+      const monsterX = monster.x;
+      const monsterY = monster.y;
+      
+      // Apply device-specific speed adjustments for vertical movement
+      const verticalSpeedMultiplier = isMobileDevice ? 0.7 : 1.0;
+      
+      switch(monster.type) {
+        case 'hybrid':
+          monster.x += monster.direction * monster.speed;
+          if (Math.abs(monster.x - playerX) < 100) {
+            monster.verticalDirection = monster.y > playerY ? -1 : 1;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.1 * verticalSpeedMultiplier);
+            monster.verticalSpeed *= 0.98;
+            monster.y += monster.verticalSpeed;
+
+            // Check for duplication when vertically aligned
+            if (!(monster as any).hasDuplicated && Math.abs(monster.x - playerX) < 30) {
+              if (Math.random() < CYAN_DUPLICATION_CHANCE) {
+                const duplicate = createMonster(
+                  monster.x + (Math.random() < 0.5 ? -50 : 50),
+                  monster.y,
+                  'hybrid'
+                );
+                (duplicate as any).hasDuplicated = true;
+                monsters.push(duplicate);
+                (monster as any).hasDuplicated = true;
+              }
+            }
+          }
+          break;
+        case 'fast':
+          monster.x += monster.direction * monster.speed;
+          break;
+        case 'advanced':
+          monster.x += monster.direction * monster.speed;
+          if (Math.abs(monster.x - playerX) < 30) {
+            monster.verticalDirection = monster.y > playerY ? -1 : 1;
+            monster.verticalSpeed = (monster.verticalSpeed || 0) + (monster.verticalDirection * 0.05 * verticalSpeedMultiplier);
+            monster.verticalSpeed *= 0.95;
+            monster.y += monster.verticalSpeed;
+          }
+          break;
+        default:
+          monster.x += monster.direction * monster.speed;
+      }
+
+      // Keep monster in bounds
+      if (monster.x < 0 || monster.x + monster.width > canvas.width) {
+        monster.direction *= -1;
+        // Ensure monster doesn't get stuck in wall
+        monster.x = Math.max(0, Math.min(canvas.width - monster.width, monster.x));
+      }
+      
+      // Check if monster is trying to cross rest platform
+      if (restStop && restStop.active) {
+        const restPlatform = restStop.platform;
+        const monsterBottom = monster.y + monster.height;
+        const monsterTop = monster.y;
+        const platformTop = restPlatform.y;
+        const platformBottom = restPlatform.y + restPlatform.height;
+        
+        // If monster is at the same vertical level as rest platform
+        if (monsterBottom > platformTop && monsterTop < platformBottom) {
+          const monsterRight = monster.x + monster.width;
+          const monsterLeft = monster.x;
+          const platformLeft = restPlatform.x;
+          const platformRight = restPlatform.x + restPlatform.width;
+          
+          // If monster is trying to cross the platform horizontally
+          if (monsterRight > platformLeft && monsterLeft < platformRight) {
+            // Reverse direction and push back
+            monster.direction *= -1;
+            if (monster.x < restPlatform.x + restPlatform.width / 2) {
+              // Monster is on left side, push left
+              monster.x = platformLeft - monster.width - 5;
+            } else {
+              // Monster is on right side, push right
+              monster.x = platformRight + 5;
+            }
+          }
+        }
+      }
+    }
+
+    // Optimize drawing functions
+    function draw() {
+      // Clear canvas with theme background
+      ctx.fillStyle = themeColors.background;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      if (!gameStarted) {
+        // Smooth, ethereal floating text effect with multiple layers
+        const time = Date.now() / 1000;
+        
+        // Multiple sine waves for smooth, organic motion
+        const floatY = Math.sin(time * 0.5) * 8 + Math.sin(time * 0.3) * 4;
+        const floatX = Math.cos(time * 0.4) * 3;
+        
+        // Smooth breathing opacity
+        const breathe = 0.75 + Math.sin(time * 0.6) * 0.25;
+        
+        // Pulsing glow
+        const glowIntensity = 15 + Math.sin(time * 0.8) * 10;
+        
+        ctx.save();
+        
+        // Draw text with individual character wave effect
+        const text = 'Can you make it out, Jumpboy?';
+        const maxWidth = canvas.width - 80;
+        const fontSize = 24 * canvasScale;
+        
+        ctx.font = `${fontSize}px "Courier New", monospace`;
+        ctx.textAlign = 'center';
+        
+        // Calculate wrapped lines
+        const lines: string[] = [];
+        const words = text.split(' ');
+        let currentLine = '';
+        
+        for (let i = 0; i < words.length; i++) {
+          const testLine = currentLine + words[i] + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && i > 0) {
+            lines.push(currentLine.trim());
+            currentLine = words[i] + ' ';
+          } else {
+            currentLine = testLine;
+          }
+        }
+        lines.push(currentLine.trim());
+        
+        // Calculate starting Y position to center all lines
+        const lineHeight = fontSize * 1.4;
+        const totalHeight = lines.length * lineHeight;
+        let startY = canvas.height / 2 - totalHeight / 2 + floatY;
+        
+        // Draw each line with individual character wave effect
+        lines.forEach((line, lineIndex) => {
+          const y = startY + lineIndex * lineHeight;
+          const chars = line.split('');
+          
+          // Calculate total width to center the line
+          const totalWidth = ctx.measureText(line).width;
+          let x = canvas.width / 2 - totalWidth / 2 + floatX;
+          
+          chars.forEach((char, charIndex) => {
+            // Individual character wave
+            const charWave = Math.sin(time * 2 + charIndex * 0.3 + lineIndex * 0.5) * 2;
+            const charOpacity = breathe + Math.sin(time * 1.5 + charIndex * 0.2) * 0.1;
+            
+            ctx.save();
+            ctx.globalAlpha = Math.max(0.5, Math.min(1, charOpacity));
+            
+            // Layered glow effect
+            ctx.shadowBlur = glowIntensity;
+            ctx.shadowColor = themeColors.text;
+            ctx.fillStyle = themeColors.text;
+            
+            // Draw character with slight wave
+            ctx.fillText(char, x, y + charWave);
+            
+            // Second layer for extra glow
+            ctx.shadowBlur = glowIntensity * 0.5;
+            ctx.fillText(char, x, y + charWave);
+            
+            ctx.restore();
+            
+            x += ctx.measureText(char).width;
+          });
+        });
+        
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      } else {
+        // Draw platforms
+        ctx.fillStyle = themeColors.platform;
+        for (let platform of platforms) {
+          if (platform.type === 'rest') {
+            // Draw rest platform with special color
+            ctx.fillStyle = '#4a5568';
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+            // Add border
+            ctx.strokeStyle = '#718096';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+          } else if (platform.type === 'brittle') {
+            ctx.fillStyle = themeColors.brittlePlatform;
+            
+            if (platform.breakTimer) {
+              const timeLeft = BRITTLE_PLATFORM_BREAK_TIME - (Date.now() - platform.breakTimer);
+              const breakProgress = timeLeft / BRITTLE_PLATFORM_BREAK_TIME;
+              const pulseIntensity = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+              // Use brittle platform color with pulse
+              ctx.fillStyle = themeColors.brittlePlatform;
+              
+              ctx.strokeStyle = `rgba(255, 0, 0, ${1 - breakProgress})`;
+              ctx.lineWidth = 2;
+              ctx.strokeRect(platform.x, platform.y, platform.width, platform.height);
+            }
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+          } else {
+            ctx.fillStyle = themeColors.platform;
+            ctx.fillRect(platform.x, platform.y, platform.width, platform.height);
+          }
+        }
+        
+        // Draw rest stop NPC
+        if (restStop && restStop.active) {
+          const npc = restStop.npc;
+          // Calculate absolute position from platform
+          const npcX = restStop.platform.x + npc.x;
+          const npcY = restStop.platform.y + npc.y;
+          
+          // Draw crowned cube (Jumpboy-like with crown) with bobbing
+          ctx.fillStyle = themeColors.player;
+          ctx.fillRect(npcX - npc.size/2, npcY - npc.size/2 + npc.hornOffset, npc.size, npc.size);
+          
+          // Draw three sharper horns (crown) - taller and pointier
+          ctx.fillStyle = '#ffffff';
+          const hornHeight = 12;
+          const hornWidth = 6;
+          const hornSpacing = npc.size / 3;
+          for (let i = 0; i < 3; i++) {
+            const hornX = npcX - npc.size/2 + (i * hornSpacing) + hornSpacing/2;
+            const hornY = npcY - npc.size/2 - hornHeight + npc.hornOffset;
+            ctx.beginPath();
+            ctx.moveTo(hornX, hornY); // Sharp tip
+            ctx.lineTo(hornX - hornWidth/2, hornY + hornHeight); // Left base
+            ctx.lineTo(hornX + hornWidth/2, hornY + hornHeight); // Right base
+            ctx.closePath();
+            ctx.fill();
+          }
+          
+          // Draw two vertical swords floating beside shoulders
+          ctx.fillStyle = '#cbd5e0';
+          const swordLeftX = npcX - 40; // Left side
+          const swordRightX = npcX + 40; // Right side
+          const swordY1 = npcY - 10 + npc.swordFloat; // Top sword
+          const swordY2 = npcY - 10 - npc.swordFloat; // Bottom sword (opposite float)
+          
+          // Left sword (vertical - pointing up)
+          // Blade (vertical rectangle)
+          ctx.fillRect(swordLeftX - 2.5, swordY1 - 35, 5, 35);
+          // Hilt (horizontal at bottom of blade)
+          ctx.fillRect(swordLeftX - 4.5, swordY1, 9, 7);
+          
+          // Right sword (vertical - pointing up)
+          // Blade (vertical rectangle)
+          ctx.fillRect(swordRightX - 2.5, swordY2 - 35, 5, 35);
+          // Hilt (horizontal at bottom of blade)
+          ctx.fillRect(swordRightX - 4.5, swordY2, 9, 7);
+          
+          // Draw interaction prompt if player is near
+          const distanceToNPC = Math.abs(player.x - npcX) + Math.abs(player.y - npcY);
+          if (distanceToNPC < 80 && !restStop.interacting) {
+            ctx.fillStyle = themeColors.text;
+            ctx.font = `${14 * canvasScale}px Arial`;
+            ctx.textAlign = 'center';
+            const promptText = isMobileDevice ? 'Tap to Talk' : '[E] Talk';
+            ctx.fillText(promptText, npcX, npcY - npc.size - 20);
+          }
+          
+          // Draw dialogue box (optimized/tighter)
+          if (restStop.interacting) {
+            // Responsive dialogue box sizing (smaller)
+            const boxWidth = Math.min(350, canvas.width - 40);
+            const boxHeight = isMobileDevice ? 90 : 80;
+            const boxX = canvas.width / 2 - boxWidth / 2;
+            const boxY = isMobileDevice ? canvas.height - 170 : canvas.height - 120; // Higher on mobile to avoid controls
+            
+            // Box background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+            ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Box border
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+            
+            // Name label (smaller)
+            const nameLabel = theoInteractionCount >= 4 ? 'Theo' : '???';
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${12 * canvasScale}px 'Courier New', monospace`;
+            ctx.textAlign = 'left';
+            ctx.fillText(nameLabel, boxX + 15, boxY + 18);
+            
+            // Dialogue text (tighter)
+            ctx.fillStyle = '#cccccc';
+            ctx.font = `${13 * canvasScale}px 'Courier New', monospace`;
+            ctx.textAlign = 'left';
+            const dialogue = restStopDialogues[restStop.dialogueIndex];
+            const maxChars = isMobileDevice ? 35 : 42;
+            const lines = dialogue.match(new RegExp(`.{1,${maxChars}}`, 'g')) || [dialogue];
+            lines.forEach((line, i) => {
+              ctx.fillText(line, boxX + 15, boxY + 38 + (i * 17));
+            });
+            
+            // Continue prompt
+            ctx.font = `${11 * canvasScale}px Arial`;
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#888888';
+            const continueText = isMobileDevice ? 'Tap to Continue' : '[E] Continue';
+            ctx.fillText(continueText, boxX + boxWidth - 20, boxY + boxHeight - 12);
+          }
+        }
+        
+        // Draw items
+        for (let item of items) {
+          if (!item.collected) {
+            if (item.type === 'pointyHat') {
+              // Add a glow effect
+              ctx.shadowColor = '#ffffff';
+              ctx.shadowBlur = 10;
+              
+              // Make the hat larger and more visible
+              ctx.fillStyle = '#ffffff';
+              ctx.beginPath();
+              ctx.moveTo(item.x + item.width / 2, item.y - 5);
+              ctx.lineTo(item.x + item.width + 5, item.y + item.height);
+              ctx.lineTo(item.x - 5, item.y + item.height);
+              ctx.closePath();
+              ctx.fill();
+              
+              // Reset shadow
+              ctx.shadowBlur = 0;
+              
+              // Add a pulsing animation
+              const pulse = Math.sin(Date.now() / 300) * 5;
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+              ctx.beginPath();
+              ctx.arc(item.x + item.width / 2, item.y + item.height / 2, item.width / 2 + pulse, 0, Math.PI * 2);
+              ctx.fill();
+            } else if (item.type === 'greensGluttony') {
+              // Add a glow effect
+              ctx.shadowColor = '#00ff00';
+              ctx.shadowBlur = 15;
+              
+              // Draw the green orb
+              const gradient = ctx.createRadialGradient(
+                item.x + item.width/2, item.y + item.height/2, 0,
+                item.x + item.width/2, item.y + item.height/2, item.width/2
+              );
+              gradient.addColorStop(0, '#00ff00');
+              gradient.addColorStop(0.7, '#00aa00');
+              gradient.addColorStop(1, '#007700');
+              
+              ctx.fillStyle = gradient;
+              ctx.beginPath();
+              ctx.arc(item.x + item.width/2, item.y + item.height/2, item.width/2, 0, Math.PI * 2);
+              ctx.fill();
+              
+              // Reset shadow
+              ctx.shadowBlur = 0;
+              
+              // Add a pulsing animation
+              const pulse = Math.sin(Date.now() / 250) * 6;
+              ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
+              ctx.beginPath();
+              ctx.arc(item.x + item.width/2, item.y + item.height/2, item.width/2 + pulse, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+        }
+        
+        // Draw monsters
+        for (let monster of monsters) {
+          ctx.fillStyle = monster.color;
+          ctx.fillRect(monster.x, monster.y, monster.width, monster.height);
+        }
+        
+        // Draw particles
+        for (let particle of particles) {
+          particle.draw(ctx);
+        }
+        
+        // Draw player with cutscene effects
+        if (player.isInCutscene) {
+          drawPlayerWithCutscene();
+        } else if (pointyHatCutscenePhase > 0) {
+          drawPlayerWithPointyHatCutscene();
+        } else if (greensGluttonyCutscenePhase > 0) {
+          drawPlayerWithGreensGluttonyCutscene();
+        } else {
+          drawPlayerNormal();
+        }
+      }
+    }
+
+    // Separate player drawing functions for better organization
+    function drawPlayerWithCutscene() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - cutsceneStartTime;
+      
+      const zoomScale = 1 + Math.sin(elapsedTime / 500) * 0.2;
+      ctx.save();
+      ctx.translate(player.x + player.width/2, player.y + player.height/2);
+      ctx.scale(zoomScale, zoomScale);
+      ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
+      
+      ctx.fillStyle = elapsedTime > CUTSCENE_DURATION ? RAINBOW_COLORS[player.currentRainbowIndex] : themeColors.player;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      ctx.restore();
+
+      ctx.fillStyle = themeColors.text;
+      ctx.font = `${20 * canvasScale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        elapsedTime < CUTSCENE_DURATION 
+          ? "Not bad, Jumpboy. You'll need this to continue"
+          : "You can now double jump!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+      );
+    }
+
+    function drawPlayerWithPointyHatCutscene() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - pointyHatCutsceneStartTime;
+      
+      ctx.fillStyle = themeColors.player;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      drawPointyHat(player.x, player.y);
+      
+      ctx.fillStyle = themeColors.text;
+      ctx.font = `${20 * canvasScale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        elapsedTime < CUTSCENE_DURATION
+          ? "It's a pointy hat."
+          : "Pierce through the heavens, Jumpboy!",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+      );
+    }
+
+    function drawPlayerWithGreensGluttonyCutscene() {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - greensGluttonyCutsceneStartTime;
+      
+      // Calculate dynamic scale with pulsing effect
+      const pulsingScale = 1 + Math.sin(elapsedTime / 400) * 0.1;
+      
+      // Combine with growth animation if still growing
+      const growthScale = isGrowing ? (1 + growthProgress * 0.3) : 1;
+      const totalScale = pulsingScale * growthScale;
+      
+      ctx.save();
+      ctx.translate(player.x + player.width/2, player.y + player.height/2);
+      ctx.scale(totalScale, totalScale);
+      ctx.translate(-(player.x + player.width/2), -(player.y + player.height/2));
+      
+      // Draw enlarged player with theme color
+      ctx.fillStyle = themeColors.player;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      const pulseIntensity = Math.sin(elapsedTime / 200) * 0.3 + 0.3; 
+      ctx.strokeStyle = `rgba(0, 255, 0, ${pulseIntensity})`;
+      ctx.lineWidth = 3;
+      ctx.strokeRect(player.x, player.y, player.width, player.height);
+      
+      if (player.hasPointyHat) {
+        drawPointyHat(player.x, player.y);
+      }
+      
+      ctx.restore();
+      
+      ctx.fillStyle = themeColors.text;
+      ctx.font = `${20 * canvasScale}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        elapsedTime < CUTSCENE_DURATION 
+          ? "\"Can I just have one more bite, please?\""
+          : "\"I don't know what else to do.\"",
+        canvas.width / 2,
+        canvas.height / 2 - 50
+      );
+    }
+
+    function drawPlayerNormal() {
+      ctx.fillStyle = themeColors.player;
+      ctx.fillRect(player.x, player.y, player.width, player.height);
+      
+      // Only show green glow during cutscene, not permanently
+      if (player.hasPointyHat) {
+        drawPointyHat(player.x, player.y);
+      }
+    }
+
+    function drawPointyHat(x: number, y: number) {
+      // White hat with red pom-pom
+      const centerX = x + player.width / 2;
+      const topY = y - 15;
+      const bottomY = y + 5;
+      
+      // Main hat body (white)
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.moveTo(centerX, topY);
+      ctx.lineTo(x + player.width + 5, bottomY);
+      ctx.lineTo(x - 5, bottomY);
+      ctx.closePath();
+      ctx.fill();
+      
+      // Red pom-pom on top
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(centerX, topY, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Optimize game loop
+    function gameLoop(timestamp: number) {
+      if (!lastTime) lastTime = timestamp;
+      const deltaTime = timestamp - lastTime;
+      lastTime = timestamp;
+
+      frameCount++;
+      if (deltaTime >= 1000) {
+        fps = frameCount;
+        frameCount = 0;
+      }
+
+      update();
+      draw();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Reset game
+    function resetGame() {
+      player.x = canvas.width / 2;
+      player.y = canvas.height - 100;
+      player.velocityY = 0;
+      player.velocityX = 0;
+      player.isJumping = false;
+      player.wasJumping = false;
+      player.hasDoubleJump = false;
+      player.doubleJumpUsed = false;
+      player.isInCutscene = false;
+      player.rainbowTimer = 0;
+      player.currentRainbowIndex = 0;
+      player.hasPointyHat = false;  // Reset pointy hat
+      player.hasGreensGluttony = false;  // Reset Green's Gluttony
+      player.isEnlarged = false;  // Reset enlarged state
+      player.width = PLAYER_SIZE;  // Reset size
+      player.height = PLAYER_SIZE;
+      isGrowing = false;  // Reset growth animation
+      growthProgress = 0;
+      score = 0;
+      cameraY = 0;
+      restStop = null;
+      restStopCreated = false;
+      theoInteractionCount = 0; // Reset Theo conversation progress
+      gameOver = false;
+      gameStarted = true;
+      particles = [];
+      items = [];  // Clear items array
+      pointyHatCutscenePhase = 0;  // Reset pointy hat cutscene
+      greensGluttonyCutscenePhase = 0;  // Reset Green's Gluttony cutscene
+      document.getElementById('gameOver').classList.add('hidden');
+      
+      // Reset score display color (CSS class handles theme color)
+      const scoreDisplay = document.getElementById('scoreDisplay');
+      if (scoreDisplay) {
+        scoreDisplay.style.color = '';
+      }
+      
+      const startButton = document.getElementById('startButton');
+      if (startButton) {
+        startButton.style.display = 'none';
+      }
+      generatePlatforms();
+
+      // Reset pointy hat spawn flag
+      pointyHatSpawned = false;
+
+      // Reset Green's Gluttony drop count
+      greensGluttonyDropCount = 0;
+    }
+
+    // Add mobile controls
+    const mobileControls = document.getElementById('mobileControls');
+    const leftBtn = document.getElementById('leftBtn')!;
+    const rightBtn = document.getElementById('rightBtn')!;
+    const jumpBtn = document.getElementById('jumpBtn')!;
+
+    // Better touch event handlers with haptic feedback simulation
+    if (leftBtn && rightBtn && jumpBtn) {
+      leftBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.left = true;
+        keys.right = false;
+        leftBtn.style.transform = 'scale(0.9)';
+      });
+
+      leftBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.left = false;
+        leftBtn.style.transform = 'scale(1)';
+      });
+
+      rightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.right = true;
+        keys.left = false;
+        rightBtn.style.transform = 'scale(0.9)';
+      });
+
+      rightBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        keys.right = false;
+        rightBtn.style.transform = 'scale(1)';
+      });
+
+      // Add touchcancel event handlers
+      leftBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.left = false;
+        leftBtn.style.transform = 'scale(1)';
+      });
+
+      rightBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        keys.right = false;
+        rightBtn.style.transform = 'scale(1)';
+      });
+
+      // Improved jump button with better timing
+      let lastJumpTime = 0;
+      let jumpPressed = false;
+      
+      jumpBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const now = Date.now();
+        jumpBtn.style.transform = 'scale(0.9)';
+        
+        if (!gameStarted || gameOver) {
+          resetGame();
+          return;
+        }
+        
+        // Allow more responsive jumping (reduced from 300ms to 200ms)
+        if (now - lastJumpTime < 200) return;
+        lastJumpTime = now;
+        jumpPressed = true;
+        
+        if (!player.isJumping) {
+          player.velocityY = JUMP_FORCE;
+          player.isJumping = true;
+          player.doubleJumpUsed = false; // Reset double jump when jumping from ground
+        } else if (player.isJumping && player.hasDoubleJump && !player.doubleJumpUsed && jumpPressed) {
+          player.velocityY = JUMP_FORCE;
+          player.doubleJumpUsed = true; // Mark double jump as used
+          jumpPressed = false; // Prevent additional jumps
+        }
+      });
+      
+      jumpBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        jumpBtn.style.transform = 'scale(1)';
+        jumpPressed = false;
+      });
+      
+      jumpBtn.addEventListener('touchcancel', (e) => {
+        e.preventDefault();
+        jumpBtn.style.transform = 'scale(1)';
+        jumpPressed = false;
+      });
+
+      // Prevent default touch behaviors
+      document.addEventListener('touchmove', (e) => {
+        if (e.target instanceof Element && e.target.closest('#mobileControls')) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
+
+    // Start game when page loads
+    window.addEventListener('load', init);
+
+    // Easing function for smoother animation
+    function easeInOutQuad(t: number): number {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+  </script>
+</BaseLayout> 

@@ -1,0 +1,705 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+// Blog posts with explicit dates for easy management
+const posts = [
+  {
+    title: "A Maze",
+    date: "November 12, 2025",
+    slug: "a-maze",
+    code: "MAZE_NAV",
+    description: "Navigate a roguelike maze with limited vision."
+  },
+  {
+    title: "Jumpboy",
+    date: "March 31, 2025",
+    slug: "jumpboy",
+    code: "JUMP_EXE",
+    description: "An endless vertical platformer."
+  },
+  {
+    title: "Recipe Guide",
+    date: "October 10, 2021",
+    slug: "cooking-guide",
+    code: "COOK_LOG",
+    description: "A personal collection of recipes."
+  },
+  {
+    title: "Calcifer",
+    date: "March 10, 2025",
+    slug: "calcifer",
+    code: "FIRE_SYS",
+    description: "A cozy fireplace companion."
+  },
+  {
+    title: "Welcome",
+    date: "March 9, 2025",
+    slug: "welcome",
+    code: "INIT_001",
+    description: "The first entry."
+  }
+];
+
+// Sort posts by date (most recent first)
+const sortedPosts = [...posts].sort((a, b) => {
+  const dateA = new Date(a.date);
+  const dateB = new Date(b.date);
+  return dateB.getTime() - dateA.getTime();
+});
+---
+
+<BaseLayout>
+  <div class="terminal-container">
+    <!-- Scanline overlay -->
+    <div class="scanlines"></div>
+    
+    <!-- CRT screen effect -->
+    <div class="crt-overlay"></div>
+    
+    <!-- Matrix rain background -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Main content -->
+    <div class="terminal-content">
+      <!-- ASCII Header -->
+      <pre class="ascii-header" data-aos="fade-in" data-aos-duration="2000">
+ ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
+ █  ▄▄▄▄▄ █▀▄▄▀█  THE  ▀▄▄▀█  ATTIC  ▄▄▄▄▄ █
+ █ █   █ █▄▀▀▄█▄▄▄▄▄▄▄▄█▄▀▀▄█▄▄▄▄▄▄▄█ █   █ █
+ █ █▄▄▄█ █ ▀▄▀ █▀▄▀▄▀▄▀█ ▀▄▀ █▀▄▀▄▀▄█ █▄▄▄█ █
+ ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+      </pre>
+      
+      <!-- System status -->
+      <div class="system-status">
+        <span class="blink">█</span> SYSTEM ONLINE <span class="status-dot"></span>
+        <span class="timestamp" id="timestamp"></span>
+      </div>
+      
+      <!-- Terminal prompt -->
+      <div class="terminal-prompt">
+        <span class="prompt-symbol">root@attic:~$</span>
+        <span class="typing-text" id="typing-text"></span>
+        <span class="cursor">▌</span>
+      </div>
+      
+      <!-- File listing -->
+      <div class="file-listing">
+        <div class="listing-header">
+          <span class="col-perms">drwxr-xr-x</span>
+          <span class="col-size">SIZE</span>
+          <span class="col-date">MODIFIED</span>
+          <span class="col-name">FILENAME</span>
+        </div>
+        
+        {sortedPosts.map((post, index) => (
+          <a href={`/blog/${post.slug}`} class="file-entry" data-index={index} data-title={post.title}>
+            <span class="col-perms">-rw-r--r--</span>
+            <span class="col-size">{Math.floor(Math.random() * 900 + 100)}K</span>
+            <span class="col-date">{post.date.split(' ').slice(0, 2).join(' ')}</span>
+            <span class="col-name">
+              <span class="encrypted-name">[ENCRYPTED] ████████.log</span>
+              <span class="decrypted-name">{post.code}_{post.slug}.exe</span>
+            </span>
+            <div class="file-description">
+              <span class="desc-arrow">→</span>
+              <span class="desc-text">{post.description}</span>
+            </div>
+            <div class="glitch-bar"></div>
+          </a>
+        ))}
+      </div>
+      
+      <!-- Error messages that glitch in -->
+      <div class="error-messages">
+        <p class="error-line" id="error-1">WARNING: Memory corruption detected in sector 7G</p>
+        <p class="error-line" id="error-2">ERROR: Ghost process running on port 666</p>
+        <p class="error-line" id="error-3">ALERT: Unknown entity accessing /dev/soul</p>
+      </div>
+      
+      <!-- Exit prompt -->
+      <div class="exit-section">
+        <a href="/" class="exit-link">
+          <span class="exit-prompt">root@attic:~$</span>
+          <span class="exit-command">cd /home</span>
+          <span class="exit-hint">[PRESS TO ESCAPE]</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Base terminal container */
+  .terminal-container {
+    min-height: 100vh;
+    background: #0a0a0a;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Courier New', 'Monaco', monospace;
+  }
+
+  /* Matrix canvas */
+  #matrix-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    opacity: 0.15;
+    pointer-events: none;
+  }
+
+  /* Scanline effect */
+  .scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  /* CRT overlay effect */
+  .crt-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 0%,
+      rgba(0, 0, 0, 0.2) 80%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+    pointer-events: none;
+    z-index: 99;
+  }
+
+  /* Main content */
+  .terminal-content {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: #00ff41;
+  }
+
+  /* ASCII Header */
+  .ascii-header {
+    font-size: 0.5rem;
+    line-height: 1.2;
+    color: #00ff41;
+    text-align: center;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px #00ff41, 0 0 20px #00ff41;
+    animation: flicker 4s infinite;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  @media (min-width: 640px) {
+    .ascii-header {
+      font-size: 0.7rem;
+    }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.8; }
+    94% { opacity: 1; }
+    97% { opacity: 0.9; }
+    98% { opacity: 1; }
+  }
+
+  /* System status */
+  .system-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #00ff41;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px solid rgba(0, 255, 65, 0.2);
+  }
+
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #00ff41;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 5px #00ff41; }
+    50% { box-shadow: 0 0 20px #00ff41, 0 0 30px #00ff41; }
+  }
+
+  .timestamp {
+    margin-left: auto;
+    opacity: 0.7;
+  }
+
+  /* Terminal prompt */
+  .terminal-prompt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+
+  .prompt-symbol {
+    color: #ff6b6b;
+  }
+
+  .typing-text {
+    color: #00ff41;
+  }
+
+  .cursor {
+    color: #00ff41;
+    animation: blink 0.7s step-end infinite;
+  }
+
+  /* File listing */
+  .file-listing {
+    margin-bottom: 2rem;
+  }
+
+  .listing-header {
+    display: grid;
+    grid-template-columns: 100px 60px 100px 1fr;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    color: #666;
+    border-bottom: 1px solid #333;
+    margin-bottom: 0.5rem;
+  }
+
+  .file-entry {
+    display: grid;
+    grid-template-columns: 100px 60px 100px 1fr;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    color: #00ff41;
+    text-decoration: none;
+    position: relative;
+    transition: all 0.3s ease;
+    border-left: 2px solid transparent;
+  }
+
+  .file-entry:hover {
+    background: rgba(0, 255, 65, 0.1);
+    border-left-color: #00ff41;
+  }
+
+  .col-perms {
+    color: #666;
+    font-size: 0.75rem;
+  }
+
+  .col-size {
+    color: #ff6b6b;
+    text-align: right;
+  }
+
+  .col-date {
+    color: #ffd93d;
+  }
+
+  .col-name {
+    position: relative;
+  }
+
+  .encrypted-name {
+    color: #ff6b6b;
+    transition: opacity 0.3s ease;
+  }
+
+  .decrypted-name {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    color: #00ff41;
+    transition: opacity 0.3s ease;
+  }
+
+  .file-entry:hover .encrypted-name {
+    opacity: 0;
+  }
+
+  .file-entry:hover .decrypted-name {
+    opacity: 1;
+    animation: decrypt 0.5s ease-out;
+  }
+
+  @keyframes decrypt {
+    0% {
+      opacity: 0;
+      transform: translateX(-10px);
+      filter: blur(4px);
+    }
+    50% {
+      filter: blur(2px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+  }
+
+  .file-description {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #666;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .file-entry:hover .file-description {
+    max-height: 50px;
+    opacity: 1;
+  }
+
+  .desc-arrow {
+    color: #00ff41;
+  }
+
+  .glitch-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #00ff41;
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .file-entry:hover .glitch-bar {
+    animation: glitchBar 0.3s ease-out forwards;
+  }
+
+  @keyframes glitchBar {
+    0% {
+      opacity: 1;
+      transform: scaleX(0);
+      top: 50%;
+    }
+    50% {
+      opacity: 1;
+      transform: scaleX(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scaleX(1);
+      top: 0;
+    }
+  }
+
+  /* Error messages */
+  .error-messages {
+    margin: 2rem 0;
+    font-size: 0.75rem;
+  }
+
+  .error-line {
+    color: #ff6b6b;
+    opacity: 0;
+    padding: 0.25rem 0;
+    animation: errorGlitch 8s infinite;
+  }
+
+  #error-1 { animation-delay: 0s; }
+  #error-2 { animation-delay: 3s; }
+  #error-3 { animation-delay: 6s; }
+
+  @keyframes errorGlitch {
+    0%, 10% { opacity: 0; transform: translateX(0); }
+    11% { opacity: 1; transform: translateX(-5px); }
+    12% { transform: translateX(5px); }
+    13% { transform: translateX(-3px); }
+    14%, 25% { transform: translateX(0); opacity: 1; }
+    26%, 100% { opacity: 0; }
+  }
+
+  /* Exit section */
+  .exit-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #333;
+  }
+
+  .exit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #00ff41;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .exit-link:hover {
+    background: rgba(0, 255, 65, 0.1);
+  }
+
+  .exit-prompt {
+    color: #ff6b6b;
+  }
+
+  .exit-command {
+    color: #00ff41;
+  }
+
+  .exit-hint {
+    color: #666;
+    font-size: 0.7rem;
+    margin-left: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .exit-link:hover .exit-hint {
+    opacity: 1;
+    animation: blink 1s step-end infinite;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .terminal-content {
+      padding: 1rem;
+    }
+
+    .listing-header {
+      display: none;
+    }
+
+    .file-entry {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 1rem;
+      border: 1px solid #333;
+      margin-bottom: 0.5rem;
+    }
+
+    .col-perms {
+      display: none;
+    }
+
+    .col-size {
+      text-align: left;
+      font-size: 0.7rem;
+    }
+
+    .col-date {
+      font-size: 0.7rem;
+    }
+
+    .file-description {
+      max-height: none;
+      opacity: 0.7;
+    }
+
+    .system-status {
+      flex-wrap: wrap;
+      font-size: 0.7rem;
+    }
+
+    .ascii-header {
+      font-size: 0.35rem;
+    }
+  }
+
+  /* Glitch effect on random intervals */
+  @keyframes glitch {
+    0%, 95%, 100% {
+      transform: translate(0);
+      filter: none;
+    }
+    96% {
+      transform: translate(-2px, 1px);
+      filter: hue-rotate(90deg);
+    }
+    97% {
+      transform: translate(2px, -1px);
+      filter: hue-rotate(-90deg);
+    }
+    98% {
+      transform: translate(-1px, -1px);
+      filter: hue-rotate(180deg);
+    }
+    99% {
+      transform: translate(1px, 1px);
+      filter: hue-rotate(0deg);
+    }
+  }
+
+  .terminal-content {
+    animation: glitch 10s infinite;
+  }
+</style>
+
+<script>
+  // Matrix rain effect
+  const canvas = document.getElementById('matrix-canvas') as HTMLCanvasElement;
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+  const charArray = chars.split('');
+  const fontSize = 14;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops: number[] = [];
+  
+  for (let i = 0; i < columns; i++) {
+    drops[i] = Math.random() * -100;
+  }
+  
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#00ff41';
+    ctx.font = `${fontSize}px monospace`;
+    
+    for (let i = 0; i < drops.length; i++) {
+      const char = charArray[Math.floor(Math.random() * charArray.length)];
+      ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+      
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        drops[i] = 0;
+      }
+      drops[i]++;
+    }
+  }
+  
+  setInterval(drawMatrix, 50);
+  
+  // Timestamp update
+  function updateTimestamp() {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString('en-US', { 
+      hour12: false, 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit' 
+    });
+    const el = document.getElementById('timestamp');
+    if (el) el.textContent = timestamp;
+  }
+  
+  updateTimestamp();
+  setInterval(updateTimestamp, 1000);
+  
+  // Typing effect
+  const commands = [
+    'ls -la /var/memories/',
+    'cat forgotten_dreams.txt',
+    'find . -name "*.secret"',
+    'grep -r "hope" /dev/null',
+    'echo "Welcome to the void..."'
+  ];
+  
+  let commandIndex = 0;
+  let charIndex = 0;
+  const typingEl = document.getElementById('typing-text');
+  
+  function typeCommand() {
+    if (charIndex < commands[commandIndex].length) {
+      if (typingEl) {
+        typingEl.textContent += commands[commandIndex][charIndex];
+      }
+      charIndex++;
+      setTimeout(typeCommand, 50 + Math.random() * 100);
+    } else {
+      setTimeout(() => {
+        if (typingEl) typingEl.textContent = '';
+        charIndex = 0;
+        commandIndex = (commandIndex + 1) % commands.length;
+        setTimeout(typeCommand, 1000);
+      }, 3000);
+    }
+  }
+  
+  setTimeout(typeCommand, 2000);
+  
+  // File entry click handler
+  const fileEntries = document.querySelectorAll('.file-entry');
+  fileEntries.forEach(entry => {
+    entry.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = (entry as HTMLAnchorElement).href;
+      
+      // Glitch effect before navigation
+      document.body.style.animation = 'none';
+      document.body.offsetHeight; // Trigger reflow
+      document.body.style.animation = 'screenGlitch 0.5s ease-out';
+      
+      setTimeout(() => {
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.3s ease';
+      }, 300);
+      
+      setTimeout(() => {
+        window.location.href = href;
+      }, 600);
+    });
+  });
+  
+  // Add screen glitch keyframes dynamically
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes screenGlitch {
+      0% { filter: none; transform: translate(0); }
+      20% { filter: hue-rotate(90deg) saturate(2); transform: translate(-5px, 2px); }
+      40% { filter: hue-rotate(-90deg) saturate(0.5); transform: translate(5px, -2px); }
+      60% { filter: hue-rotate(180deg) brightness(1.5); transform: translate(-3px, -3px); }
+      80% { filter: invert(1); transform: translate(3px, 3px); }
+      100% { filter: none; transform: translate(0); }
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Resize handler
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>

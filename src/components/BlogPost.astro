@@ -1,0 +1,30 @@
+---
+interface Props {
+  title: string;
+  date: string;
+  preview: string;
+  slug: string;
+  description?: string;
+}
+
+const { title, date, preview, slug, description } = Astro.props;
+---
+
+<article class="prose" data-aos="fade-up" data-aos-duration="1500">
+  <div class="bg-primary/5 p-4 sm:p-6 rounded-lg border border-primary/10 hover:bg-white/5 hover:border-white/20 transition-all duration-300">
+    <a href={`/blog/${slug}`} class="block">
+      <h2 class="text-lg sm:text-xl font-semibold text-primary mb-3 sm:mb-4 group-hover:text-white">{title}</h2>
+      <p class="text-sm sm:text-base text-primary/80 leading-relaxed">
+        {preview}
+      </p>
+      {description && (
+        <p class="text-xs sm:text-sm text-primary/60 mt-2 leading-relaxed">
+          {description}
+        </p>
+      )}
+      <div class="mt-4 text-xs sm:text-sm text-primary/60">
+        Posted on {date}
+      </div>
+    </a>
+  </div>
+</article> 

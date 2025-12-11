@@ -1,0 +1,512 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const post = {
+  title: "Calcifer",
+  date: "March 10, 2025",
+  content: `
+    I love Howl's Moving Castle!
+  `
+};
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
+    <div class="max-w-4xl lg:max-w-5xl mx-auto">
+      <article class="prose prose-invert max-w-none" data-aos="fade-up" data-aos-duration="1000">
+        <div class="bg-primary/5 p-6 sm:p-8 rounded-lg border border-primary/10">
+          <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4">{post.title}</h1>
+          <div class="text-sm text-primary/60 mb-6">Posted on {post.date}</div>
+          
+          <div class="text-primary/80 space-y-4">
+            {post.content.split('\n\n').map((paragraph) => (
+              <p class="text-base sm:text-lg leading-relaxed">
+                {paragraph.trim()}
+              </p>
+            ))}
+          </div>
+
+          <a 
+            href="/blog/the-attic" 
+            class="inline-block mt-8 text-primary/60 hover:text-white transition-colors duration-300"
+          >
+            ← Back to Blog
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Floating Calcifer -->
+    <div id="calcifer-container" class="fixed bottom-6 right-6 sm:bottom-12 sm:right-12 pointer-events-none">
+      <div class="pointer-events-auto relative">
+        <svg
+          id="calcifer"
+          class="cursor-pointer w-[100px] h-[100px] sm:w-[150px] sm:h-[150px]"
+          viewBox="-8 0 80 80"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <!-- Wood grain pattern -->
+          <defs>
+            <pattern id="woodgrain" patternUnits="userSpaceOnUse" width="8" height="8">
+              <path d="M0,0 Q4,4 8,0 Q4,4 0,8" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+              <path d="M0,4 Q4,8 8,4" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+            </pattern>
+          </defs>
+
+          <!-- Fire glow effect -->
+          <circle cx="32" cy="40" r="38" fill="#FF6B00" opacity="0.2">
+            <animate attributeName="r" values="38;40;38" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.2;0.3;0.2" dur="1.5s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- Logs with wood texture -->
+          <!-- Bottom log -->
+          <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="#4A2F1B" />
+          <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="url(#woodgrain)" />
+          
+          <!-- Top log with curve -->
+          <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="#6B4423" />
+          <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="url(#woodgrain)" />
+          
+          <!-- Log details -->
+          <path d="M8,72 C8,72 10,68 12,68 C14,68 16,70 18,70" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          <path d="M24,72 C24,72 26,66 28,66 C30,66 32,69 34,69" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          <path d="M40,72 C40,72 42,67 44,67 C46,67 48,70 50,70" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.5"/>
+          
+          <!-- Main flame body - more stout and edgy -->
+          <path d="M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z" fill="#FF4D00">
+            <animate attributeName="d" 
+              values="M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z;
+                     M8,72 L10,56 L9,48 L13,40 L11,34 L15,28 L17,24 L21,20 L25,17 L29,15 L32,13 L35,15 L39,17 L43,20 L47,24 L49,28 L53,34 L51,40 L55,48 L53,56 L56,72 L44,66 L40,68 L36,66 L32,68 L28,66 L24,68 L20,66 Z;
+                     M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z"
+              dur="2s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Flame spikes for extra edginess -->
+          <path d="M18,44 L20,36 L22,44 Z" fill="#FF6B00" opacity="0.8">
+            <animate attributeName="d"
+              values="M18,44 L20,36 L22,44 Z;
+                     M18,44 L20,34 L22,44 Z;
+                     M18,44 L20,36 L22,44 Z"
+              dur="1.5s" repeatCount="indefinite" />
+          </path>
+          <path d="M28,28 L30,22 L32,28 Z" fill="#FF6B00" opacity="0.8">
+            <animate attributeName="d"
+              values="M28,28 L30,22 L32,28 Z;
+                     M28,28 L30,20 L32,28 Z;
+                     M28,28 L30,22 L32,28 Z"
+              dur="1.8s" repeatCount="indefinite" />
+          </path>
+          <path d="M42,44 L44,36 L46,44 Z" fill="#FF6B00" opacity="0.8">
+            <animate attributeName="d"
+              values="M42,44 L44,36 L46,44 Z;
+                     M42,44 L44,34 L46,44 Z;
+                     M42,44 L44,36 L46,44 Z"
+              dur="1.6s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Inner flame - sharper edges, more stout -->
+          <path d="M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z" fill="#FFA500">
+            <animate attributeName="d"
+              values="M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z;
+                     M12,72 L14,56 L13,48 L17,40 L15,34 L19,28 L21,24 L25,21 L29,19 L32,17 L35,19 L39,21 L43,24 L45,28 L49,34 L47,40 L51,48 L49,56 L52,72 L42,67 L38,68 L34,67 L30,68 L26,67 L22,68 Z;
+                     M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z"
+              dur="2.2s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Core flame - bright center, stout -->
+          <path d="M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z" fill="#FFF700">
+            <animate attributeName="d"
+              values="M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z;
+                     M18,72 L20,56 L22,46 L24,38 L26,30 L28,24 L30,20 L32,18 L34,20 L36,24 L38,30 L40,38 L42,46 L44,56 L46,72 L38,68 L34,69 L30,68 Z;
+                     M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z"
+              dur="1.8s" repeatCount="indefinite" />
+          </path>
+
+          <!-- Embers/sparks floating up -->
+          <circle cx="16" cy="40" r="1.5" fill="#FFF700" opacity="0.8">
+            <animate attributeName="cy" values="40;20;40" dur="4s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0.3;0.8" dur="4s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="48" cy="45" r="1" fill="#FFA500" opacity="0.8">
+            <animate attributeName="cy" values="45;25;45" dur="3.5s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="3.5s" repeatCount="indefinite" />
+          </circle>
+          <circle cx="32" cy="35" r="1.2" fill="#FF6B00" opacity="0.7">
+            <animate attributeName="cy" values="35;15;35" dur="4.2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.7;0.2;0.7" dur="4.2s" repeatCount="indefinite" />
+          </circle>
+
+          <!-- Eyes (original round style) -->
+          <g transform="translate(22,48)">
+            <!-- Left eye -->
+            <circle cx="0" cy="0" r="5" fill="white" opacity="0.9" />
+            <circle cx="0" cy="0" r="2.5" fill="#2D1F3D">
+              <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+            </circle>
+
+            <!-- Right eye -->
+            <circle cx="20" cy="0" r="5" fill="white" opacity="0.9" />
+            <circle cx="20" cy="0" r="2.5" fill="#2D1F3D">
+              <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+            </circle>
+          </g>
+
+          <!-- Mouth -->
+          <path
+            d="M30,54 Q32,56 34,54"
+            fill="none"
+            stroke="#2D1F3D"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <animate attributeName="d"
+              values="M30,54 Q32,56 34,54;
+                     M30,53 Q32,55 34,53;
+                     M30,54 Q32,56 34,54"
+              dur="3s" repeatCount="indefinite" />
+          </path>
+        </svg>
+        
+        <!-- Modern Text Message Style Dialogue Box -->
+        <div id="dialogue-box" class="hidden absolute bottom-full right-0 mb-4 w-[280px] sm:w-[320px] bg-black/95 backdrop-blur-md rounded-2xl border border-orange-500/30 shadow-2xl overflow-hidden">
+          <!-- Messages Container -->
+          <div id="messages-container" class="p-4 max-h-[300px] overflow-y-auto space-y-3">
+            <!-- Messages will be added here dynamically -->
+          </div>
+          
+          <!-- Response Buttons -->
+          <div id="response-buttons" class="hidden border-t border-orange-500/20 p-3 bg-black/50 space-y-2">
+            <button id="yes-btn" class="w-full px-4 py-3 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/50 rounded-xl text-orange-400 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+              Yes, join me! 🔥
+            </button>
+            <button id="no-btn" class="w-full px-4 py-3 bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 rounded-xl text-gray-400 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+              Maybe later
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Remove stars animation and keep only necessary styles */
+    .min-h-screen {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Ensure content stays above background */
+    .max-w-3xl {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Update Calcifer container positioning */
+    #calcifer-container {
+      z-index: 50;
+    }
+
+    /* Calcifer animations */
+    #calcifer {
+      filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      transition: transform 0.3s ease;
+    }
+
+    #calcifer:hover {
+      animation: flicker 3s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { 
+        transform: scale(1);
+        filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      }
+      50% { 
+        transform: translateY(-5px) scale(1.1);
+        filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.6));
+      }
+    }
+
+    #calcifer.clicked {
+      animation: extinguish 1.5s forwards;
+    }
+
+    @keyframes extinguish {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+        filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));
+      }
+      50% {
+        transform: translateY(-10px) scale(1.2);
+        opacity: 0.6;
+        filter: drop-shadow(0 0 24px rgba(255, 107, 0, 0.8));
+      }
+      100% {
+        transform: translateY(-20px) scale(0);
+        opacity: 0;
+        filter: blur(12px) drop-shadow(0 0 24px rgba(255, 107, 0, 0));
+      }
+    }
+
+    /* Update hover effects to use white */
+    .prose :is(a, button):hover {
+      color: white !important;
+    }
+
+    .bg-primary\/5:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Typing indicator animation */
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      background-color: rgba(251, 146, 60, 0.6);
+      border-radius: 50%;
+      animation: typingBounce 1.4s infinite ease-in-out;
+    }
+    
+    @keyframes typingBounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.6;
+      }
+      30% {
+        transform: translateY(-8px);
+        opacity: 1;
+      }
+    }
+    
+    /* Custom scrollbar for messages */
+    #messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #messages-container::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 3px;
+    }
+    
+    #messages-container::-webkit-scrollbar-thumb {
+      background: rgba(251, 146, 60, 0.3);
+      border-radius: 3px;
+    }
+    
+    #messages-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(251, 146, 60, 0.5);
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+      #dialogue-box {
+        width: calc(100vw - 40px) !important;
+        max-width: 280px;
+        right: 50%;
+        transform: translateX(50%);
+        bottom: 110%;
+      }
+      
+      #calcifer-container {
+        bottom: 1rem !important;
+        right: 1rem !important;
+      }
+    }
+  </style>
+
+  <script>
+    // Hide page-specific Calcifer if companion is active
+    const calciferContainer = document.getElementById('calcifer-container');
+    const companionActive = localStorage.getItem('calcifer-companion') === 'true';
+    
+    if (companionActive && calciferContainer) {
+      calciferContainer.style.display = 'none';
+    }
+    
+    // Calcifer modern dialogue system with text message style
+    const calcifer = document.getElementById('calcifer');
+    const dialogueBox = document.getElementById('dialogue-box');
+    const messagesContainer = document.getElementById('messages-container');
+    const responseButtons = document.getElementById('response-buttons');
+    const yesBtn = document.getElementById('yes-btn');
+    const noBtn = document.getElementById('no-btn');
+    
+    let isHovering = false;
+    let hoverTimeout: number | null = null;
+    let dialogueStarted = false;
+    let messageIndex = 0;
+    
+    const messages = [
+      { text: "Hey there! 👋", delay: 0 },
+      { text: "It's getting a bit lonely here...", delay: 1200 },
+      { text: "Would you like me to join you on your journey through the site?", delay: 2400 },
+      { text: "I promise I'll keep things cozy! 🔥", delay: 3600 }
+    ];
+    
+    function createMessageBubble(text: string, isTyping = false) {
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble opacity-0 transform translate-y-2 transition-all duration-300';
+      
+      if (isTyping) {
+        bubble.innerHTML = `
+          <div class="flex items-center gap-1 px-4 py-3 bg-orange-500/10 border border-orange-500/30 rounded-2xl rounded-bl-sm max-w-[85%]">
+            <div class="typing-dot"></div>
+            <div class="typing-dot" style="animation-delay: 0.2s"></div>
+            <div class="typing-dot" style="animation-delay: 0.4s"></div>
+          </div>
+        `;
+      } else {
+        bubble.innerHTML = `
+          <div class="px-4 py-3 bg-orange-500/10 border border-orange-500/30 rounded-2xl rounded-bl-sm text-orange-100 text-sm leading-relaxed max-w-[85%]">
+            ${text}
+          </div>
+        `;
+      }
+      
+      return bubble;
+    }
+    
+    function addMessage(text: string) {
+      // Add typing indicator
+      const typingBubble = createMessageBubble('', true);
+      messagesContainer?.appendChild(typingBubble);
+      
+      // Animate in
+      setTimeout(() => {
+        typingBubble.style.opacity = '1';
+        typingBubble.style.transform = 'translateY(0)';
+      }, 50);
+      
+      // Scroll to bottom
+      setTimeout(() => {
+        messagesContainer?.scrollTo({
+          top: messagesContainer.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 100);
+      
+      // Replace typing with actual message after delay
+      setTimeout(() => {
+        typingBubble.remove();
+        const messageBubble = createMessageBubble(text);
+        messagesContainer?.appendChild(messageBubble);
+        
+        setTimeout(() => {
+          messageBubble.style.opacity = '1';
+          messageBubble.style.transform = 'translateY(0)';
+          
+          // Scroll to bottom
+          setTimeout(() => {
+            messagesContainer?.scrollTo({
+              top: messagesContainer.scrollHeight,
+              behavior: 'smooth'
+            });
+          }, 50);
+        }, 50);
+      }, 800);
+    }
+    
+    function startDialogue() {
+      if (dialogueStarted) return;
+      
+      // Check if companion is already active
+      const companionActive = localStorage.getItem('calcifer-companion') === 'true';
+      if (companionActive) return;
+      
+      dialogueStarted = true;
+      dialogueBox?.classList.remove('hidden');
+      
+      // Add messages with delays
+      messages.forEach((msg, index) => {
+        setTimeout(() => {
+          addMessage(msg.text);
+          
+          // Show response buttons after last message
+          if (index === messages.length - 1) {
+            setTimeout(() => {
+              responseButtons?.classList.remove('hidden');
+              
+              // Scroll to show buttons
+              setTimeout(() => {
+                messagesContainer?.scrollTo({
+                  top: messagesContainer.scrollHeight,
+                  behavior: 'smooth'
+                });
+              }, 100);
+            }, 1000);
+          }
+        }, msg.delay);
+      });
+    }
+    
+    function hideDialogue() {
+      dialogueBox?.classList.add('hidden');
+      if (messagesContainer) messagesContainer.innerHTML = '';
+      responseButtons?.classList.add('hidden');
+      dialogueStarted = false;
+      messageIndex = 0;
+    }
+    
+    // Hover to trigger dialogue
+    calcifer?.addEventListener('mouseenter', () => {
+      isHovering = true;
+      hoverTimeout = window.setTimeout(() => {
+        if (isHovering) {
+          startDialogue();
+        }
+      }, 1000);
+    });
+    
+    calcifer?.addEventListener('mouseleave', () => {
+      isHovering = false;
+      if (hoverTimeout) {
+        clearTimeout(hoverTimeout);
+        hoverTimeout = null;
+      }
+    });
+    
+    // Mobile tap to show dialogue
+    calcifer?.addEventListener('touchstart', (e) => {
+      if (!dialogueStarted) {
+        e.preventDefault();
+        startDialogue();
+      }
+    });
+    
+    // Yes button - activate companion
+    yesBtn?.addEventListener('click', () => {
+      localStorage.setItem('calcifer-companion', 'true');
+      hideDialogue();
+      
+      // Animate page-specific Calcifer fading out
+      const container = document.getElementById('calcifer-container');
+      if (container) {
+        container.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+        container.style.opacity = '0';
+        container.style.transform = 'scale(0.8)';
+        
+        setTimeout(() => {
+          container.style.display = 'none';
+          
+          // Show the global companion
+          const globalCompanion = document.querySelector('.calcifer-companion-container');
+          if (globalCompanion) {
+            globalCompanion.classList.remove('hidden');
+            globalCompanion.style.opacity = '0';
+            setTimeout(() => {
+              globalCompanion.style.transition = 'opacity 0.5s ease-in-out';
+              globalCompanion.style.opacity = '1';
+            }, 100);
+          }
+        }, 500);
+      }
+    });
+    
+    // No button - hide dialogue
+    noBtn?.addEventListener('click', () => {
+      hideDialogue();
+    });
+  </script>
+</BaseLayout> 

@@ -1,0 +1,1503 @@
+---
+// Define the features array directly in the Astro component
+const features = [
+  {
+    "url": "https://bytes.dev/archives/29#:~:text=WickedBlocks%20is%20a%20collection%20of%20120%2B%20layout%20blocks%20and%20components%20built%20with%20Tailwind%20CSS%20ready%20to%20copy%2Dpaste%20into%20your%20Tailwind%20project.%20If%20you%27d%20like%20the%20New%20England%20version%2C%20check%20out%20WickedBlachs.%20My%20boy%27s%20wicked%20smaht",
+    "title": "Bytes UI"
+  },
+  {
+    "url": "https://www.producthunt.com/@michael_andreuzza/made",
+    "title": "Producthunt"
+  },
+  {
+    "url": "https://buttondown.email/alpinejs/archive/alpinejs-weekly-72/#:~:text=Vertical%20tabs%20with%20Alpine.js%20by%20%40Mike_Andreuzza",
+    "title": "Alpinejs Weekly"
+  },
+  {
+    "url": "https://buttondown.email/alpinejs/archive/alpinejs-weekly-72/#:~:text=Vertical%20tabs%20with%20Alpine.js%20by%20%40Mike_Andreuzza",
+    "title": "Alpinejs Weekly"
+  },
+  {
+    "url": "https://github.com/bradtraversy/design-resources-for-developers",
+    "title": "Brad Traversy"
+  },
+  {
+    "url": "https://speckyboy.com/weekly-news-for-designers-610/#:~:text=A%20color%20and%20typography%20system%20for%20designers.%20Compatible%20with%20Figma%2C%20Sketch%20and%20more",
+    "title": "Specky Boy"
+  },
+  {
+    "url": "https://tympanus.net/codrops/collective/collective-608/#:~:text=Colors%20%26%20Fonts%20is%20a%20curated%20library%20of%20colors%20and%20fonts%20for%20digital%20designers%20and%20web%20developers",
+    "title": "Code drops"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=LQw2ljPHJU0&t=606s",
+    "title": "Gary Simons"
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=IfybAqUqXHc&t=175s",
+    "title": "Laravel Daily"
+  },
+  {
+    "url": "https://github.com/arthurspk/guiadevbrasil",
+    "title": "Guia Dev Brasil"
+  }
+  // Add more features as needed...
+];
+---
+
+<section class="bg-primary">
+  <div class="px-8 2xl:max-w-7xl mx-auto py-6">
+    <div class="mt-32 space-y-2">
+      <div
+        class="h-0.5 bg-secondary"
+        data-aos="fade-up"
+        data-aos-duration="1000">
+      </div>
+      <h3
+        class="text-secondary text-xs font-medium"
+        data-aos="fade-up"
+        data-aos-duration="1500">
+        <span class="font-bold">Thanks for stopping by!</span>
+      </h3>
+      <div
+        class="h-1.5 bg-secondary"
+        data-aos="fade-up"
+        data-aos-duration="2000">
+      </div>
+      <div 
+        class="ascii-bar h-3 bg-secondary relative overflow-hidden cursor-none" 
+        data-aos="fade-up" 
+        data-aos-duration="2500"
+        data-bar-size="small">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 80px; height: 80px; opacity: 0;"></div>
+      </div>
+      <div 
+        class="ascii-bar h-6 bg-secondary relative overflow-hidden cursor-none" 
+        data-aos="fade-up" 
+        data-aos-duration="3000"
+        data-bar-size="small">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 100px; height: 100px; opacity: 0;"></div>
+      </div>
+      <div
+        class="ascii-bar h-12 bg-secondary relative overflow-hidden cursor-none"
+        data-aos="fade-up"
+        data-aos-duration="3000"
+        data-bar-size="medium">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 120px; height: 120px; opacity: 0;"></div>
+      </div>
+      <div
+        class="ascii-bar h-24 bg-secondary relative overflow-hidden cursor-none"
+        data-aos="fade-up"
+        data-aos-duration="3000"
+        data-aos-delay="150"
+        data-bar-size="large">
+        <canvas class="ascii-canvas absolute inset-0 w-full h-full pointer-events-none"></canvas>
+        <div class="magnifier absolute pointer-events-none rounded-full" style="width: 150px; height: 150px; opacity: 0;"></div>
+      </div>
+    </div>
+
+    <!-- Sleeping Sprites at the bottom -->
+    <div class="sprites-container">
+      <!-- Larvitar on the left - links to Gallery -->
+      <div class="larvitar-container">
+        <a href="/gallery" class="larvitar-link" onclick="handleLarvitar(event)">
+          <svg
+            version="1.1"
+            id="larvitar"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            width="100"
+            height="100"
+            class="larvitar-svg"
+          >
+            <!-- Back spikes -->
+            <path d="M44,28 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,32 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M50,36 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,40 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Horn -->
+            <path d="M28,4 h8 v4 h-8 z" fill="#9CB18C" />
+            <path d="M30,0 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Head -->
+            <path d="M20,8 h24 v20 h-24 z" fill="#A8C090" />
+            
+            <!-- Body -->
+            <path d="M16,28 h32 v24 h-32 z" fill="#A8C090" />
+            
+            <!-- Red belly diamond -->
+            <path d="M28,32 h8 v4 h-8 z" fill="#C65D4A" />
+            <path d="M26,36 h12 v6 h-12 z" fill="#C65D4A" />
+            <path d="M28,42 h8 v4 h-8 z" fill="#C65D4A" />
+            
+            <!-- Black diamond markings - both sides -->
+            <path d="M20,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            <path d="M40,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            
+            <!-- Eyes - Awake (visible on hover) -->
+            <g class="larvitar-eyes-awake">
+              <path d="M24,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <path d="M34,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <circle cx="27" cy="19" r="2" fill="#C44" />
+              <circle cx="37" cy="19" r="2" fill="#C44" />
+            </g>
+            
+            <!-- Eyes - Sleeping (visible by default) -->
+            <g class="larvitar-eyes-sleeping">
+              <path d="M24,18 h6 v2 h-6 z" fill="#2D2D2D" />
+              <path d="M34,18 h6 v2 h-6 z" fill="#2D2D2D" />
+            </g>
+            
+            <!-- Arms -->
+            <path d="M12,32 h4 v10 h-4 z" fill="#A8C090" />
+            <path d="M48,32 h4 v10 h-4 z" fill="#A8C090" />
+            
+            <!-- White claws on base body -->
+            <path d="M18,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M24,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M36,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M42,50 h4 v4 h-4 z" fill="#FFFFFF" />
+          </svg>
+          
+          <!-- Floating Z's for Larvitar -->
+          <div class="larvitar-zzz-container">
+            <span class="larvitar-z larvitar-z1">Z</span>
+            <span class="larvitar-z larvitar-z2">Z</span>
+            <span class="larvitar-z larvitar-z3">Z</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Charmander on the right - links to Attic -->
+      <div class="charmander-container">
+        <a href="/blog/the-attic" class="charmander-link" onclick="handleCharmander(event)">
+          <svg
+            version="1.1"
+            id="charmander"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 0 64 64"
+            xml:space="preserve"
+            width="120"
+            height="120"
+            class="charmander-svg"
+          >
+            <!-- Tail (moved to back) -->
+            <path d="M40,44 h10 v4 h-10 z" fill="#FFA726" />
+            <path d="M50,44 h2 v4 h-2 z" fill="#FFEB3B" />
+            <path d="M52,44 h2 v4 h-2 z" fill="#FF5722" />
+
+            <!-- Charmander's Body -->
+            <path d="M20,30 h24 v24 h-24 z" fill="#FFA726" />
+
+            <!-- Charmander's Head -->
+            <path d="M24,16 h16 v16 h-16 z" fill="#FFA726" />
+
+            <!-- Eyes - Awake (visible on hover) -->
+            <g class="eyes-awake">
+              <circle cx="28" cy="22" r="2" fill="#FFFFFF" />
+              <circle cx="36" cy="22" r="2" fill="#FFFFFF" />
+              <circle cx="28" cy="22" r="1" fill="#000000" />
+              <circle cx="36" cy="22" r="1" fill="#000000" />
+            </g>
+
+            <!-- Eyes - Sleeping (visible by default) -->
+            <g class="eyes-sleeping">
+              <path d="M26,22 h4 v1 h-4 z" fill="#000000" />
+              <path d="M34,22 h4 v1 h-4 z" fill="#000000" />
+            </g>
+
+            <!-- Mouth -->
+            <path d="M30,28 h4 v2 h-4 z" fill="#000000" />
+
+            <!-- Belly -->
+            <path d="M26,36 h12 v12 h-12 z" fill="#FFE0B2" />
+
+            <!-- Arms -->
+            <path d="M16,34 h4 v10 h-4 z" fill="#FFA726" />
+            <path d="M44,34 h4 v10 h-4 z" fill="#FFA726" />
+          </svg>
+          
+          <!-- Floating Z's -->
+          <div class="zzz-container">
+            <span class="z z1">Z</span>
+            <span class="z z2">Z</span>
+            <span class="z z3">Z</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+    <style>
+      .ascii-bar {
+        position: relative;
+        touch-action: none; /* Improve touch performance */
+      }
+
+      .ascii-canvas {
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .magnifier {
+        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
+        backdrop-filter: blur(0px);
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
+        z-index: 10;
+        pointer-events: none;
+      }
+
+      .ascii-bar:hover .magnifier {
+        opacity: 1 !important;
+      }
+
+      /* Mobile optimizations */
+      @media (max-width: 767px) {
+        .ascii-bar {
+          cursor: pointer; /* Better mobile UX */
+        }
+        
+        .magnifier {
+          transition: opacity 0.2s ease; /* Faster transitions on mobile */
+        }
+      }
+
+      /* Sprites container - holds both Snorunt and Charmander */
+      .sprites-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 10px 20px 0px 20px;
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+
+      /* Larvitar container - left side */
+      .larvitar-container {
+        position: relative;
+      }
+
+      .larvitar-link {
+        position: relative;
+        display: block;
+        cursor: pointer;
+      }
+
+      .larvitar-svg {
+        transition: transform 0.3s ease-in-out;
+        animation: gentleBob 3.5s ease-in-out infinite;
+        animation-delay: 0.5s;
+      }
+
+      .larvitar-link:hover .larvitar-svg {
+        animation: shake 0.6s ease-in-out infinite;
+      }
+
+      /* Larvitar eye states */
+      .larvitar-eyes-sleeping {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-eyes-awake {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-link:hover .larvitar-eyes-sleeping {
+        opacity: 0;
+      }
+
+      .larvitar-link:hover .larvitar-eyes-awake {
+        opacity: 1;
+      }
+
+      /* Larvitar floating Z's */
+      .larvitar-zzz-container {
+        position: absolute;
+        top: -5px;
+        right: 60%;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .larvitar-link:hover .larvitar-zzz-container {
+        opacity: 0;
+      }
+
+      .larvitar-z {
+        position: absolute;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        font-weight: bold;
+        color: rgb(var(--color-secondary));
+        opacity: 0;
+        animation: floatZ 3s ease-in-out infinite;
+      }
+
+      .larvitar-z1 {
+        left: 0px;
+        font-size: 10px;
+        animation-delay: 0.2s;
+      }
+
+      .larvitar-z2 {
+        left: 8px;
+        font-size: 14px;
+        animation-delay: 0.7s;
+      }
+
+      .larvitar-z3 {
+        left: 18px;
+        font-size: 18px;
+        animation-delay: 1.2s;
+      }
+
+      /* Larvitar dissipate on click */
+      .larvitar-svg.clicked {
+        animation: dissipate 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
+      }
+
+      /* Charmander container - right side */
+      .charmander-container {
+        position: relative;
+      }
+
+      .charmander-link {
+        position: relative;
+        display: block;
+        cursor: pointer;
+      }
+
+      .charmander-svg {
+        transition: transform 0.3s ease-in-out;
+        animation: gentleBob 3s ease-in-out infinite;
+      }
+
+      /* Gentle bobbing animation when sleeping */
+      @keyframes gentleBob {
+        0%, 100% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      /* Gentler shake animation on hover */
+      @keyframes shake {
+        0%, 100% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        10% {
+          transform: translate(-1.5px, -1px) rotate(-1deg);
+        }
+        20% {
+          transform: translate(1.5px, 1px) rotate(1deg);
+        }
+        30% {
+          transform: translate(-1.5px, 1px) rotate(-0.5deg);
+        }
+        40% {
+          transform: translate(1.5px, -1px) rotate(0.5deg);
+        }
+        50% {
+          transform: translate(-1px, -1.5px) rotate(-1deg);
+        }
+        60% {
+          transform: translate(1px, 1.5px) rotate(1deg);
+        }
+        70% {
+          transform: translate(-1px, 1px) rotate(-0.5deg);
+        }
+        80% {
+          transform: translate(1px, -1px) rotate(0.5deg);
+        }
+        90% {
+          transform: translate(-0.5px, -0.5px) rotate(-0.5deg);
+        }
+      }
+
+      .charmander-link:hover .charmander-svg {
+        animation: shake 0.6s ease-in-out infinite; /* Slightly slower */
+      }
+
+      /* Eye states */
+      .eyes-sleeping {
+        opacity: 1;
+        transition: opacity 0.3s ease;
+      }
+
+      .eyes-awake {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .charmander-link:hover .eyes-sleeping {
+        opacity: 0;
+      }
+
+      .charmander-link:hover .eyes-awake {
+        opacity: 1;
+      }
+
+      /* Floating Z's - smaller and cuter, closer to Charmander */
+      .zzz-container {
+        position: absolute;
+        top: 5px; /* Much closer to Charmander's head */
+        left: 60%; /* More to the right */
+        transform: translateX(-50%);
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .charmander-link:hover .zzz-container {
+        opacity: 0;
+      }
+
+      .z {
+        position: absolute;
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        font-weight: bold;
+        color: rgb(var(--color-secondary));
+        opacity: 0;
+        animation: floatZ 3s ease-in-out infinite;
+      }
+
+      .z1 {
+        left: -6px; /* Closer together */
+        font-size: 12px;
+        animation-delay: 0s;
+      }
+
+      .z2 {
+        left: 2px; /* Closer together */
+        font-size: 16px;
+        animation-delay: 0.5s;
+      }
+
+      .z3 {
+        left: 12px; /* Closer together */
+        font-size: 20px;
+        animation-delay: 1s;
+      }
+
+      @keyframes floatZ {
+        0% {
+          opacity: 0;
+          transform: translateY(0px) scale(0.7) rotate(-5deg);
+        }
+        20% {
+          opacity: 0.7;
+          transform: translateY(-8px) scale(0.9) rotate(3deg);
+        }
+        80% {
+          opacity: 0.5;
+          transform: translateY(-30px) scale(1.1) rotate(-3deg);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-45px) scale(1.2) rotate(5deg);
+        }
+      }
+
+      /* Smoother dissipation effect on click */
+      .charmander-svg.clicked {
+        animation: dissipate 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        pointer-events: none;
+      }
+    
+      @keyframes dissipate {
+        0% {
+          transform: scale(1) translateY(0) rotate(0deg);
+          opacity: 1;
+          filter: brightness(1);
+        }
+        30% {
+          transform: scale(1.15) translateY(-10px) rotate(5deg);
+          opacity: 0.9;
+          filter: brightness(1.3);
+        }
+        60% {
+          transform: scale(1.3) translateY(-25px) rotate(-5deg);
+          opacity: 0.5;
+          filter: brightness(1.5);
+        }
+        100% {
+          transform: scale(0.3) translateY(-50px) rotate(10deg);
+          opacity: 0;
+          filter: brightness(2);
+        }
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 640px) {
+        .sprites-container {
+          padding: 5px 10px 0px 10px;
+          margin-top: 5px;
+          gap: 20px;
+        }
+
+        .larvitar-svg {
+          width: 70px;
+          height: 70px;
+        }
+
+        .larvitar-zzz-container {
+          top: -8px;
+          right: 50%;
+        }
+
+        .larvitar-z1 {
+          font-size: 8px;
+        }
+
+        .larvitar-z2 {
+          font-size: 11px;
+        }
+
+        .larvitar-z3 {
+          font-size: 14px;
+        }
+
+        .charmander-svg {
+          width: 80px;
+          height: 80px;
+        }
+
+        .zzz-container {
+          top: 8px; /* Closer to head on mobile */
+        }
+
+        .z {
+          font-family: 'Comic Sans MS', cursive, sans-serif;
+          font-weight: bold;
+        }
+
+        .z1 {
+          font-size: 10px;
+        }
+
+        .z2 {
+          font-size: 13px;
+        }
+
+        .z3 {
+          font-size: 16px;
+        }
+      }
+    </style>
+    
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const asciiBars = document.querySelectorAll('.ascii-bar');
+        
+        // ASCII art patterns that can appear
+        const asciiArtPatterns = [
+          {
+            art: `                                           .-=+++==:                                      
+                                       =##%%%%%%%%%%%%#+                                  
+                                    -#%%%%%%%%%%%%%%%%%%%=                                
+                                  :#%%%%%%%%%%%%%%%%%%%%%%%                               
+                                 -%%%%%%%%%%%%%%%%%%%%%%%%%#.                             
+                                 %@%%%%%%%%%%%%%%%%%%%%%%%%%*                             
+                                *@%%%%%%%%%%%%%%%%%%%%%%%%%%%:                            
+                                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%=                            
+                               -%%%%%%%%%%%%%%%%%%%%%%%%%%%%%+                            
+                               =%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*                            
+                               =%@@@@%%%%%@@%%%%%%%%%%%%%%%%%*                            
+                 ......        =@@@@@%%%%%@@@%%%%%%%%%%%%%@%%+                            
+           -+#%%%%%%%%%%%##+-  :@@@@@%%%@@@@@%%%%@@%%%%%@@%%%-      :+*##%%#*+=           
+       -*%%%%%%%%%%%%%%%%%%@@%#:%@@@%%%%%@@@@@%%@@@%%%%@@%%%#.   +%%%%%%%%%%%%%%#+.       
+     #%%%%%%%%%%%%%%%%%%%%@@%@@@@@@@%%%%%%@@@@%@@@%%%%%@%%%@+ .%@@%%%@%%@%%%%%%%%%%#.     
+   +%%%%%%%%%%%%%%%%%%%%%%%@@%%@@@@@@%%%%%%@@@%@@%%%%@%%%%@%+#@@%%%%@@%%%%%%%%%%%%%%%*    
+  +%%%%%%%%%%%%%%%%%%%%%%%%@@@%%@@%@@@%%%%%@@@@@@%%%@%%%%@@@@@%%%%@@%%%%%%%%%%%%%%%%%%*   
+ -%%%%%%%%%%%%%%%%%%%%%%%%%%@@@%%@@%%@@%%%%@@%@@%%%%%%%%@%%@%%%@@@%%%%%%%%%%%%%%%%%%%%%*  
+ *%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@%@@@%%@@%%%@@%@@%%%%%%%@@%%%@@@%%%%%@@@@@@%%%%%%%%%%%%%%+ 
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@%@@@%%@@%%@@%@@%%@%%@@%%@@@@%%%%@@@@%@@@@%%%%%%%%%%%%%%% 
+ #%%%%%%%%%%%%@@@@@@@@%%%%%%%%%@%%@@@@%%@%%@@@@@@@@@@%%@@@%%%%%@@@@@@@@@%%%%%%%%%%%%%%%%%.
+ =%%%%%%%%%%%%@@@@@@@@@@@@@@%%%%%@@@@@%%=    --=@@@@@@@@%%%%@@@@@@@@@@%%%%%%%%%%%%%%%%%%# 
+  #%%%%%%%%%%%%%%@@@@@@@@@@@@@%%%%%%@@+         -=*%@@%%%%@@%%%%%%%%%%%%%%%%%%%%%%%%%%%%+ 
+  -%%%%%%%%%%%%%%%%%%%%@@@@@@@@@@@@@@@+            *@%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*  
+   -%%%%%%%%@@@@%%%%%%%%%%%%%%%%%@@@%%               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*   
+    .@@@%%%@@@@@@%%%%%%%%%@@@@@@@@@@@@+             +@@@@@@%%%%%%%%%%%%%%%%%%%%%@@@@%=    
+      +@@@@@@@@@@@@@@@@@@@@@@%%%@@@@@@@%:            @@@@@@@@@@@@@@@%%%%%@@@@@@@@@%#      
+        =%@@@@@@@@@@@@@@@@@@@@%%%%%%%%@@%@%=      =#%@%%@@@%%%%%%%@@@@@@@@@@@@@%#=        
+           -+#@@@@@@@@@@@@@%%%%%%%@@@@@%%@%@@%%%@%%@@%%%%%%%%%%%%%%%@@@@@@@%#+-           
+                  .=#@@@@@%%%%%%%@@@@%%@@@%%%@%%%@@@@@@@%%%%%%%%%%%%@@@*.                 
+                  #@@@@@%%%%%%%%@@@@%%%%@%%%@@%@@@%@@@@@@@%%%%%%%%%%%%@@%-                
+                .%@@@@%%%%%%%%%@@@@%%%%@%%%%@@%%@@@%%@@@@@@@@@%%%%%%%%%%@@#               
+                %@@@%%%%%%%%%%@@@@%%%%%%%%%%@@%%%@@%%@@@%@@%%%@@%%%%%%%%%%%#              
+               =@%%%%%%%%%%%@@@@@%%%%%%%%%%%@@%%@%@%%@@%@%%%%%%%%%%%%%%%%%%%*             
+               #@%%%%%%%%%%%%%@%%%%%%%%%%%%%@@@@@%@%%%%%%@@%%%%%%%%%%%%%%%%%%-            
+               %%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%@@%%%%@%@@@%%%%%%%%%%%%%%%%+            
+              :%%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@%%@@%%%%%%%%@@%%%%%%%%%%%%%%%+            
+              -%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%%@@@%%%%%%%%%%%%%%%%%%%%%%%%+            
+              :%%%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@@%%%@@@%%%%%%%%%%%%%%%%%%%%%%%+            
+               #%%%%%%%%%%%%%%%%%%%%%%%%%%@@@@=@%%%%%@%%%@@%%%%%%%%%%%%%%%%%%-            
+               =%%%%%%%%%%%%%%%%%%%%%%%%%%@@%: *@%%%%%@%%%@@%%%%%%@@%%%%%%%%#             
+                *%%%%%%%%%%%%%%%%%%%%%%%%@@#.   %@%%%%%@%%%%%%%%%%%%%%%%%%%#-             
+                 =%%%%%%%%%%%%%%%%%%%%%%@%=      +%%%%%%%%%%%%%%%%%%%%%%%%#               
+                   +%%%%%%%%%%%%%%%%%%%%+         .#%%%%%%%%%%%%%%%%%%%%#:                
+                     .+#%%%%%%%%%%%%%%=              +#%%%%%%%%%%%%%%%*:                  
+                          :=*##%%#*-                     -+**####*+-`,
+            width: 90,
+            height: 50
+          },
+          {
+            art: ` /\\_/\\  
+( o.o ) 
+ > ^ <`,
+            width: 8,
+            height: 3
+          },
+          {
+            art: `  \\  |  /
+ '.  \\|/  .'
+--  --*--  --
+ '.  /|\\  .'
+   /  |  \\`,
+            width: 13,
+            height: 5
+          },
+          {
+            art: `      .--.
+  .-(    ).
+ (___.__)__)`,
+            width: 12,
+            height: 3
+          },
+          {
+            art: `                                               .=                                         
+                                              ==+                                         
+                                            +-*++                                         
+                                       -+*+***+*+*                                        
+                                     -++*++++***+*++                                      
+                                    -****+=+=+=+=**=++                                    
+                                    ++=+*+*+++++++++===                                   
+                                   **++=*++*+***+**+*+*+                                  
+                                  ****+*+**+****+****+=+*+:                               
+                                 +*****+++*+**+******+++*+++                              
+                                    -****++******  .+**+*=                                
+                                        +*****+**                                         
+                                          - -****:                                        
+                                              .***                                        
+                                                **=                                       
+                                                 =*                                       
+                                                  =`,
+            width: 85,
+            height: 17
+          },
+          {
+            art: `                           .:.                                                            
+                      .:---=--:                                                           
+                 :-------=:=--=:..:--                                                     
+               :-=--=++-::-=====-----.                                                    
+            .:---===+-::::-=+======--::::.                                                
+           :--:--=:::----====+=++=---===.                                                 
+         .--=----=-------=*+==+=---=+=-                                                   
+        ::++==--========--++==+======                                                     
+       .====+=--=====+++==++*+=++=:                                                       
+       :-===+====+****++++*+**+-.                                                         
+      :--+*******+**+=*###+=+++=.                                                         
+       :++=+=+*+++=-+*++=++===-.                                                          
+       --====+*****+==-.-+===-.                                                           
+           :=+***++=:.  .===  ::                                                          
+          =  ...         :     .:.                                                        
+                                 .:.                                                      
+                                    ::.                                                   
+                                      ::.                                                 
+                                        :-.                                               
+                                         .-:                                              
+                                           --                                             
+                                            -=.                                           
+                                             :=.                                          
+                                              :=.                                         
+                                               :-.                                        
+                                                --                .                       
+                                                .-:              :-.                      
+                                                 .=.       .      -          .            
+                                                  :-      .-.:==: :      .  ..            
+                                                   --     .===- :-:    :.     ..          
+                                                    --      :--  .:   .                   
+                                                    .=-        :. .  .                    
+                                                     :=:         ..                       
+                                   ..                :::-:.      .:                       
+                                    ..               :=-=-       :                        
+                                    ..        -.    :.-=+=      :                         
+                                     ..       .:. .:. ..:+:    -                          
+                                        ..   ......   :  -=.  --. .                       
+                                          .   :-:..  ..  :+- :=*=                         
+                                             .:--::. :.   -=:-:                           
+                                               :=::. :.   :===:                           
+                                                .-:. .:    -+-                            
+                                               .  --. -    .=+                            
+                                                .  .: .-    -+=                           
+                                                    .  .:    -+:                          
+                                                     :  ::   :++                          
+                                                    . -  .:   =+.                         
+                                                      ::  .:  -+-                         
+                                                       :-  :: .==                         
+                                                        :.  -  ==                         
+                                                         :  :: -=.                        
+                                                         .- .= -=.                        
+                                                          :: = -=.                        
+                                                           ::-.-=.                        
+                                                            :-:-=                         
+                                                            .--=-                         
+                                                             :-=-                         
+                                                             .==:                         
+                                                              -=-                         
+                                                              :==                         
+                                                              .==                         
+                                                               ==.                        
+                                                               :-.`,
+            width: 85,
+            height: 62
+          },
+          {
+            art: `                                            .                                                                                   
+                              .    :-==---:-----.       .::=-::::.                                                              
+                            --::-----===---------:.   :=====-----:---.                                                          
+                         .:------------=-----------  -====--------=---:                                                         
+                         .::------::--------------:--======----========--.                                                      
+                         .---------:----------------======================                                                      
+                         .::::::---::----------------=====================:                                               .*.   
+               .-----==:  :::-::----::------------::-========++===========.                                           .-#*+     
+             .:----===-===-::::::--::::-----------::-=++===++++===========                                       ..=*****.      
+           .-:-----==========--:::-:::::----------::-++++=++++++++=======: .:====-                       =###*********+         
+         .----------===========------:::-------=---::++++++*+++++========--=========:               -*#**************=          
+         ---====--==============------------=====--:-+++****++++========----========-           :*******************+           
+        .--=-==============+++++==-------======+==-:=******+++++====-==--=============      :=*********************=            
+       .-============+==++++++++++=--=====+++++++=-:*********++====-===================+.+*#**********************              
+       .====+======+++++++++++*****+=-==++++++**+==-*********+===--=========-============***********************-               
+        =========++++++++***++*******+-=+********+-=*##*****+==-===+++===================**********************:                
+        .==========+++++++**********#*+=+*#***#**+-*###****+=====+*+===========--====-===--=*#*************#*#:                 
+          :==========+++++**********###***######***###**#*+=-=+***+++=======-----------=--===***************#.                  
+            -==========+++*******#**#####**#####**##***##+==*###***+++====----------------==+***************.                   
+              :===========++********#####***#**##*****#*++######****++===-------------======:************##                     
+          :=-----============+**##****##**+=++=++=%==***#####*******+++========------------=**************                      
+      :===================-=====+*###******=#=======*%*###########**++=====--------------=*#************:                       
+    :======================+++++====**#***=+-+===-=+==++#######*+=----=================+#*************+                         
+   .=-==========+++++++++*****##**********#+*-=--==+===+****#########******++++============**#******#.                          
+   .===========++++++++*************####**=*+=-++++#=*#+****########*******+++++===========-=******:                            
+   :-===========++++++********########***+*#=+#======+*%#**#######********++++++==========-===***=                              
+   ---========+++++++***********************+**#*+#**+*********************+++++=======------=#:                                
+   .---===========++++++++**-----=*#*##*#***##*@#+*+*****##******************++++======-----::.                                 
+    --------======+=+++=------=+****#***###**#********#*#####***+-=*******+++++++++=====------.                                 
+    .::------========-------==++++******##**########**#######****==-:-+*+++++++++===========--                                  
+      -----=======--------=======+********##########+**##******+++===-::-=++++++++========----                                  
+      .--=======---------------=++++**+*+*##########*=********++====----::-================-:                                   
+        .:-===-----====------=++==+++++=+*######*####-=++**++++===-------::::==============:                                    
+             :-=======------===========-=*#**##***##*=-=+++++===---------:::::-============+-                                   
+            -========-----===--=---==---++*++********+:-===+====---::------:::::-=======+*#*#*:                                 
+           -========-----=--------=-:--=++++++++++++++----===------::::-------::::**************:                               
+           ===+====--:----------=--::--===+=======+=++=----==---------:::-----:::::***************                              
+           :=++==--:-----------=--:-:--====---=========-::-------------:::---------:+**************                             
+              =--:-----------=--:::-------------===--===--:------------------------::+*************#.                           
+               ::----------=---::::------------------===--::----------------:-------#**************##.                          
+               .:-----------::::-----------------==---==----:-----------------::---#******************                          
+                  ::-----:::::----.-------------===---==----------------===---+*++*****************#**-                         
+                     .::-:------. .:------------====---------------------====**************+***********.                        
+                      .::---:     .:------------====--------= :---------=::  =**************+**********#:                       
+                                   :-----------=====------=-.   .------.       +*************************                       
+                                   :----------======--==-=-=                     *#**********************+                      
+                                    ----------====+=--==--:                        +#********************#                      
+                                    .:=----=.-++++-   ..                             +#*#******************                     
+                                        .:                                             :*#*****************                     
+                                                                                          .*#**************                     
+                                                                                              =*#**********                     
+                                                                                                 -#********+                    
+                                                                                                   ********+                    
+                                                                                                     .*#****.                   
+                                                                                                         -***                   
+                                                                                                          .#*+                  
+                                                                                                            :#-                 
+                                                                                                              .-`,
+            width: 150,
+            height: 80
+          },
+          {
+            art: `                                             ....::::..                                                         
+                                                            .::--:::--:.                                                        
+                                                          ..::::::..::---..                                                     
+                                                .....    .........:---====-:=+++=-:.                                            
+                                               ..:::::---------:.......::========-::::.                                         
+                                             .:-----:-------------.........-====::::--:                                         
+                                            :-:..:...-----::----:::.   ......::.......:.                                        
+                                           .:::...............::....   ..........::.....                                        
+                                           .:....::::...      .......       ..:....:::::                                        
+                                            ..:-:::..::...     ::..::    ...::-:. ....::..                                      
+                                           .:--:::::.........::.::..:..........:::  ...:...                                     
+                                          ::-=---::..  .:.:::.--:::::.....      ::   ........                                   
+                                         .::-=--:.::. .::::--:-------::......  ..:   ..:-.....                                  
+                                          ---:..    :---::::---==--=--::-:.    .... ..:+=...:.                                  
+                                           .:::..   .::::-:--==-:::-::-:--:.   .::..:=++:.:::.                                  
+                                           .:-::---:::-------::::-:---::::--::::---=+++:::::::                                  
+                                           :--...:::-:::::---::-=+-:-----:..:---=----..:::-:                                    
+                                           --..          :--------::-:--:..    .::..-::--:                                      
+                                           .:. .        .::-::-:::::-:......      ...-:                                         
+                                             :..       . .::.:::::--:-: .:....      .-.                                         
+                                             .--:::-==.  .....-..::---:.     ..    ..                                           
+                                            ...:=====:..  .:  .  ---..        ..  ..                                            
+                                              .....  ...        .- :.        .:-:-+=           ....                             
+                                              ....   ...        -:          -===:...     .*+=======++.                          
+                                             .=  ..   .-:     .-:      ...:-====.... ==-+#*++++++==+++=:.                       
+                                               -  ......:. .---:       .-=====:....:==+****+=+++++*****++-                      
+                                               .=: =:       ...       .----:.   ..:+=++=+++=+===+=++*****++:                    
+                                                +=-=+:      =+-:....=**-.......  ++*++++*==+++++++*+*********=.                 
+                                               .*===+*-     +:*:.   .=#*++==.  -***+++*####**********+******=                   
+                                              .:**++=*-:   ===++-      :+-+***##**+++===*#*********+++++***=                    
+                                                =#+*++.    -+++-:     .*#####*****+++====+###*##*****++++++.                    
+                                                 =**+=-     +**.=:..==:****#*##***+++++====*###******++++=.                     
+                                                  ++==:    .+=-++*=.   -***********++======.  .-=*****+=.                       
+                      .-=+=+=-:                    +*+.   .+**+*-.      -++++****+++*+=====.                                    
+                    .-=+++==+++++-                -++=    -++*-.         .=+++++*+++++++===.                                    
+                  :++*****+++++++#-           :+####*==  :**=.             .:=+*++++=+++++=-                                    
+                +*+*****++++=++=*****=      :*#######+*  +*=                     ::-=::.:::-:                                   
+                .********+==+=++=*+++==    =*#*######*+ =*+                                                                     
+                 :***++++*****++=++=+=+:  :##***###***+.-*+                                                                     
+                 .++++++++*********+++*+. :******#*+**+ .*+                                                                     
+                  =++++***+**#**###++++*+..+++++****+++..+*                                                                     
+                   -+++******###*===+++*#+..=+++***#- -:+**                                                                     
+                    .=*****###*=====+++**###*=-+-.    .==**.                                                                    
+                              :====+++++**#####+    .=-=.**+.                                                                   
+                              :=====++****#*****-    .++-**                                                                     
+                              -===+++++********= =:.-:=++*+                                                                     
+                             :=++++++++*+*++++:   .**=.*+*=                                                                     
+                            :--=++=+++++*+++-.      =++++*-                                                                     
+                                  .-=+=-..           -+***.                                                                     
+                                                      -***.                                                                     
+                                                       -*=                                                                      
+                                                       -*=                                                                      
+                                                       =*+                                                                      
+                                                       +*+`,
+            width: 150,
+            height: 75
+          },
+          {
+            art: `    .-'''-.
+  .'       '.
+ /     *     \\
+:     ***     :
+:    *****    :
+ \\   *****   /
+  '.  ***  .'
+    '-._.-'`,
+            width: 15,
+            height: 8
+          },
+          {
+            art: `      *
+     ***
+    *****
+   *******
+  *********
+ ***********
+*************
+   *******
+    *****
+     ***
+      *`,
+            width: 13,
+            height: 11
+          },
+          {
+            art: `   /\\_/\\
+  ( o o )
+  (  >  )
+  /|   |\\
+ (_|   |_)`,
+            width: 10,
+            height: 5
+          },
+          {
+            art: `       __
+  (___()'';
+  /,    /\`
+  \\\\\"--\\\\`,
+            width: 12,
+            height: 4
+          },
+          {
+            art: `        .
+       ":"
+     ___:____     |"\\/"|
+   ,'        \`.    \\  /
+   |  O        \\___/  |
+ ~^~^~^~^~^~^~^~^~^~^~^~^~`,
+            width: 23,
+            height: 6
+          },
+          {
+            art: `    \\   /
+  '. \\ / .'
+ -=  \\|/  =-
+  .-'/ \\\\-.
+    /   \\`,
+            width: 13,
+            height: 5
+          },
+          {
+            art: `      .
+     / \\
+    /   \\
+   /_____\\
+  /       \\
+ /         \\
+/___________\\`,
+            width: 13,
+            height: 7
+          },
+          {
+            art: `                   .           .==:       .
+                   . .     ==: .
+       .:-         :.:   :--- :==  :
+       ..:-.       -.-:  :=-=    +-:.
+       :..:-:      -:=@@+ - +   -= ::
+       :. .-+-    +@@@@@@:= +   :. *@#:
+       :=:  =%%+. @@%@#@@-=-+   :-== *=.       @@@@@@@@
+        .==:.-+#%#@@+@+@@=:-.    :+@%.+=   .-@@@@@@@@@@
+         :=##=.+%%*= @=@@.          ++:#:  :@@@@@@@@@@@
+  ..:..::--: .-+.: -%@@@@#           .%.%.   @@@@@@@@@:
+:*%%#####@@@@@@@%-+@@@@#@@    .::.    :+==.- .@@@@@@@
+=+:      ...:-+%@@@@:+@@@-    -++=-: := - : -
+++ :--:...:::-=-. +@@@@@@*   .-#@@@@@=+ =. :-:
++::    ..::-== +@@@@@@=+@=  :*@@@@@@@# *=
+:*-:::-*%@@@: :=**=-:+#+*%  +@@@@@@@@@+.
+  =-==-*%%%@@@@=---. :+@%#  *@@@*#@@@@
+:*##%@@@@@@*%@@%#+=-....  @@@@@@@@@                +@@@@.
+    .            .       -@@@@@@@+                :@@@@@@
+                        %@.@=@ @=               :=@@@%@@@
+                       %@:@ @ @+            :@@@@.@@@@@@@@
+                     +@@*@ @ @-       .@@@@:-@@@@=@@@@@@@@
+                   :%@-*#-%.@: .    #@@@@@@=:@@@@: @@@@:
+                 +@@*-@ @-*@-  . +@@#%@@@@@-       @@@@
+               @@@%*@-*+-@ :   . #@##@@+
+            @@@-@@@ @=%%.. =..: -@@*
+          *@@% @@@ *@=@*@@@@ :::      .
+       +@@*%@#@@ +@:*+@@@@@@            .
+    *@*#%=@@= %@+@@@@-@@@@@          .. .-@@@@@@@%:
+  *%* #@@*  @@@@@#=@+@@-            .   =@@@@@@@@%:
+=%=+.+@+ @@@@@*%@@#@@            .      *@@:+@%*@@@.
+=@= =+@@@@:@@ @=#@@@#           .:=+++=*@@@:*@@@@@@#..=-
+@@.=%@=@@=@@@@@@@@  -::   .:.-%@@@@%@@@@+ *##*+=. :.. :
+@@=@@@.@@:   @@@@@:@@%=--: -=@@@@@@@@@@%*+#@@#=.     -:
+*@@@@@@@# @@#    @@@@@*@:=:-+*@@@@@@@@@@@*:--:-+##+:  :.
+         *@@@@@+    @@@@ =#-    :-@@@@@ #@@@@@@@@@@#:
+                    @=@  @@=  =++@@@@@ #%@@@@@@@@@@@#=.
+                    * +  @+#--:    @@@@@@@@@+       :++---:.
+                    # +@@##=@   .=+@@@@@@+@@:      ...:=**+-.
+                   .@@@@-#+@@ ..#%#=#@@@@@@@=      .-:.. .:..
+               .=@@@@@@*@@*   +@@#  -=+.@+%@*:...   .    .:..
+          .=@@@@@@%-=+ -@@@@   .%@@@@@.==+=:=@%+@@-  .....  ++=-*+
+      .:..+@@+@@    -@@@% %@*=-   @@#@@@:    ....::=*+*
+    .:@#@+     :@@+-%##=.  :.@@%-@@@*:    .  = #@:
+    @@@-      *%+:+-=    #-:@@@ @@@%+  :+=.+@@=
+  . #%.: +*=*+%@%@ @@@@:@%%%: -*#%-
+  #@@@+ *#*%@=@@. +@@@@@##-   .
+  .*@%@@##%+*@@+    =@@@@*:
+      -#@@@@%=`,
+            width: 60,
+            height: 50
+          },
+          {
+            art: `                =@@@@@@@@@@@@@@=         :@@@@@@@@@@@@@@@@@
+            :@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@@@@@@@@
+          @@@@@@@@@          @@@@@@  @@@@@@@            @@@@@@@@@@
+       .@@@@@@@                +@@@@@@@@@                   :@@@@@@@@
+      @@@@@@                     @@@@@@-   .                    @@@@@@@
+    @@@@@@                     .  @@@@:     ..                    +@@@@@
+   @@@@@                     ...  @@@@      ...                     *@@@@
+  @@@@.                            . .                                @@@@
+ @@@@                                                                  @@@:
+@@@@                                  ..                                @@@
+@@@                                                                     @@@
+@@@                           .                                        @@@=
+@@@                                    ..                             @@@@
+@@@                              ....-. ..   .                      =@@@@+
+@@@@.                       ..   . -##:   ..  .                   .*@@@@@@@@@@@:
+-*+@@@@@                             -@@#   ..                         @@@@@@@@@@@@@
+%@@@@@@@@@@@@-.                           :@@@ .                           :.       @@@@@@@
+@@@@@@@@@@@@@@@                             :@%@.                                        @@@@@
+@@@@@%                                      =@@@@@@-               .                       =@@@@
+@@@@-                                    %@@@@@@#@@@@@@@+      %@@  :.:                       @@@@
+@@@@                            @@@+    %@@@@@@@.  -@@@@@@@= @@@# @.                            @@@+
+@@@                          : -@. *@@@@@@@-            .@@@@@.#=%*                             .@@@
+#@@-                             #@@#+  @@.                .@@@@@+                                @@@
+@@@                                 #@@@@                    .@@                                   @@@
+@@@                                   @@=                     @@                                   @@@
+@@@                                   @@                      @@                                   @@@
+@@@                                   @@                      @@                                   @@@
+@@@                                   @@.                    =@@                                   @@@
+@@@                                   %@=                    *@@@*                                 @@@
+ @@@                                =@@@@@=                -@%  #*@@*                             -@@%
+ @@@.                             =#=%.@@@@@*            #@@@@@@@+ -@- .                          @@@
+ +@@@                             @ #@@@ .@@@@@@@@: =@@@@@@@-    *@@@                            @@@@
+  @@@@                       ::-  @@#      .%@@@@@@.@@@@@#.                                    :@@@@
+   @@@@-                       :                 +@#@=                                       #@@@@@
+    @@@@@                                        .@%@:                             @@@@@@@@@@@@@@@
+     @@@@@@@        .                           . @@@:                           .-@@@@@@@@@@@@@
+       @@@@@@@@@@@@@                              #@@-                             @@@@%%@+
+         -@@@@@@@@@@@#:                   .  ..   :*#- .....                        .@@@@
+               =@@@@*                         ... .-.:.....                           @@@
+               @@@@                             ..                                    @@@
+              -@@@                                                                    @@@
+              @@@                                                                     @@@
+              @@@                             ......   .                             @@@@
+              -@@@                                                                  @@@@
+               @@@@                                . .                             @@@@
+                @@@@+                            . @@@@                          @@@@@
+                 @@@@@+                    .      .@@@@   .                    @@@@@@
+                  @@@@@@@                   ..   :@@@@@@                     @@@@@@
+                    @@@@@@@@                    @@@@@@@@@-                @@@@@@@-
+                      .@@@@@@@@@@            @@@@@@@  @@@@@@          @@@@@@@@@
+                         .@@@@@@@@@@@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@@@@@@@-
+                              @@@@@@@@@@@@@@@@@-         *@@@@@@@@@@@@@@+`,
+            width: 90,
+            height: 60
+          },
+          {
+            art: `███████████████████████████████████
+S     █         █       █         █
+█████ ███ █████ ███ █████ ███████ █
+█   █     █   █ █   █   █ █       █
+█ █ ███████ ███ █ ███ █ █ █ █████ █
+█ █     █     █ █     █   █ █     █
+█ ███████ ███ █ █████ █████ █ █████
+█         █   █     █   █ █ █     █
+█ █████████ █ █████ ███ █ █ █████ █
+█ █     █   █     █ █ █   █     █ █
+█ █ █████ ███ █████ █ ███ █████ █ █
+█   █     █   █   █ █       █   █ █
+███ █ █████ ███ █ █ █████████ ███ █
+█   █     █ █   █ █   █       █ █ █
+█ ███████ ███ ███ ███ █ ███████ █ █
+█ █     █     █     █   █     █   █
+█ █ ███ ███████ █████████ █████ ███
+█ █ █   █     █   █   █   █     █ █
+█ ███ █ █████ ███ █ █ █ █ █ █████ █
+█     █         █   █   █         E
+███████████████████████████████████`,
+            width: 35,
+            height: 21
+          }
+        ];
+        
+        // Pure ASCII characters (no emojis) for random generation
+        const asciiChars = [
+          '░', '▒', '▓', '█', '▀', '▄', '▌', '▐', '■', '□', '▪', '▫',
+          '◆', '◇', '◈', '◉', '◊', '○', '◌', '◍', '◎', '●', '◐', '◑', '◒', '◓',
+          '◔', '◕', '◖', '◗', '◘', '◙', '◚', '◛', '◜', '◝', '◞', '◟', '◠', '◡',
+          '◢', '◣', '◤', '◥', '◦', '◧', '◨', '◩', '◪', '◫', '◬', '◭', '◮', '◯',
+          '★', '☆', '▲', '△', '▴', '▵', '▶', '▷', '▸', '▹', '►', '▻', '▼',
+          '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅', '⊕', '⊗', '⊙', '⊚', '⊛',
+          '⊜', '⊝', '⊞', '⊟', '⊠', '⊡', '⋆', '⋇', '⋈', '⋉', '⋊', '⋋', '⋌', '⋍',
+          '▬', '▭', '▮', '▯', '▰', '▱', '▲', '▴', '▵', '▶', '▷', '▸', '▹', '►',
+          '▻', '▼', '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅', '◆', '◇', '◈',
+          '╔', '╗', '╚', '╝', '╠', '╣', '╦', '╩', '╬', '═', '║', '╒', '╓', '╕',
+          '╖', '╘', '╙', '╛', '╜', '╞', '╟', '╡', '╢', '╤', '╥', '╧', '╨', '╪',
+          '╫', '╬', '─', '│', '┌', '┐', '└', '┘', '├', '┤', '┬', '┴', '┼', '━',
+          '┃', '┏', '┓', '┗', '┛', '┣', '┫', '┳', '┻', '╋', '┠', '┨', '┯', '┷',
+          '┿', '╂', '╄', '╅', '╆', '╇', '╈', '╉', '╊', '╌', '╍', '╎', '╏', '═',
+          '║', '╒', '╓', '╔', '╕', '╖', '╗', '╘', '╙', '╚', '╛', '╜', '╝', '╞',
+          '╟', '╠', '╡', '╢', '╣', '╤', '╥', '╦', '╧', '╨', '╩', '╪', '╫', '╬',
+          '▀', ' ', '▂', '▃', '▄', '▅', '▆', '▇', '█', '▉', '▊', '▋', '▌', '▍',
+          '▎', '▏', '▐', '░', '▒', '▓', '▔', '▕', '▖', '▗', '▘', '▙', '▚', '▛',
+          '▜', '▝', '▞', '▟', '■', '□', '▢', '▣', '▤', '▥', '▦', '▧', '▨', '▩',
+          '▪', '▫', '▬', '▭', '▮', '▯', '▰', '▱', '▲', '△', '▴', '▵', '▶', '▷',
+          '▸', '▹', '►', '▻', '▼', '▽', '▾', '▿', '◀', '◁', '◂', '◃', '◄', '◅'
+        ];
+
+        // Initialize each bar
+        asciiBars.forEach((bar, index) => {
+          const canvas = bar.querySelector('.ascii-canvas');
+          const magnifier = bar.querySelector('.magnifier');
+          const ctx = canvas.getContext('2d');
+          const size = bar.dataset.barSize;
+          
+          // Set canvas size
+          const rect = bar.getBoundingClientRect();
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+          
+          // Character settings based on bar size - balanced density
+          // Adjust for mobile screens
+          const isMobile = window.innerWidth < 768;
+          const charSize = size === 'large' ? (isMobile ? 12 : 15) : size === 'medium' ? (isMobile ? 9 : 11) : (isMobile ? 7 : 9);
+          const density = size === 'large' ? (isMobile ? 0.5 : 0.6) : size === 'medium' ? (isMobile ? 0.35 : 0.45) : (isMobile ? 0.3 : 0.375);
+          
+          // Generate random ASCII character positions
+          const characters = [];
+          const cols = Math.floor(canvas.width / charSize);
+          const rows = Math.floor(canvas.height / charSize);
+          const totalChars = Math.floor(cols * rows * density);
+          
+          // Add multiple ASCII art patterns (80% chance for large bars, 60% for medium/small)
+          const artChance = size === 'large' ? 0.8 : (size === 'medium' || size === 'small') ? 0.6 : 0;
+          if (artChance > 0 && Math.random() < artChance && asciiArtPatterns.length > 0) {
+            // Determine how many patterns to add based on bar size and device
+            // Reduce patterns on mobile for better performance
+            const maxPatterns = isMobile 
+              ? (size === 'large' ? 2 : 1) 
+              : (size === 'large' ? 3 : size === 'medium' ? 2 : 1);
+            const numPatterns = Math.floor(Math.random() * maxPatterns) + 1; // 1 to maxPatterns
+            
+            const placedPatterns = []; // Track placed patterns to avoid overlap
+            
+            for (let p = 0; p < numPatterns; p++) {
+              const pattern = asciiArtPatterns[Math.floor(Math.random() * asciiArtPatterns.length)];
+              const lines = pattern.art.split('\n');
+              const patternCharSize = 2; // Smaller size for art patterns
+              
+              // Try to find a non-overlapping position
+              let attempts = 0;
+              let patternX, patternY;
+              let overlaps = true;
+              
+              while (overlaps && attempts < 10) {
+                patternX = Math.random() * (canvas.width - pattern.width * patternCharSize);
+                patternY = Math.random() * (canvas.height - pattern.height * patternCharSize);
+                
+                // Check if this position overlaps with existing patterns
+                overlaps = placedPatterns.some(placed => {
+                  const horizontalOverlap = patternX < placed.x + placed.width && patternX + pattern.width * patternCharSize > placed.x;
+                  const verticalOverlap = patternY < placed.y + placed.height && patternY + pattern.height * patternCharSize > placed.y;
+                  return horizontalOverlap && verticalOverlap;
+                });
+                
+                attempts++;
+              }
+              
+              // If we found a good position, add the pattern
+              if (!overlaps || attempts >= 10) {
+                placedPatterns.push({
+                  x: patternX,
+                  y: patternY,
+                  width: pattern.width * patternCharSize,
+                  height: pattern.height * patternCharSize
+                });
+                
+                // Add each character from the pattern
+                lines.forEach((line, lineIndex) => {
+                  for (let charIndex = 0; charIndex < line.length; charIndex++) {
+                    const char = line[charIndex];
+                    if (char !== ' ') { // Skip spaces
+                      characters.push({
+                        char: char,
+                        x: patternX + charIndex * patternCharSize,
+                        y: patternY + lineIndex * patternCharSize,
+                        baseX: 0,
+                        baseY: 0,
+                        offsetX: 0,
+                        offsetY: 0,
+                        targetOffsetX: 0,
+                        targetOffsetY: 0,
+                        visible: false,
+                        glitchTimer: Math.random() * 5000,
+                        isPattern: true
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          }
+          
+          // Add random individual characters
+          for (let i = 0; i < totalChars; i++) {
+            characters.push({
+              char: asciiChars[Math.floor(Math.random() * asciiChars.length)],
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              baseX: 0,
+              baseY: 0,
+              offsetX: 0,
+              offsetY: 0,
+              targetOffsetX: 0,
+              targetOffsetY: 0,
+              visible: false,
+              glitchTimer: Math.random() * 5000,
+              isPattern: false
+            });
+          }
+          
+          // Store base positions
+          characters.forEach(char => {
+            char.baseX = char.x;
+            char.baseY = char.y;
+          });
+          
+          let mouseX = -1000;
+          let mouseY = -1000;
+          let isHovering = false;
+          
+          // Mouse tracking
+          bar.addEventListener('mouseenter', () => {
+            isHovering = true;
+          });
+          
+          bar.addEventListener('mouseleave', () => {
+            isHovering = false;
+            mouseX = -1000;
+            mouseY = -1000;
+          });
+          
+          bar.addEventListener('mousemove', (e) => {
+            const barRect = bar.getBoundingClientRect();
+            mouseX = e.clientX - barRect.left;
+            mouseY = e.clientY - barRect.top;
+            
+            // Update magnifier position
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          // Touch support for mobile
+          bar.addEventListener('touchstart', (e) => {
+            isHovering = true;
+            const touch = e.touches[0];
+            const barRect = bar.getBoundingClientRect();
+            mouseX = touch.clientX - barRect.left;
+            mouseY = touch.clientY - barRect.top;
+            
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          bar.addEventListener('touchmove', (e) => {
+            e.preventDefault(); // Prevent scrolling while touching
+            const touch = e.touches[0];
+            const barRect = bar.getBoundingClientRect();
+            mouseX = touch.clientX - barRect.left;
+            mouseY = touch.clientY - barRect.top;
+            
+            magnifier.style.left = mouseX + 'px';
+            magnifier.style.top = mouseY + 'px';
+          });
+          
+          bar.addEventListener('touchend', () => {
+            isHovering = false;
+            mouseX = -1000;
+            mouseY = -1000;
+          });
+          
+          // Cache values outside animation loop for better performance
+          const magnifierRadius = isMobile 
+            ? (size === 'large' ? 60 : size === 'medium' ? 50 : size === 'thin' ? 25 : 35)
+            : (size === 'large' ? 75 : size === 'medium' ? 60 : size === 'thin' ? 30 : 40);
+          const jiggleIntensity = isMobile ? 1.5 : 2;
+          const returnSpeed = 0.1;
+          
+          // Cache font and text settings
+          ctx.font = `${charSize}px monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          
+          // Cache color parsing for performance
+          let cachedR = 235, cachedG = 235, cachedB = 235;
+          let colorUpdateCounter = 0;
+          
+          // Animation loop
+          function animate() {
+            // Only update colors every 60 frames (~1 second) instead of every frame
+            if (colorUpdateCounter % 60 === 0) {
+              const root = document.documentElement;
+              const primaryColor = getComputedStyle(root).getPropertyValue('--color-primary').trim();
+              
+              if (primaryColor && primaryColor.includes(' ')) {
+                [cachedR, cachedG, cachedB] = primaryColor.split(' ').map(v => parseInt(v.trim()));
+              }
+            }
+            colorUpdateCounter++;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            characters.forEach(char => {
+              // Calculate distance from mouse
+              const dx = char.x - mouseX;
+              const dy = char.y - mouseY;
+              const distance = Math.sqrt(dx * dx + dy * dy);
+              
+              // Magnifier effect - show characters within radius
+              if (isHovering && distance < magnifierRadius) {
+                char.visible = true;
+                
+                // Jiggle effect
+                const influence = 1 - (distance / magnifierRadius);
+                char.targetOffsetX = (Math.random() - 0.5) * jiggleIntensity * influence;
+                char.targetOffsetY = (Math.random() - 0.5) * jiggleIntensity * influence;
+              } else {
+                char.visible = false;
+                char.targetOffsetX = 0;
+                char.targetOffsetY = 0;
+              }
+              
+              // Smooth return animation
+              char.offsetX += (char.targetOffsetX - char.offsetX) * returnSpeed;
+              char.offsetY += (char.targetOffsetY - char.offsetY) * returnSpeed;
+              
+              // Random glitch hints - very minimal
+              char.glitchTimer -= 16;
+              if (char.glitchTimer <= 0) {
+                char.glitchTimer = 10000 + Math.random() * 20000; // Much longer intervals (10-30s)
+                if (!isHovering && Math.random() < 0.01) { // Reduced to 1% chance
+                  // Show character briefly
+                  const glitchDuration = 150 + Math.random() * 200;
+                  char.visible = true;
+                  setTimeout(() => {
+                    if (!isHovering) char.visible = false;
+                  }, glitchDuration);
+                }
+              }
+              
+              // Draw character with theme-aware color
+              if (char.visible) {
+                const opacity = isHovering && distance < magnifierRadius 
+                  ? Math.min(1, 1 - (distance / magnifierRadius) * 0.5)
+                  : 0.5;
+                
+                // Use cached primary color for contrast against the dark bar
+                ctx.fillStyle = `rgba(${cachedR}, ${cachedG}, ${cachedB}, ${opacity})`;
+                ctx.fillText(
+                  char.char,
+                  char.x + char.offsetX,
+                  char.y + char.offsetY
+                );
+              }
+            });
+            
+            requestAnimationFrame(animate);
+          }
+          
+          animate();
+          
+          // Handle window resize with debouncing for better performance
+          let resizeTimeout;
+          window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+              const newRect = bar.getBoundingClientRect();
+              canvas.width = newRect.width;
+              canvas.height = newRect.height;
+              // Re-cache mobile status on resize
+              const wasMobile = isMobile;
+              const nowMobile = window.innerWidth < 768;
+              if (wasMobile !== nowMobile) {
+                // Reload page if switching between mobile/desktop for proper recalculation
+                window.location.reload();
+              }
+            }, 250);
+          });
+        });
+      });
+    </script>
+    
+    <script>
+      // Declare the function types globally
+      declare global {
+        interface Window {
+          handleCharmander: (event: Event) => void;
+          handleLarvitar: (event: Event) => void;
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', () => {
+        // Charmander click handler - goes to Attic
+        window.handleCharmander = (event) => {
+          event.preventDefault();
+          const svg = document.getElementById('charmander');
+          if (!svg.classList.contains('clicked')) {
+            svg.classList.add('clicked');
+            
+            // Smooth fade out of page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => {
+              document.body.style.opacity = '0';
+            }, 500);
+            
+            // Navigate after animation completes
+            setTimeout(() => {
+              window.location.href = '/blog/the-attic';
+            }, 800);
+          }
+        };
+
+        // Larvitar click handler - goes to Gallery
+        window.handleLarvitar = (event) => {
+          event.preventDefault();
+          const svg = document.getElementById('larvitar');
+          if (!svg.classList.contains('clicked')) {
+            svg.classList.add('clicked');
+            
+            // Smooth fade out of page
+            document.body.style.transition = 'opacity 0.3s ease-out';
+            setTimeout(() => {
+              document.body.style.opacity = '0';
+            }, 500);
+            
+            // Navigate after animation completes
+            setTimeout(() => {
+              window.location.href = '/gallery';
+            }, 800);
+          }
+        };
+      });
+    </script>
+    
+    
+    
+
+{/* 
+    <ul
+      class="mx-auto flex flex-col lg:flex-row text-left gap-3 items-start text-secondary mt-3">
+      {
+        features.map((template) => (
+          <>
+            <li class="flow-root col-span-full h-full ">
+              <a href={template.url}>
+                <div>
+                  <p class="italic shrink-0 text-xs ">{template.title}</p>
+                </div>
+              </a>
+            </li>
+          </>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+*/}
+
+
+{/* 
+<html lang="en" data-theme="light">
+<head>
+  <!-- Your head content -->
+</head>
+<body>
+  <button id="themeSwitcher">Toggle Theme</button>
+
+  <div class="h-3 theme-light:bg-light-secondary theme-dark:bg-dark-secondary" data-aos="fade-up" data-aos-duration="2500"></div>
+  <div class="h-6 theme-light:bg-light-secondary theme-dark:bg-dark-secondary" data-aos="fade-up" data-aos-duration="3000"></div>
+
+  <script>
+    document.getElementById('themeSwitcher').addEventListener('click', function () {
+      const htmlElement = document.documentElement;
+      if (htmlElement.getAttribute('data-theme') === 'light') {
+        htmlElement.setAttribute('data-theme', 'dark');
+      } else {
+        htmlElement.setAttribute('data-theme', 'light');
+      }
+    });
+  </script>
+</body>  dumb commenting system. */}

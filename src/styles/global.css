@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* CSS */
+:root {
+  color-scheme: light;
+  --color-secondary: 19 19 19;
+  --color-primary: 235 235 235;
+  font-family: Inter, sans-serif;
+  transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  font-feature-settings:
+  "liga" 1,
+  "calt" 1, /* Contextual Alternates */
+  "dlig" 1, /* Discretionary Ligatures */
+  "ss07" 1, /* fSquare punctuation */
+  "ss08" 1, /* Square quotes */
+  "zero" 1, /* Slashed zero */
+  "tnum" 1, /* Tabular numbers */
+    "cv03", /* Open six */
+    "cv04" 1, /* Open nine */
+    "cv01" 1, /* Alternate one */
+    "cv09", /* Flat-top three */
+    "cv02" 1; /* Open 4 */
+}
+
+/* Selection glitch container - very subtle */
+.selection-glitch {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-family: monospace;
+  font-size: 8px; /* Smaller size */
+  color: rgb(var(--color-secondary));
+  opacity: 0;
+  animation: glitchFade 0.35s ease-in-out; /* Faster fade */
+}
+
+@keyframes glitchFade {
+  0% { opacity: 0; transform: scale(0.9); }
+  20% { opacity: 0.3; transform: scale(1.05); } /* Lower peak opacity */
+  80% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-secondary: 235 235 235;
+  --color-primary: 19 19 19;
+}
+
+/* Earth Mode - Morning (5am-11am): Sunrise meadow with dew */
+:root[data-theme="earth-morning"] {
+  color-scheme: light;
+  --color-secondary: 191 54 12; /* burnt amber - warm sunrise */
+  --color-primary: 157 214 235; /* muted powder blue - morning sky */
+}
+
+/* Earth Mode - Afternoon (11am-5pm): Vibrant forest canopy */
+:root[data-theme="earth-afternoon"] {
+  color-scheme: light;
+  --color-secondary: 34 139 34; /* forest green - lush leaves */
+  --color-primary: 240 255 240; /* honeydew - filtered sunlight */
+}
+
+/* Earth Mode - Evening (5pm-9pm): Sunset over lavender fields */
+:root[data-theme="earth-evening"] {
+  color-scheme: dark;
+  --color-secondary: 255 192 203; /* light pink - soft twilight glow */
+  --color-primary: 75 0 130; /* indigo - deep twilight sky */
+}
+
+/* Earth Mode - Night (9pm-5am): Starlit ocean depths */
+:root[data-theme="earth-night"] {
+  color-scheme: dark;
+  --color-secondary: 176 224 230; /* powder blue - moonlight shimmer */
+  --color-primary: 13 27 42; /* dark slate - deep midnight ocean */
+}
+
+/* Random Mode - Dynamic colors set via JavaScript */
+:root[data-theme="random"] {
+  /* Colors will be set dynamically */
+}
+
+*, *::before, *::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.5s;
+}
+
+/* Prevent transitions on page load */
+.preload * {
+  transition: none !important;
+}
+
+/* Optimize for mobile */
+@media (max-width: 640px) {
+  *, *::before, *::after {
+    transition-duration: 0.3s;
+  }
+  
+  /* Faster, simpler animations on mobile for better performance */
+  [data-aos] {
+    transition-duration: 0.6s !important;
+  }
+}
+
+/* AOS animation fixes - prevent overlap and ensure smooth flow */
+[data-aos] {
+  position: relative;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure sections maintain proper stacking order */
+section {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
+
+/* Prevent content overflow during animations */
+body {
+  overflow-x: hidden;
+}
+
+/* Ensure proper stacking context for animated elements */
+[data-aos][data-aos][data-aos-duration="1000"],
+[data-aos][data-aos][data-aos-duration="1500"],
+[data-aos][data-aos][data-aos-duration="2000"],
+[data-aos][data-aos][data-aos-duration="2500"],
+[data-aos][data-aos][data-aos-duration="3000"] {
+  z-index: auto;
+}
+
+/* Improve animation performance */
+[data-aos].aos-animate {
+  transform: translateZ(0);
+}
+@supports (font-variation-settings: normal) {
+  /* Use variable font if supported */
+  :root {
+    font-family: InterVariable, sans-serif;
+  }
+}

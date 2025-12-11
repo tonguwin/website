@@ -1,0 +1,140 @@
+---
+// Define the array of projects directly in the frontmatter script.
+import BlossomingFlower from './BlossomingFlower.astro';
+import CSSFlowers from './CSSFlowers.astro';
+
+const otherprojects = [
+  {
+    "url": "https://www.baggu.com/",
+    "title": "BAGGU",
+    "description": "Manages a team of three, overseeing product setup and software development across all sales channels,  focusing on operational efficiency and streamlined workflows."
+  },
+  {
+    "url": "https://shiphawk.com/",
+    "title": "ShipHawk",
+    "description": "Built a Looker dashboard with streamlined data from Fivetran that visualizes daily and weekly performance target metrics for the ShipHawk Product Team."
+  },
+  {
+    "url": "https://www.youtube.com/watch?v=v0yrY72n3tY",
+    "title": "TEDx Co-Director",
+    "description": "Coordinated a 10 team organization to host 2 virtual TEDx conferences with 80,000+ views featuring prominent speakers like Mayuko Inoue."
+  },
+  {
+    "title": "Netflix Watch Party Project",
+    "description": "Conducted 25+ Netflix user interviews to identify key pain points; analyzed market trends and organizational needs to inform the implementation of a social integration feature."
+  },
+  {
+    "url": "/case-study/accessories-copper",
+    "title": "Accessories Case Study - Copper",
+    "description": "Strategic analysis exploring business-expanding accessories that create meaningful impact and unlock new revenue opportunities through thoughtful product development.",
+    "badge": "New"
+  }
+  // Add more projects as needed...
+];
+
+function calculateAosDelay(index) {
+  return index * 150;
+}
+---
+
+<section class="bg-primary">
+  <div class="px-8 2xl:max-w-7xl mx-auto py-27">
+    <div class="space-y-2">
+      <!-- Section Title and Decorative Elements -->
+      <div
+        class="h-0.5 bg-secondary"
+        data-aos="fade-up"
+        data-aos-duration="1000"
+      >
+      </div>
+      <h3
+        class="text-secondary text-base font-medium"
+        data-aos="fade-up"
+        data-aos-duration="1500"
+      >
+        <span>main</span>
+        <span class="font-bold">experience + projects</span>
+      </h3>
+    </div>
+
+    <ul
+      class="mx-auto grid grid-cols-1 sm:grid-cols-2 text-secondary md:grid-cols-3 lg:grid-cols-4 items-start gap-6 mt-20"
+      role="list"
+    >
+      {otherprojects.map((project, index) => (
+        <li
+          class="flow-root h-full"
+          data-aos="fade-up"
+          data-aos-duration="1000"
+          data-aos-delay={calculateAosDelay(index).toString()}
+        >
+          <div class="h-full flex flex-col justify-between">
+            <div>
+              <div class="flex items-start justify-between gap-4">
+                <p class="font-bold shrink-0">{project.title}</p>
+                {project.badge && (
+                  <span class="inline-flex items-center rounded-full border border-secondary/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-secondary">
+                    {project.badge}
+                  </span>
+                )}
+              </div>
+              <p class="text-base mt-3 leading-relaxed">
+                {project.description}
+              </p>
+            </div>
+            {project.url && (
+              <div class="flex items-center justify-start mt-4">
+                <a href={project.url} class="group">
+                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-secondary/10 transition-all duration-300 ease-out group-hover:bg-secondary group-hover:scale-110">
+                    <span class="text-xl font-bold text-secondary transition-all duration-300 ease-out group-hover:rotate-12 group-hover:text-primary">
+                      ↗
+                    </span>
+                  </div>
+                </a>
+              </div>
+            )}
+          </div>
+        </li>
+      ))}
+      
+      <!-- CSS Flowers - Decorative element - DISABLED FOR NOW -->
+      <!-- <li class="flow-root h-full">
+        <CSSFlowers />
+      </li> -->
+
+      <!-- Blossoming Flower Animation - DISABLED FOR NOW -->
+      <!-- <li class="flow-root h-full flower-grid-spot">
+        <BlossomingFlower />
+      </li> -->
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* Ensure flower is always in the far right on desktop and at the very bottom on mobile */
+  .flower-grid-spot {
+    /* On mobile (1 column), it will naturally be at the bottom */
+    order: 999;
+  }
+
+  @media (min-width: 640px) {
+    /* On tablet (2 columns), place it in the last position */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+
+  @media (min-width: 768px) {
+    /* On desktop (3 columns), place it in the last position */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    /* On large desktop (4 columns), place it in the last position (far right) */
+    .flower-grid-spot {
+      order: 999;
+    }
+  }
+</style>

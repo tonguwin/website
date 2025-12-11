@@ -1,0 +1,1079 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+---
+
+<html lang="en" class="preload selection:bg-secondary selection:text-secondary" data-theme="light">
+  <head>
+    <BaseHead />
+    <script is:inline>
+      (function () {
+        const storageKey = 'theme-preference';
+        const root = document.documentElement;
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const safeLocalStorage = {
+          get(key) {
+            try {
+              return localStorage.getItem(key);
+            } catch {
+              return null;
+            }
+          },
+          set(key, value) {
+            try {
+              localStorage.setItem(key, value);
+            } catch {
+              /* noop */
+            }
+          },
+          remove(key) {
+            try {
+              localStorage.removeItem(key);
+            } catch {
+              /* noop */
+            }
+          },
+        };
+
+        const getTimeOfDay = () => {
+          const hour = new Date().getHours();
+          if (hour >= 5 && hour < 11) return 'morning';
+          if (hour >= 11 && hour < 17) return 'afternoon';
+          if (hour >= 17 && hour < 21) return 'evening';
+          return 'night';
+        };
+
+        const generateRandomColors = () => {
+          // Curated color palettes with guaranteed good contrast
+          const palettes = [
+            // Warm palettes
+            { bg: '254 243 199', text: '120 53 15', scheme: 'light' }, // amber cream / brown
+            { bg: '254 226 226', text: '127 29 29', scheme: 'light' }, // rose / dark red
+            { bg: '253 230 138', text: '113 63 18', scheme: 'light' }, // yellow / amber dark
+            { bg: '251 207 232', text: '131 24 67', scheme: 'light' }, // pink / rose dark
+            { bg: '255 237 213', text: '124 45 18', scheme: 'light' }, // peach / burnt orange
+            
+            // Cool palettes
+            { bg: '219 234 254', text: '30 58 138', scheme: 'light' }, // sky blue / deep blue
+            { bg: '224 242 254', text: '7 89 133', scheme: 'light' }, // light blue / blue
+            { bg: '221 214 254', text: '76 29 149', scheme: 'light' }, // purple light / purple dark
+            { bg: '209 250 229', text: '6 78 59', scheme: 'light' }, // green light / green dark
+            { bg: '204 251 241', text: '19 78 74', scheme: 'light' }, // teal light / teal dark
+            
+            // Dark palettes
+            { bg: '30 41 59', text: '191 219 254', scheme: 'dark' }, // slate / light blue
+            { bg: '23 37 84', text: '191 219 254', scheme: 'dark' }, // navy / light blue
+            { bg: '49 46 129', text: '224 231 255', scheme: 'dark' }, // indigo / indigo light
+            { bg: '88 28 135', text: '243 232 255', scheme: 'dark' }, // purple / purple light
+            { bg: '20 83 45', text: '187 247 208', scheme: 'dark' }, // forest / green light
+            { bg: '127 29 29', text: '254 226 226', scheme: 'dark' }, // dark red / rose
+            
+            // Unique palettes
+            { bg: '254 252 232', text: '133 77 14', scheme: 'light' }, // cream / amber
+            { bg: '236 253 245', text: '6 95 70', scheme: 'light' }, // mint / emerald
+            { bg: '241 245 249', text: '51 65 85', scheme: 'light' }, // slate light / slate
+            { bg: '44 62 80', text: '236 240 241', scheme: 'dark' }, // midnight / cloud
+          ];
+          
+          return palettes[Math.floor(Math.random() * palettes.length)];
+        };
+
+        const applyTheme = (theme) => {
+          if (theme === 'earth') {
+            // Clear any random mode inline styles
+            root.style.removeProperty('--color-primary');
+            root.style.removeProperty('--color-secondary');
+            const timeOfDay = getTimeOfDay();
+            root.setAttribute('data-theme', `earth-${timeOfDay}`);
+            root.setAttribute('data-theme-mode', 'earth');
+          } else if (theme === 'random') {
+            const colors = generateRandomColors();
+            root.style.setProperty('--color-primary', colors.bg);
+            root.style.setProperty('--color-secondary', colors.text);
+            root.setAttribute('color-scheme', colors.scheme);
+            root.setAttribute('data-theme', 'random');
+            root.setAttribute('data-theme-mode', 'random');
+          } else {
+            // Clear any random mode inline styles when switching to light/dark
+            root.style.removeProperty('--color-primary');
+            root.style.removeProperty('--color-secondary');
+            root.setAttribute('data-theme', theme);
+            root.setAttribute('data-theme-mode', theme);
+          }
+        };
+
+        const getPreferredTheme = () => {
+          const storedPreference = safeLocalStorage.get(storageKey);
+          if (storedPreference === 'light' || storedPreference === 'dark' || storedPreference === 'earth' || storedPreference === 'random') {
+            return storedPreference;
+          }
+          return mediaQuery.matches ? 'dark' : 'light';
+        };
+
+        applyTheme(getPreferredTheme());
+
+        // Update earth mode every minute
+        let earthModeInterval = null;
+        const startEarthModeUpdates = () => {
+          if (earthModeInterval) clearInterval(earthModeInterval);
+          earthModeInterval = setInterval(() => {
+            const currentMode = root.getAttribute('data-theme-mode');
+            if (currentMode === 'earth') {
+              applyTheme('earth');
+            }
+          }, 60000); // Check every minute
+        };
+
+        const stopEarthModeUpdates = () => {
+          if (earthModeInterval) {
+            clearInterval(earthModeInterval);
+            earthModeInterval = null;
+          }
+        };
+
+        if (getPreferredTheme() === 'earth') {
+          startEarthModeUpdates();
+        }
+
+        mediaQuery.addEventListener('change', (event) => {
+          const storedPreference = safeLocalStorage.get(storageKey);
+          if (!storedPreference) {
+            applyTheme(event.matches ? 'dark' : 'light');
+          }
+        });
+
+        window.__setPreferredTheme = (theme) => {
+          if (theme !== 'light' && theme !== 'dark' && theme !== 'earth' && theme !== 'random') return;
+          safeLocalStorage.set(storageKey, theme);
+          applyTheme(theme);
+          
+          if (theme === 'earth') {
+            startEarthModeUpdates();
+          } else {
+            stopEarthModeUpdates();
+          }
+        };
+
+        window.__clearPreferredTheme = () => {
+          safeLocalStorage.remove(storageKey);
+          stopEarthModeUpdates();
+          applyTheme(getPreferredTheme());
+        };
+
+        // Remove preload class after initial load to enable transitions
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            root.classList.remove('preload');
+          }, 100);
+        });
+      })();
+    </script>
+  </head>
+
+      <body class="bg-primary text-secondary transition-colors duration-500 ease-in-out">
+        <slot />
+        
+        <!-- Global Calcifer Companion (at bottom of page content) -->
+        <div class="calcifer-companion-container hidden">
+          <div class="relative pointer-events-auto">
+            <svg
+              id="calcifer-companion-svg"
+              class="cursor-pointer w-[80px] h-[80px] sm:w-[100px] sm:h-[100px] hover:scale-110 transition-transform duration-300"
+              viewBox="-8 0 80 80"
+              xmlns="http://www.w3.org/2000/svg"
+              style="filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.4));"
+            >
+            <!-- Wood grain pattern -->
+            <defs>
+              <pattern id="woodgrain-companion" patternUnits="userSpaceOnUse" width="8" height="8">
+                <path d="M0,0 Q4,4 8,0 Q4,4 0,8" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+                <path d="M0,4 Q4,8 8,4" fill="none" stroke="#3D2616" stroke-width="0.5" opacity="0.3"/>
+              </pattern>
+            </defs>
+
+            <!-- Fire glow effect -->
+            <circle cx="32" cy="40" r="38" fill="#FF6B00" opacity="0.2">
+              <animate attributeName="r" values="38;40;38" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.2;0.3;0.2" dur="1.5s" repeatCount="indefinite" />
+            </circle>
+
+            <!-- Logs with wood texture -->
+            <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="#4A2F1B" />
+            <path d="M0,72 L64,72 C64,72 62,80 58,80 L6,80 C2,80 0,72 0,72" fill="url(#woodgrain-companion)" />
+            <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="#6B4423" />
+            <path d="M4,72 C4,72 6,64 10,64 L54,64 C58,64 60,72 60,72" fill="url(#woodgrain-companion)" />
+
+            <!-- Main flame body -->
+            <path d="M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z" fill="#FF4D00">
+              <animate attributeName="d" 
+                values="M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z;
+                       M8,72 L10,56 L9,48 L13,40 L11,34 L15,28 L17,24 L21,20 L25,17 L29,15 L32,13 L35,15 L39,17 L43,20 L47,24 L49,28 L53,34 L51,40 L55,48 L53,56 L56,72 L44,66 L40,68 L36,66 L32,68 L28,66 L24,68 L20,66 Z;
+                       M8,72 L10,58 L8,50 L12,42 L10,36 L14,30 L16,26 L20,22 L24,18 L28,16 L32,14 L36,16 L40,18 L44,22 L48,26 L50,30 L54,36 L52,42 L56,50 L54,58 L56,72 L44,68 L40,70 L36,68 L32,70 L28,68 L24,70 L20,68 Z"
+                dur="2s" repeatCount="indefinite" />
+            </path>
+
+            <!-- Inner flame -->
+            <path d="M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z" fill="#FFA500">
+              <animate attributeName="d"
+                values="M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z;
+                       M12,72 L14,56 L13,48 L17,40 L15,34 L19,28 L21,24 L25,21 L29,19 L32,17 L35,19 L39,21 L43,24 L45,28 L49,34 L47,40 L51,48 L49,56 L52,72 L42,67 L38,68 L34,67 L30,68 L26,67 L22,68 Z;
+                       M12,72 L14,58 L12,50 L16,42 L14,36 L18,30 L20,26 L24,22 L28,20 L32,18 L36,20 L40,22 L44,26 L46,30 L50,36 L48,42 L52,50 L50,58 L52,72 L42,69 L38,70 L34,69 L30,70 L26,69 L22,70 Z"
+                dur="2.2s" repeatCount="indefinite" />
+            </path>
+
+            <!-- Core flame -->
+            <path d="M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z" fill="#FFF700">
+              <animate attributeName="d"
+                values="M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z;
+                       M18,72 L20,56 L22,46 L24,38 L26,30 L28,24 L30,20 L32,18 L34,20 L36,24 L38,30 L40,38 L42,46 L44,56 L46,72 L38,68 L34,69 L30,68 Z;
+                       M18,72 L20,58 L22,48 L24,40 L26,32 L28,26 L30,22 L32,20 L34,22 L36,26 L38,32 L40,40 L42,48 L44,58 L46,72 L38,70 L34,71 L30,70 Z"
+                dur="1.8s" repeatCount="indefinite" />
+            </path>
+
+            <!-- Eyes -->
+            <g transform="translate(22,48)">
+              <circle cx="0" cy="0" r="5" fill="white" opacity="0.9" />
+              <circle cx="0" cy="0" r="2.5" fill="#2D1F3D">
+                <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="20" cy="0" r="5" fill="white" opacity="0.9" />
+              <circle cx="20" cy="0" r="2.5" fill="#2D1F3D">
+                <animate attributeName="r" values="2.5;2.7;2.5" dur="3s" repeatCount="indefinite" />
+              </circle>
+            </g>
+
+            <!-- Mouth -->
+            <path
+              d="M30,54 Q32,56 34,54"
+              fill="none"
+              stroke="#2D1F3D"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <animate attributeName="d"
+                values="M30,54 Q32,56 34,54;
+                       M30,53 Q32,55 34,53;
+                       M30,54 Q32,56 34,54"
+                dur="3s" repeatCount="indefinite" />
+            </path>
+          </svg>
+          
+          <!-- Modern Text Message Style Dialogue Box -->
+          <div id="calcifer-companion-dialogue" class="hidden absolute bottom-full left-0 mb-4 w-[280px] sm:w-[320px] bg-black/95 backdrop-blur-md rounded-2xl border border-orange-500/30 shadow-2xl overflow-hidden">
+            <!-- Messages Container -->
+            <div class="p-4 space-y-3">
+              <div class="px-4 py-3 bg-orange-500/10 border border-orange-500/30 rounded-2xl rounded-bl-sm text-orange-100 text-sm leading-relaxed max-w-[85%]">
+                Would you like me to return to the fireplace? 🏠
+              </div>
+            </div>
+            
+            <!-- Response Buttons -->
+            <div class="border-t border-orange-500/20 p-3 bg-black/50 space-y-2">
+              <button id="companion-no-btn" class="w-full px-4 py-3 bg-gray-500/20 hover:bg-gray-500/30 border border-gray-500/50 rounded-xl text-gray-400 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                Stay with me
+              </button>
+              <button id="companion-yes-btn" class="w-full px-4 py-3 bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/50 rounded-xl text-orange-400 text-sm font-medium transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]">
+                Go home 🔥
+              </button>
+            </div>
+          </div>
+        </div>
+        </div>
+        
+        <style>
+          .calcifer-companion-container {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            z-index: 50;
+            pointer-events: none;
+          }
+          
+          .calcifer-companion-container > div {
+            pointer-events: auto;
+          }
+          
+          /* Mobile optimizations */
+          @media (max-width: 640px) {
+            .calcifer-companion-container {
+              bottom: 1rem;
+              left: 1rem;
+            }
+            
+            #calcifer-companion-dialogue {
+              width: calc(100vw - 40px) !important;
+              max-width: 280px;
+              left: 50%;
+              transform: translateX(-50%);
+              bottom: 110%;
+            }
+          }
+        </style>
+        
+        <script src="https://unpkg.com/mailgo@0.12.2/dist/mailgo.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/aos@2.3.1/dist/aos.js"
+        ></script>
+        <script type="text/javascript">
+          // Initialize AOS after DOM is ready
+          window.addEventListener('load', function() {
+            // Detect mobile for optimized settings
+            const isMobile = window.innerWidth < 768;
+            
+            AOS.init({
+              duration: isMobile ? 600 : 1000,
+              once: false, // Allow re-animation on resize
+              mirror: false,
+              anchorPlacement: 'top-bottom',
+              offset: 0,
+              easing: 'ease-out-cubic',
+              disable: false,
+              disableMutationObserver: isMobile
+            });
+            
+            // Refresh AOS on window resize to recalculate positions
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+              clearTimeout(resizeTimer);
+              resizeTimer = setTimeout(function() {
+                AOS.refresh();
+              }, 250);
+            });
+          });
+        </script>
+        
+        <!-- Calcifer Companion Script -->
+        <script is:inline>
+          (function() {
+            const companionContainer = document.querySelector('.calcifer-companion-container');
+            const companionSvg = document.getElementById('calcifer-companion-svg');
+            const dialogue = document.getElementById('calcifer-companion-dialogue');
+            const yesBtn = document.getElementById('companion-yes-btn');
+            const noBtn = document.getElementById('companion-no-btn');
+            
+            if (!companionContainer) return;
+            
+            // Check if companion is active
+            const isActive = localStorage.getItem('calcifer-companion') === 'true';
+            
+            if (isActive) {
+              // Show companion with fade-in animation
+              companionContainer.classList.remove('hidden');
+              companionContainer.style.opacity = '0';
+              setTimeout(() => {
+                companionContainer.style.transition = 'opacity 0.5s ease-in-out';
+                companionContainer.style.opacity = '1';
+              }, 100);
+              
+              let hoverTimeout = null;
+              let isDialogueOpen = false;
+              
+              // Show dialogue on hover
+              companionSvg.addEventListener('mouseenter', () => {
+                hoverTimeout = setTimeout(() => {
+                  if (!isDialogueOpen) {
+                    dialogue.classList.remove('hidden');
+                    isDialogueOpen = true;
+                  }
+                }, 500); // Show after 0.5 seconds
+              });
+              
+              companionSvg.addEventListener('mouseleave', () => {
+                if (hoverTimeout) {
+                  clearTimeout(hoverTimeout);
+                  hoverTimeout = null;
+                }
+              });
+              
+              // Keep dialogue open when hovering over it
+              dialogue.addEventListener('mouseenter', () => {
+                if (hoverTimeout) {
+                  clearTimeout(hoverTimeout);
+                  hoverTimeout = null;
+                }
+              });
+              
+              dialogue.addEventListener('mouseleave', () => {
+                dialogue.classList.add('hidden');
+                isDialogueOpen = false;
+              });
+              
+              // "Go Home" button - dismiss companion
+              yesBtn.addEventListener('click', () => {
+                localStorage.removeItem('calcifer-companion');
+                companionContainer.style.transition = 'opacity 0.5s ease-in-out, transform 0.5s ease-in-out';
+                companionContainer.style.opacity = '0';
+                companionContainer.style.transform = 'scale(0.5)';
+                setTimeout(() => {
+                  companionContainer.classList.add('hidden');
+                }, 500);
+              });
+              
+              // "Stay" button - just hide dialogue
+              noBtn.addEventListener('click', () => {
+                dialogue.classList.add('hidden');
+                isDialogueOpen = false;
+              });
+              
+              // Mobile tap to show dialogue
+              companionSvg.addEventListener('touchstart', (e) => {
+                if (!isDialogueOpen) {
+                  e.preventDefault();
+                  dialogue.classList.remove('hidden');
+                  isDialogueOpen = true;
+                }
+              });
+              
+              // Close dialogue when tapping outside
+              document.addEventListener('touchstart', (e) => {
+                if (isDialogueOpen && 
+                    !companionSvg.contains(e.target) && 
+                    !dialogue.contains(e.target)) {
+                  dialogue.classList.add('hidden');
+                  isDialogueOpen = false;
+                }
+              });
+            }
+          })();
+        </script>
+        
+        <script is:inline>
+          // Selection glitch effect - very subtle
+          (function() {
+            const glitchChars = ['░', '▒', '▓', '◆', '◇', '●', '○'];
+            let lastSelectionTime = 0;
+            
+            function createSelectionGlitch(x, y) {
+              // Throttle to prevent too many glitches
+              const now = Date.now();
+              if (now - lastSelectionTime < 500) return; // Increased throttle
+              lastSelectionTime = now;
+              
+              // Only 1-2 glitch characters (reduced from 2-4)
+              const numGlitches = Math.random() > 0.6 ? 2 : 1;
+              
+              for (let i = 0; i < numGlitches; i++) {
+                const glitch = document.createElement('div');
+                glitch.className = 'selection-glitch';
+                glitch.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                
+                // Position near the selection with some randomness
+                const offsetX = (Math.random() - 0.5) * 30; // Reduced spread
+                const offsetY = (Math.random() - 0.5) * 30;
+                glitch.style.left = (x + offsetX) + 'px';
+                glitch.style.top = (y + offsetY) + 'px';
+                
+                document.body.appendChild(glitch);
+                
+                // Remove after animation
+                setTimeout(() => {
+                  glitch.remove();
+                }, 400);
+              }
+            }
+            
+            // Track mouse position during selection
+            let mouseX = 0;
+            let mouseY = 0;
+            document.addEventListener('mousemove', (e) => {
+              mouseX = e.clientX;
+              mouseY = e.clientY;
+            });
+            
+            // Detect text selection
+            document.addEventListener('mouseup', () => {
+              const selection = window.getSelection();
+              if (selection && selection.toString().length > 0) {
+                // Only trigger if at least 5 characters are selected (increased from 3)
+                if (selection.toString().trim().length >= 5) {
+                  // 15% chance (reduced from 100% testing)
+                  if (Math.random() < 0.15) {
+                    createSelectionGlitch(mouseX, mouseY);
+                  }
+                }
+              }
+            });
+            
+            // Also trigger on touch devices
+            document.addEventListener('touchend', (e) => {
+              const selection = window.getSelection();
+              if (selection && selection.toString().length > 0) {
+                if (selection.toString().trim().length >= 5) {
+                  if (Math.random() < 0.15) {
+                    const touch = e.changedTouches[0];
+                    createSelectionGlitch(touch.clientX, touch.clientY);
+                  }
+                }
+              }
+            });
+          })();
+        </script>
+        
+        <!-- Earth Mode Animated Graphics -->
+        <canvas id="earth-mode-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; opacity: 0; transition: opacity 0.5s ease;"></canvas>
+        
+        <script is:inline>
+          (function() {
+            const canvas = document.getElementById('earth-mode-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let animationId = null;
+            
+            // Set canvas size
+            function resizeCanvas() {
+              canvas.width = window.innerWidth;
+              canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Check if user prefers reduced motion
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            
+            // Particle classes for different effects
+            class Dewdrop {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 1 + Math.random() * 2;
+                this.size = 2 + Math.random() * 3;
+                this.opacity = 0.4 + Math.random() * 0.5;
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.opacity -= 0.002;
+                return this.y < canvas.height && this.opacity > 0;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = '#4A90A4'; // Darker blue
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                // Sparkle effect
+                ctx.fillStyle = '#A0D6E8';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Cloud {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.baseX = this.x;
+                this.baseY = this.y;
+                this.speedX = 0.1 + Math.random() * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.1;
+                this.size = 60 + Math.random() * 80;
+                this.opacity = 0.15 + Math.random() * 0.15;
+                this.puffCount = 3 + Math.floor(Math.random() * 3);
+                this.puffs = [];
+                this.dispersing = false;
+                this.disperseSpeed = 0;
+                this.maxDisperseSpeed = 3;
+                
+                // Create cloud puffs
+                for (let i = 0; i < this.puffCount; i++) {
+                  this.puffs.push({
+                    offsetX: (Math.random() - 0.5) * this.size * 0.8,
+                    offsetY: (Math.random() - 0.5) * this.size * 0.4,
+                    size: this.size * (0.5 + Math.random() * 0.5),
+                    disperseAngle: Math.random() * Math.PI * 2,
+                    disperseDistance: 0
+                  });
+                }
+              }
+              
+              checkMouseProximity(mouseX, mouseY) {
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // If mouse is within cloud radius, start dispersing
+                if (distance < this.size * 1.5) {
+                  this.dispersing = true;
+                  this.disperseSpeed = Math.min(this.disperseSpeed + 0.2, this.maxDisperseSpeed);
+                } else if (this.dispersing) {
+                  // Slowly reform
+                  this.disperseSpeed = Math.max(this.disperseSpeed - 0.1, 0);
+                  if (this.disperseSpeed === 0) {
+                    this.dispersing = false;
+                    // Reset disperse distances
+                    this.puffs.forEach(puff => {
+                      puff.disperseDistance *= 0.95;
+                    });
+                  }
+                }
+              }
+              
+              update(mouseX, mouseY) {
+                // Check mouse proximity
+                this.checkMouseProximity(mouseX, mouseY);
+                
+                // Move cloud
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // Update puff positions if dispersing
+                if (this.dispersing || this.disperseSpeed > 0) {
+                  this.puffs.forEach(puff => {
+                    puff.disperseDistance += this.disperseSpeed;
+                  });
+                }
+                
+                // Wrap around screen
+                if (this.x > canvas.width + this.size) {
+                  this.x = -this.size;
+                  this.y = Math.random() * canvas.height * 0.5;
+                  // Reset disperse
+                  this.dispersing = false;
+                  this.disperseSpeed = 0;
+                  this.puffs.forEach(puff => puff.disperseDistance = 0);
+                }
+                
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity * (1 - Math.min(this.disperseSpeed / this.maxDisperseSpeed, 0.8));
+                
+                // Draw each puff
+                this.puffs.forEach(puff => {
+                  const disperseX = Math.cos(puff.disperseAngle) * puff.disperseDistance;
+                  const disperseY = Math.sin(puff.disperseAngle) * puff.disperseDistance;
+                  
+                  const puffX = this.x + puff.offsetX + disperseX;
+                  const puffY = this.y + puff.offsetY + disperseY;
+                  
+                  const gradient = ctx.createRadialGradient(
+                    puffX, puffY, 0,
+                    puffX, puffY, puff.size
+                  );
+                  
+                  gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
+                  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                  
+                  ctx.fillStyle = gradient;
+                  ctx.filter = 'blur(12px)';
+                  ctx.beginPath();
+                  ctx.arc(puffX, puffY, puff.size, 0, Math.PI * 2);
+                  ctx.fill();
+                });
+                
+                ctx.filter = 'none';
+                ctx.restore();
+              }
+            }
+            
+            class Leaf {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 0.5 + Math.random() * 1;
+                this.size = 8 + Math.random() * 12;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.05;
+                this.sway = Math.random() * 2;
+                this.swaySpeed = 0.02 + Math.random() * 0.02;
+                this.phase = Math.random() * Math.PI * 2;
+                this.opacity = 0.4 + Math.random() * 0.4;
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.rotation += this.rotationSpeed;
+                this.phase += this.swaySpeed;
+                this.x += Math.sin(this.phase) * this.sway;
+                return this.y < canvas.height + 20;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = '#228B22';
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size * 0.6, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#1a6b1a';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            class DappledLight {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 30 + Math.random() * 50;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = 0;
+                this.maxOpacity = 0.05 + Math.random() * 0.05;
+                this.pulseSpeed = 0.01 + Math.random() * 0.01;
+                this.phase = Math.random() * Math.PI * 2;
+              }
+              
+              update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.phase += this.pulseSpeed;
+                this.opacity = this.maxOpacity * (0.5 + 0.5 * Math.sin(this.phase));
+                
+                if (this.x < -this.size) this.x = canvas.width + this.size;
+                if (this.x > canvas.width + this.size) this.x = -this.size;
+                if (this.y < -this.size) this.y = canvas.height + this.size;
+                if (this.y > canvas.height + this.size) this.y = -this.size;
+                
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, '#FFFFE0');
+                gradient.addColorStop(1, 'rgba(255, 255, 224, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Firefly {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = 2 + Math.random() * 2;
+                this.speedX = (Math.random() - 0.5) * 1;
+                this.speedY = (Math.random() - 0.5) * 1;
+                this.opacity = 0;
+                this.maxOpacity = 0.6 + Math.random() * 0.4;
+                this.pulseSpeed = 0.03 + Math.random() * 0.03;
+                this.phase = Math.random() * Math.PI * 2;
+                this.hue = 45 + Math.random() * 15; // Yellow-orange
+              }
+              
+              update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.phase += this.pulseSpeed;
+                this.opacity = this.maxOpacity * (0.3 + 0.7 * Math.sin(this.phase));
+                
+                // Gentle direction changes
+                if (Math.random() < 0.02) {
+                  this.speedX += (Math.random() - 0.5) * 0.2;
+                  this.speedY += (Math.random() - 0.5) * 0.2;
+                  this.speedX = Math.max(-1, Math.min(1, this.speedX));
+                  this.speedY = Math.max(-1, Math.min(1, this.speedY));
+                }
+                
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+                
+                return true;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 3);
+                gradient.addColorStop(0, `hsl(${this.hue}, 100%, 70%)`);
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class Petal {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.speed = 0.3 + Math.random() * 0.7;
+                this.size = 6 + Math.random() * 8;
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.08;
+                this.sway = Math.random() * 3;
+                this.swaySpeed = 0.015 + Math.random() * 0.015;
+                this.phase = Math.random() * Math.PI * 2;
+                this.opacity = 0.3 + Math.random() * 0.4;
+                this.color = Math.random() < 0.5 ? '#DDA0DD' : '#FFB6C1'; // Plum or light pink
+              }
+              
+              update() {
+                this.y += this.speed;
+                this.rotation += this.rotationSpeed;
+                this.phase += this.swaySpeed;
+                this.x += Math.sin(this.phase) * this.sway;
+                return this.y < canvas.height + 20;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                ctx.fillStyle = this.color;
+                // Draw petal shape
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size * 1.5, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+              }
+            }
+            
+            class ShootingStar {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.length = 30 + Math.random() * 50;
+                this.speed = 8 + Math.random() * 4;
+                this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.5;
+                this.opacity = 1;
+                this.life = 30 + Math.random() * 20;
+              }
+              
+              update() {
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                this.life--;
+                this.opacity = this.life / 50;
+                return this.life > 0;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                  this.x - Math.cos(this.angle) * this.length,
+                  this.y - Math.sin(this.angle) * this.length
+                );
+                ctx.stroke();
+                // Glow
+                ctx.strokeStyle = '#87CEEB';
+                ctx.lineWidth = 4;
+                ctx.globalAlpha = this.opacity * 0.5;
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            class WaveRipple {
+              constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = 0;
+                this.maxRadius = 50 + Math.random() * 100;
+                this.speed = 1 + Math.random() * 1;
+                this.opacity = 0.3;
+              }
+              
+              update() {
+                this.radius += this.speed;
+                this.opacity = 0.3 * (1 - this.radius / this.maxRadius);
+                return this.radius < this.maxRadius;
+              }
+              
+              draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#87CEEB';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+              }
+            }
+            
+            // Track mouse position for cloud interaction
+            let mouseX = -1000;
+            let mouseY = -1000;
+            
+            canvas.addEventListener('mousemove', (e) => {
+              const rect = canvas.getBoundingClientRect();
+              mouseX = e.clientX - rect.left;
+              mouseY = e.clientY - rect.top;
+            });
+            
+            canvas.addEventListener('mouseleave', () => {
+              mouseX = -1000;
+              mouseY = -1000;
+            });
+            
+            // Touch support for mobile
+            canvas.addEventListener('touchmove', (e) => {
+              const rect = canvas.getBoundingClientRect();
+              const touch = e.touches[0];
+              mouseX = touch.clientX - rect.left;
+              mouseY = touch.clientY - rect.top;
+            });
+            
+            canvas.addEventListener('touchend', () => {
+              mouseX = -1000;
+              mouseY = -1000;
+            });
+            
+            // Initialize particles based on time of day
+            function initParticles(timeOfDay) {
+              particles = [];
+              const isMobile = window.innerWidth < 768;
+              
+              switch(timeOfDay) {
+                case 'morning':
+                  // Dewdrops + Clouds
+                  const dewCount = isMobile ? 3 : 5;
+                  const cloudCount = isMobile ? 2 : 4;
+                  for (let i = 0; i < dewCount; i++) particles.push(new Dewdrop());
+                  for (let i = 0; i < cloudCount; i++) particles.push(new Cloud());
+                  break;
+                  
+                case 'afternoon':
+                  // Leaves + Dappled light
+                  const leafCount = isMobile ? 2 : 3;
+                  const lightCount = isMobile ? 3 : 5;
+                  for (let i = 0; i < leafCount; i++) particles.push(new Leaf());
+                  for (let i = 0; i < lightCount; i++) particles.push(new DappledLight());
+                  break;
+                  
+                case 'evening':
+                  // Fireflies + Petals
+                  const fireflyCount = isMobile ? 4 : 6;
+                  const petalCount = isMobile ? 2 : 3;
+                  for (let i = 0; i < fireflyCount; i++) particles.push(new Firefly());
+                  for (let i = 0; i < petalCount; i++) particles.push(new Petal());
+                  break;
+                  
+                case 'night':
+                  // Shooting stars (spawn occasionally) + Wave ripples
+                  const rippleCount = isMobile ? 2 : 3;
+                  for (let i = 0; i < rippleCount; i++) particles.push(new WaveRipple());
+                  break;
+              }
+            }
+            
+            let lastShootingStarTime = 0;
+            let lastRippleTime = 0;
+            
+            function animate() {
+              const root = document.documentElement;
+              const themeMode = root.getAttribute('data-theme-mode');
+              const currentTheme = root.getAttribute('data-theme');
+              
+              // Only animate in earth mode
+              if (themeMode !== 'earth') {
+                canvas.style.opacity = '0';
+                if (animationId) {
+                  cancelAnimationFrame(animationId);
+                  animationId = null;
+                }
+                return;
+              }
+              
+              canvas.style.opacity = '1';
+              
+              // Get time of day from theme
+              const timeOfDay = currentTheme.replace('earth-', '');
+              
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
+              
+              // Update and draw particles
+              particles = particles.filter(particle => {
+                // Pass mouse coordinates to clouds
+                const alive = particle instanceof Cloud ? particle.update(mouseX, mouseY) : particle.update();
+                if (alive) particle.draw();
+                return alive;
+              });
+              
+              // Spawn new particles as needed
+              const now = Date.now();
+              const isMobile = window.innerWidth < 768;
+              
+              if (timeOfDay === 'morning') {
+                if (particles.filter(p => p instanceof Dewdrop).length < (isMobile ? 3 : 5)) {
+                  if (Math.random() < 0.02) particles.push(new Dewdrop());
+                }
+                if (particles.filter(p => p instanceof Cloud).length < (isMobile ? 2 : 4)) {
+                  if (Math.random() < 0.005) particles.push(new Cloud());
+                }
+              } else if (timeOfDay === 'afternoon') {
+                if (particles.filter(p => p instanceof Leaf).length < (isMobile ? 2 : 3)) {
+                  if (Math.random() < 0.01) particles.push(new Leaf());
+                }
+              } else if (timeOfDay === 'evening') {
+                if (particles.filter(p => p instanceof Petal).length < (isMobile ? 2 : 3)) {
+                  if (Math.random() < 0.01) particles.push(new Petal());
+                }
+              } else if (timeOfDay === 'night') {
+                // Spawn shooting stars occasionally
+                if (now - lastShootingStarTime > 10000 && Math.random() < 0.01) {
+                  particles.push(new ShootingStar());
+                  lastShootingStarTime = now;
+                }
+                // Spawn ripples
+                if (now - lastRippleTime > 3000 && Math.random() < 0.02) {
+                  particles.push(new WaveRipple());
+                  lastRippleTime = now;
+                }
+              }
+              
+              animationId = requestAnimationFrame(animate);
+            }
+            
+            // Watch for theme changes
+            const observer = new MutationObserver(() => {
+              const root = document.documentElement;
+              const themeMode = root.getAttribute('data-theme-mode');
+              const currentTheme = root.getAttribute('data-theme');
+              
+              if (themeMode === 'earth' && !prefersReducedMotion) {
+                const timeOfDay = currentTheme.replace('earth-', '');
+                initParticles(timeOfDay);
+                if (!animationId) animate();
+              } else {
+                canvas.style.opacity = '0';
+                if (animationId) {
+                  cancelAnimationFrame(animationId);
+                  animationId = null;
+                }
+              }
+            });
+            
+            observer.observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['data-theme', 'data-theme-mode']
+            });
+            
+            // Initialize if already in earth mode
+            const root = document.documentElement;
+            const themeMode = root.getAttribute('data-theme-mode');
+            if (themeMode === 'earth' && !prefersReducedMotion) {
+              const currentTheme = root.getAttribute('data-theme');
+              const timeOfDay = currentTheme.replace('earth-', '');
+              initParticles(timeOfDay);
+              animate();
+            }
+          })();
+        </script>
+      </body>
+    </html>

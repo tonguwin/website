@@ -1,0 +1,10 @@
+/* themes.css */
+:root {
+    --color-primary: #ebebeb;
+    --color-secondary: #131313;
+  }
+  
+  .dark-theme {
+    --color-primary: #131313;
+    --color-secondary: #ebebeb;
+  }

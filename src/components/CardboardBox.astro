@@ -1,0 +1,307 @@
+---
+interface Props {
+  title: string;
+  date: string;
+  slug: string;
+  description: string;
+  index: number;
+}
+
+const { title, date, slug, description, index } = Astro.props;
+
+// Vary box sizes based on content length
+const sizeClass = description.length > 150 ? 'box-large' : description.length > 100 ? 'box-medium' : 'box-small';
+---
+
+<div 
+  class={`cardboard-box-wrapper ${sizeClass}`}
+  data-slug={slug}
+  data-index={index}
+>
+  <div class="cardboard-box">
+    {/* Box Body */}
+    <div class="box-body">
+      <div class="box-content">
+        <h3 class="box-title">{title}</h3>
+        <p class="box-date">{date}</p>
+      </div>
+    </div>
+
+    {/* Box Lid - lifts up on hover */}
+    <div class="box-lid">
+      <div class="lid-content">
+        <div class="lid-flaps"></div>
+      </div>
+    </div>
+
+    {/* Dust Particles Canvas */}
+    <canvas class="dust-canvas"></canvas>
+  </div>
+
+  {/* Description (fades in below box) */}
+  <div class="box-description">
+    <p>{description}</p>
+  </div>
+</div>
+
+<style>
+  .cardboard-box-wrapper {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+
+  .cardboard-box-wrapper:hover {
+    transform: translateY(-4px);
+  }
+
+  /* Box sizes */
+  .box-small {
+    width: 220px;
+  }
+
+  .box-medium {
+    width: 260px;
+  }
+
+  .box-large {
+    width: 300px;
+  }
+
+  .cardboard-box {
+    position: relative;
+    width: 100%;
+    height: 160px;
+  }
+
+  /* Box Body - flat, spooky pixel style */
+  .box-body {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #2a2a2a;
+    border: 4px solid #404040;
+    box-shadow: 
+      0 8px 16px rgba(0, 0, 0, 0.5),
+      inset 0 2px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(var(--color-primary), 0.2);
+    image-rendering: pixelated;
+  }
+
+  /* Heavy pixel grain */
+  .box-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.15) 2px,
+        rgba(0, 0, 0, 0.15) 4px
+      ),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    pointer-events: none; /* Allow clicks to pass through */
+  }
+
+  .box-content {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .box-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: rgb(var(--color-primary));
+    margin-bottom: 0.5rem;
+    font-family: 'Courier New', monospace;
+    text-shadow: 2px 2px 0 rgba(var(--color-secondary), 0.3);
+    line-height: 1.3;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .box-date {
+    font-size: 0.75rem;
+    color: rgb(var(--color-primary));
+    opacity: 0.7;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  /* Box Lid - simple flat design */
+  .box-lid {
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    top: 0;
+    left: 0;
+    transform-origin: top center;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+    pointer-events: none; /* Allow clicks/touches to pass through to wrapper */
+  }
+
+  .lid-content {
+    width: 100%;
+    height: 100%;
+    background: #3a3a3a;
+    border: 4px solid #505050;
+    border-bottom: none;
+    box-shadow: 
+      0 -4px 8px rgba(0, 0, 0, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.1),
+      0 0 0 1px rgba(var(--color-primary), 0.25);
+  }
+
+  /* Pixel grain on lid */
+  .lid-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    mix-blend-mode: overlay;
+    pointer-events: none; /* Allow clicks to pass through */
+  }
+
+  /* Flap lines */
+  .lid-flaps {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 2px;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Hover state - lid lifts */
+  .cardboard-box-wrapper:hover .box-lid {
+    transform: translateY(-50px) rotateX(-20deg);
+  }
+
+  /* Description */
+  .box-description {
+    margin-top: 1rem;
+    padding: 0 1rem;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.4s ease 0.2s;
+    pointer-events: none;
+  }
+
+  .cardboard-box-wrapper:hover .box-description {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .box-description p {
+    color: rgb(var(--color-primary));
+    font-size: 0.875rem;
+    line-height: 1.6;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* Dust Canvas */
+  .dust-canvas {
+    position: absolute;
+    top: -50px;
+    left: 0;
+    width: 100%;
+    height: 250px;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .box-small,
+    .box-medium,
+    .box-large {
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .cardboard-box {
+      height: 145px;
+    }
+
+    .box-title {
+      font-size: 1.1rem;
+      line-height: 1.25;
+    }
+
+    .box-content {
+      padding: 1.25rem;
+    }
+
+    /* Simpler hover on mobile */
+    .cardboard-box-wrapper:hover .box-lid {
+      transform: translateY(-30px);
+    }
+
+    /* Reduce dust canvas size for performance */
+    .dust-canvas {
+      height: 200px;
+    }
+
+    /* Improve touch targets on mobile */
+    .cardboard-box-wrapper {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    /* Show description by default on mobile since no hover */
+    .box-description {
+      opacity: 0.7;
+      transform: translateY(0);
+    }
+  }
+
+  /* Tablet adjustments */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    .box-small {
+      width: 240px;
+    }
+
+    .box-medium {
+      width: 280px;
+    }
+
+    .box-large {
+      width: 320px;
+    }
+  }
+</style>
+
+<script>
+  // This will be initialized per box instance
+  export {};
+</script>
+

@@ -1,0 +1,246 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout>
+  <div class="min-h-screen bg-primary flex items-center justify-center px-8">
+    <div class="text-center">
+      <h1 class="text-4xl md:text-6xl font-bold text-secondary mb-6">
+        The Gallery
+      </h1>
+      <p class="text-xl md:text-2xl text-secondary/70 mb-8">
+        Coming soon...
+      </p>
+      <p class="text-secondary/50 text-sm max-w-md mx-auto mb-12">
+        A curated collection.
+      </p>
+      
+      <!-- Larvitar Navigation -->
+      <a href="/" class="larvitar-home-link">
+        <div class="larvitar-wrapper">
+          <svg
+            version="1.1"
+            id="larvitar-gallery"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 64 64"
+            width="120"
+            height="120"
+            class="larvitar-svg"
+          >
+            <!-- Back spikes -->
+            <path d="M44,28 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,32 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M50,36 h4 v4 h-4 z" fill="#9CB18C" />
+            <path d="M48,40 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Horn -->
+            <path d="M28,4 h8 v4 h-8 z" fill="#9CB18C" />
+            <path d="M30,0 h4 v4 h-4 z" fill="#9CB18C" />
+            
+            <!-- Head -->
+            <path d="M20,8 h24 v20 h-24 z" fill="#A8C090" />
+            
+            <!-- Body -->
+            <path d="M16,28 h32 v24 h-32 z" fill="#A8C090" />
+            
+            <!-- Red belly diamond -->
+            <path d="M28,32 h8 v4 h-8 z" fill="#C65D4A" />
+            <path d="M26,36 h12 v6 h-12 z" fill="#C65D4A" />
+            <path d="M28,42 h8 v4 h-8 z" fill="#C65D4A" />
+            
+            <!-- Black diamond markings - both sides -->
+            <path d="M20,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            <path d="M40,40 h4 v4 h-4 z" fill="#2D2D2D" />
+            
+            <!-- Eyes - Awake (visible by default) -->
+            <g class="larvitar-eyes-awake">
+              <path d="M24,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <path d="M34,16 h6 v6 h-6 z" fill="#FFFFFF" />
+              <circle cx="27" cy="19" r="2" fill="#C44" />
+              <circle cx="37" cy="19" r="2" fill="#C44" />
+            </g>
+            
+            <!-- Eyes - Sleeping/Happy (visible on hover) -->
+            <g class="larvitar-eyes-happy">
+              <path d="M24,18 h6 v2 h-6 z" fill="#2D2D2D" />
+              <path d="M34,18 h6 v2 h-6 z" fill="#2D2D2D" />
+            </g>
+            
+            <!-- Arms -->
+            <path d="M12,32 h4 v10 h-4 z" fill="#A8C090" />
+            <path d="M48,32 h4 v10 h-4 z" fill="#A8C090" />
+            
+            <!-- White claws on base body -->
+            <path d="M18,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M24,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M36,50 h4 v4 h-4 z" fill="#FFFFFF" />
+            <path d="M42,50 h4 v4 h-4 z" fill="#FFFFFF" />
+          </svg>
+          
+          <!-- Floating Hearts (visible on hover) -->
+          <div class="heart-container">
+            <span class="heart heart1">♥</span>
+            <span class="heart heart2">♥</span>
+          </div>
+        </div>
+        
+        <!-- Text that appears on hover -->
+        <p class="home-text">Go back home?</p>
+      </a>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .larvitar-home-link {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .larvitar-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .larvitar-svg {
+    transition: transform 0.3s ease;
+    animation: idleBob 2.5s ease-in-out infinite;
+  }
+
+  @keyframes idleBob {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-3px) rotate(1deg);
+    }
+    75% {
+      transform: translateY(-3px) rotate(-1deg);
+    }
+  }
+
+  /* Eye states */
+  .larvitar-eyes-awake {
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .larvitar-eyes-happy {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .larvitar-home-link:hover .larvitar-eyes-awake {
+    opacity: 0;
+  }
+
+  .larvitar-home-link:hover .larvitar-eyes-happy {
+    opacity: 1;
+  }
+
+  .larvitar-home-link:hover .larvitar-svg {
+    animation: happyWiggle 0.4s ease-in-out infinite;
+  }
+
+  @keyframes happyWiggle {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    25% {
+      transform: translateY(-2px) rotate(3deg);
+    }
+    75% {
+      transform: translateY(-2px) rotate(-3deg);
+    }
+  }
+
+  /* Heart container */
+  .heart-container {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .larvitar-home-link:hover .heart-container {
+    opacity: 1;
+  }
+
+  .heart {
+    position: absolute;
+    font-size: 16px;
+    color: #E88;
+    opacity: 0;
+    animation: floatHeart 1.5s ease-in-out infinite;
+  }
+
+  .heart1 {
+    left: -15px;
+    animation-delay: 0s;
+  }
+
+  .heart2 {
+    left: 5px;
+    animation-delay: 0.5s;
+  }
+
+  .larvitar-home-link:hover .heart {
+    opacity: 1;
+  }
+
+  @keyframes floatHeart {
+    0% {
+      opacity: 0;
+      transform: translateY(0px) scale(0.5);
+    }
+    20% {
+      opacity: 1;
+      transform: translateY(-10px) scale(1);
+    }
+    80% {
+      opacity: 0.8;
+      transform: translateY(-30px) scale(1.1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-45px) scale(0.8);
+    }
+  }
+
+  /* Home text */
+  .home-text {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: rgb(var(--color-secondary));
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+  }
+
+  .larvitar-home-link:hover .home-text {
+    opacity: 0.7;
+    transform: translateY(0px);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 640px) {
+    .larvitar-svg {
+      width: 100px;
+      height: 100px;
+    }
+
+    .heart {
+      font-size: 14px;
+    }
+
+    .home-text {
+      font-size: 0.8rem;
+    }
+  }
+</style>
