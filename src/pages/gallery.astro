@@ -1688,8 +1688,472 @@ for (let row = 0; row < 10; row++) {
     modalClose?.addEventListener('click', close);
     modal?.addEventListener('click', (e) => { if (e.target === modal) close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+
+    // ===== GLITCHY ASCII FAIRY CURSOR =====
+    const cursor = document.getElementById('fairyCursor');
+    const cursorTrail = document.getElementById('cursorTrail');
+    if (!cursor || !cursorTrail) return;
+
+    const fairyChars = ['✦', '✧', '⋆', '˚', '✶', '⊹', '✴', '✵', '❋', '✺'];
+    const glitchChars = ['░', '▒', '▓', '█', '◊', '◈', '✧'];
+    let mouseX = -100, mouseY = -100;
+    let cursorX = -100, cursorY = -100;
+    let isClicking = false;
+
+    // Update fairy character periodically for glitch effect
+    const fairyCore = cursor.querySelector('.fairy-core');
+    const fairyGlitch1 = cursor.querySelector('.fairy-glitch-1');
+    const fairyGlitch2 = cursor.querySelector('.fairy-glitch-2');
+    
+    setInterval(() => {
+      if (fairyCore) {
+        fairyCore.textContent = fairyChars[Math.floor(Math.random() * fairyChars.length)];
+      }
+      if (Math.random() > 0.7 && fairyGlitch1) {
+        fairyGlitch1.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+      }
+      if (Math.random() > 0.7 && fairyGlitch2) {
+        fairyGlitch2.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
+      }
+    }, 100);
+
+    // Smooth cursor follow
+    function animateCursor() {
+      const ease = 0.15;
+      cursorX += (mouseX - cursorX) * ease;
+      cursorY += (mouseY - cursorY) * ease;
+      
+      cursor.style.left = `${cursorX}px`;
+      cursor.style.top = `${cursorY}px`;
+      
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    // Track mouse
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursor.style.opacity = '1';
+      
+      // Leave trail particles
+      if (Math.random() > 0.7) {
+        createTrailParticle(e.clientX, e.clientY);
+      }
+    });
+
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0';
+    });
+
+    // Click shimmer effect
+    document.addEventListener('mousedown', () => {
+      isClicking = true;
+      cursor.classList.add('clicking');
+      createShimmerBurst(mouseX, mouseY);
+      createClickRipple(mouseX, mouseY);
+      createGlitchFlash();
+    });
+
+    document.addEventListener('mouseup', () => {
+      isClicking = false;
+      cursor.classList.remove('clicking');
+    });
+
+    // Trail particle
+    function createTrailParticle(x, y) {
+      const particle = document.createElement('span');
+      particle.className = 'trail-particle';
+      particle.textContent = fairyChars[Math.floor(Math.random() * fairyChars.length)];
+      particle.style.left = `${x + (Math.random() - 0.5) * 10}px`;
+      particle.style.top = `${y + (Math.random() - 0.5) * 10}px`;
+      cursorTrail.appendChild(particle);
+      
+      setTimeout(() => particle.remove(), 600);
+    }
+
+    // Shimmer burst on click - MORE particles, BIGGER burst
+    function createShimmerBurst(x, y) {
+      // Inner ring - fast
+      for (let i = 0; i < 12; i++) {
+        const spark = document.createElement('span');
+        spark.className = 'shimmer-spark';
+        spark.textContent = fairyChars[Math.floor(Math.random() * fairyChars.length)];
+        
+        const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+        const distance = 40 + Math.random() * 30;
+        spark.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+        spark.style.left = `${x}px`;
+        spark.style.top = `${y}px`;
+        spark.style.animationDuration = '0.4s';
+        
+        cursorTrail.appendChild(spark);
+        setTimeout(() => spark.remove(), 400);
+      }
+      
+      // Outer ring - slower, bigger
+      for (let i = 0; i < 8; i++) {
+        const spark = document.createElement('span');
+        spark.className = 'shimmer-spark outer';
+        spark.textContent = '✦';
+        
+        const angle = (i / 8) * Math.PI * 2 + 0.4;
+        const distance = 60 + Math.random() * 40;
+        spark.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+        spark.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+        spark.style.left = `${x}px`;
+        spark.style.top = `${y}px`;
+        
+        cursorTrail.appendChild(spark);
+        setTimeout(() => spark.remove(), 600);
+      }
+      
+      // ASCII glitch fragments
+      const glitchFragments = ['█', '▓', '▒', '░', '◈', '◊'];
+      for (let i = 0; i < 6; i++) {
+        const frag = document.createElement('span');
+        frag.className = 'glitch-fragment';
+        frag.textContent = glitchFragments[Math.floor(Math.random() * glitchFragments.length)];
+        
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 20 + Math.random() * 50;
+        frag.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+        frag.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+        frag.style.left = `${x}px`;
+        frag.style.top = `${y}px`;
+        frag.style.animationDelay = `${Math.random() * 0.1}s`;
+        
+        cursorTrail.appendChild(frag);
+        setTimeout(() => frag.remove(), 500);
+      }
+    }
+
+    // Ripple ring effect
+    function createClickRipple(x, y) {
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      cursorTrail.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 600);
+      
+      // Second delayed ripple
+      setTimeout(() => {
+        const ripple2 = document.createElement('div');
+        ripple2.className = 'click-ripple delayed';
+        ripple2.style.left = `${x}px`;
+        ripple2.style.top = `${y}px`;
+        cursorTrail.appendChild(ripple2);
+        setTimeout(() => ripple2.remove(), 600);
+      }, 100);
+    }
+
+    // Brief screen glitch flash
+    function createGlitchFlash() {
+      const flash = document.createElement('div');
+      flash.className = 'glitch-flash';
+      document.body.appendChild(flash);
+      setTimeout(() => flash.remove(), 150);
+    }
   });
 </script>
+
+<!-- Glitchy ASCII Fairy Cursor -->
+<div id="fairyCursor" class="fairy-cursor">
+  <span class="fairy-glitch-1">░</span>
+  <span class="fairy-core">✦</span>
+  <span class="fairy-glitch-2">▒</span>
+</div>
+<div id="cursorTrail" class="cursor-trail"></div>
+
+<style>
+  /* Hide default cursor on gallery page */
+  .gallery-page {
+    cursor: none;
+  }
+  
+  .gallery-page * {
+    cursor: none;
+  }
+
+  /* Fairy Cursor */
+  .fairy-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    color: rgb(var(--color-secondary));
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    filter: drop-shadow(0 0 4px rgb(var(--color-secondary) / 0.5));
+  }
+
+  .fairy-core {
+    font-size: 18px;
+    animation: fairy-pulse 1s ease-in-out infinite;
+  }
+
+  .fairy-glitch-1, .fairy-glitch-2 {
+    font-size: 10px;
+    opacity: 0.4;
+    animation: fairy-glitch 0.2s steps(2) infinite;
+  }
+
+  .fairy-glitch-1 {
+    transform: translate(-2px, -3px);
+    color: rgb(var(--color-secondary) / 0.6);
+  }
+
+  .fairy-glitch-2 {
+    transform: translate(2px, 3px);
+    color: rgb(var(--color-secondary) / 0.6);
+  }
+
+  @keyframes fairy-pulse {
+    0%, 100% { 
+      transform: scale(1); 
+      text-shadow: 0 0 8px rgb(var(--color-secondary) / 0.6);
+    }
+    50% { 
+      transform: scale(1.1); 
+      text-shadow: 0 0 12px rgb(var(--color-secondary) / 0.8);
+    }
+  }
+
+  @keyframes fairy-glitch {
+    0% { opacity: 0.3; transform: translate(-2px, -3px); }
+    50% { opacity: 0.6; transform: translate(2px, 2px); }
+    100% { opacity: 0.3; transform: translate(-1px, -2px); }
+  }
+
+  /* Click effect - PUNCHY */
+  .fairy-cursor.clicking {
+    animation: cursor-shimmer 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .fairy-cursor.clicking .fairy-core {
+    transform: scale(2);
+    text-shadow: 
+      0 0 20px rgb(var(--color-secondary)),
+      0 0 40px rgb(var(--color-secondary)),
+      0 0 60px rgb(var(--color-secondary) / 0.5);
+    animation: core-burst 0.25s ease-out;
+  }
+
+  .fairy-cursor.clicking .fairy-glitch-1,
+  .fairy-cursor.clicking .fairy-glitch-2 {
+    opacity: 1;
+    animation: glitch-burst 0.2s steps(3);
+  }
+
+  @keyframes cursor-shimmer {
+    0% { 
+      filter: drop-shadow(0 0 4px rgb(var(--color-secondary) / 0.5)); 
+      transform: translate(-50%, -50%) scale(1);
+    }
+    30% { 
+      filter: drop-shadow(0 0 25px rgb(var(--color-secondary))) brightness(1.5); 
+      transform: translate(-50%, -50%) scale(1.3);
+    }
+    100% { 
+      filter: drop-shadow(0 0 4px rgb(var(--color-secondary) / 0.5)); 
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes core-burst {
+    0% { transform: scale(1); }
+    40% { transform: scale(2.5); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes glitch-burst {
+    0% { transform: translate(0, 0); opacity: 0.4; }
+    33% { transform: translate(-8px, -5px); opacity: 1; }
+    66% { transform: translate(8px, 5px); opacity: 0.8; }
+    100% { transform: translate(0, 0); opacity: 0.4; }
+  }
+
+  /* Trail */
+  .cursor-trail {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .trail-particle {
+    position: absolute;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgb(var(--color-secondary) / 0.6);
+    pointer-events: none;
+    animation: trail-fade 0.6s ease-out forwards;
+  }
+
+  @keyframes trail-fade {
+    0% { 
+      opacity: 0.6; 
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% { 
+      opacity: 0; 
+      transform: translate(-50%, -50%) scale(0.3) translateY(-20px);
+    }
+  }
+
+  /* Shimmer sparks on click */
+  .shimmer-spark {
+    position: absolute;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    color: rgb(var(--color-secondary));
+    pointer-events: none;
+    animation: spark-burst 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    text-shadow: 0 0 10px rgb(var(--color-secondary)), 0 0 20px rgb(var(--color-secondary) / 0.5);
+  }
+
+  .shimmer-spark.outer {
+    font-size: 18px;
+    animation: spark-burst 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    text-shadow: 0 0 15px rgb(var(--color-secondary)), 0 0 30px rgb(var(--color-secondary) / 0.6);
+  }
+
+  @keyframes spark-burst {
+    0% { 
+      opacity: 1; 
+      transform: translate(-50%, -50%) scale(1.2) rotate(0deg);
+    }
+    50% {
+      opacity: 0.8;
+    }
+    100% { 
+      opacity: 0; 
+      transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(180deg);
+    }
+  }
+
+  /* Glitch fragments */
+  .glitch-fragment {
+    position: absolute;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: rgb(var(--color-secondary) / 0.8);
+    pointer-events: none;
+    animation: glitch-frag 0.4s steps(4) forwards;
+  }
+
+  @keyframes glitch-frag {
+    0% { 
+      opacity: 1; 
+      transform: translate(-50%, -50%) scale(1);
+    }
+    25% {
+      transform: translate(calc(-50% + var(--tx) * 0.3), calc(-50% + var(--ty) * 0.3)) scale(1.2) skewX(20deg);
+    }
+    50% {
+      transform: translate(calc(-50% + var(--tx) * 0.6), calc(-50% + var(--ty) * 0.6)) scale(0.8) skewX(-10deg);
+    }
+    100% { 
+      opacity: 0; 
+      transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.2);
+    }
+  }
+
+  /* Click ripple ring */
+  .click-ripple {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgb(var(--color-secondary));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    animation: ripple-expand 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-shadow: 0 0 10px rgb(var(--color-secondary) / 0.5), inset 0 0 10px rgb(var(--color-secondary) / 0.3);
+  }
+
+  .click-ripple.delayed {
+    animation-delay: 0s;
+    border-style: dashed;
+    opacity: 0.6;
+  }
+
+  @keyframes ripple-expand {
+    0% { 
+      width: 10px; 
+      height: 10px; 
+      opacity: 1;
+      border-width: 3px;
+    }
+    100% { 
+      width: 120px; 
+      height: 120px; 
+      opacity: 0;
+      border-width: 1px;
+    }
+  }
+
+  /* Screen glitch flash */
+  .glitch-flash {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    animation: screen-glitch 0.15s steps(3) forwards;
+    background: linear-gradient(
+      0deg,
+      transparent 0%,
+      rgb(var(--color-secondary) / 0.03) 25%,
+      transparent 50%,
+      rgb(var(--color-secondary) / 0.05) 75%,
+      transparent 100%
+    );
+  }
+
+  @keyframes screen-glitch {
+    0% {
+      opacity: 1;
+      transform: translateX(0);
+      clip-path: inset(0 0 0 0);
+    }
+    33% {
+      opacity: 0.8;
+      transform: translateX(-2px);
+      clip-path: inset(10% 0 80% 0);
+    }
+    66% {
+      opacity: 0.6;
+      transform: translateX(2px);
+      clip-path: inset(60% 0 20% 0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(0);
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* Disable on mobile/touch */
+  @media (hover: none) and (pointer: coarse) {
+    .fairy-cursor,
+    .cursor-trail {
+      display: none;
+    }
+    
+    .gallery-page,
+    .gallery-page * {
+      cursor: auto;
+    }
+  }
+</style>
 
 <!-- SVG Filters for clean digital glitch (no color tint) -->
 <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
