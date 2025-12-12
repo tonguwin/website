@@ -529,6 +529,40 @@ const sortedPosts = [...posts].sort((a, b) => {
       const dustCanvas = wrapper.querySelector('.dust-canvas');
       const slug = wrapper.dataset.slug;
       
+      // Click/Touch handler - dive into box (MUST be registered regardless of canvas)
+      let isNavigating = false;
+      
+      function handleBoxNavigation(e) {
+        // Prevent double-firing and default behavior
+        if (isNavigating) return;
+        isNavigating = true;
+        
+        if (e.type === 'touchend') {
+          e.preventDefault();
+        }
+        
+        // Zoom into the box
+        wrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease';
+        wrapper.style.transform = 'scale(3) translateY(-50px)';
+        wrapper.style.opacity = '0';
+        
+        // Fade out page
+        document.body.style.transition = 'opacity 0.5s ease-out';
+        setTimeout(() => {
+          document.body.style.opacity = '0';
+        }, 300);
+        
+        // Navigate
+        setTimeout(() => {
+          window.location.href = `/blog/${slug}`;
+        }, 800);
+      }
+      
+      // Add both click and touch handlers
+      wrapper.addEventListener('click', handleBoxNavigation);
+      wrapper.addEventListener('touchend', handleBoxNavigation);
+      
+      // Dust particle effects (optional - skip if no canvas)
       if (!dustCanvas) return;
       
       const ctx = dustCanvas.getContext('2d');
@@ -622,39 +656,6 @@ const sortedPosts = [...posts].sort((a, b) => {
           }
         }, 1000);
       });
-      
-      // Click/Touch handler - dive into box
-      let isNavigating = false;
-      
-      function handleBoxNavigation(e) {
-        // Prevent double-firing and default behavior
-        if (isNavigating) return;
-        isNavigating = true;
-        
-        if (e.type === 'touchend') {
-          e.preventDefault();
-        }
-        
-        // Zoom into the box
-        wrapper.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.8s ease';
-        wrapper.style.transform = 'scale(3) translateY(-50px)';
-        wrapper.style.opacity = '0';
-        
-        // Fade out page
-        document.body.style.transition = 'opacity 0.5s ease-out';
-        setTimeout(() => {
-          document.body.style.opacity = '0';
-        }, 300);
-        
-        // Navigate
-        setTimeout(() => {
-          window.location.href = `/blog/${slug}`;
-        }, 800);
-      }
-      
-      // Add both click and touch handlers
-      wrapper.addEventListener('click', handleBoxNavigation);
-      wrapper.addEventListener('touchend', handleBoxNavigation);
     });
   </script>
 </BaseLayout>
