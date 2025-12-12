@@ -90,7 +90,8 @@ const quoteItems = [
 }));
 
 // Combined and shuffled content for "all" mode
-const allContent = [...jpgItems, ...pngItems, ...mp4Items, ...bookItems, ...quoteItems]
+// NOTE: quoteItems removed for now - add back when ready: [...jpgItems, ...pngItems, ...mp4Items, ...bookItems, ...quoteItems]
+const allContent = [...jpgItems, ...pngItems, ...mp4Items, ...bookItems]
   .sort(() => Math.random() - 0.5)
   .map((item, i) => ({
     ...item,
@@ -104,7 +105,7 @@ const counts = {
   png: pngItems.length,
   mp4: mp4Items.length,
   books: bookItems.length,
-  quotes: quoteItems.length,
+  // quotes: quoteItems.length, // Disabled for now
 };
 
 // ASCII art patterns - more variety
@@ -273,12 +274,14 @@ for (let row = 0; row < 10; row++) {
           <span class="nav-count">{counts.books}</span>
           <span class="nav-glitch"></span>
         </button>
+        <!-- QUOTES button disabled for now
         <span class="nav-divider">│</span>
         <button class="nav-btn" data-mode="quotes">
           <span class="nav-text">QUOTES</span>
           <span class="nav-count">{counts.quotes}</span>
           <span class="nav-glitch"></span>
         </button>
+        -->
       </div>
     </nav>
 
