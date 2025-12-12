@@ -55,6 +55,21 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     transform: translateY(-4px);
   }
 
+  .cardboard-box-wrapper:hover .box-body {
+    background: rgb(var(--color-secondary) / 0.25);
+    border-color: rgb(var(--color-secondary) / 0.45);
+    box-shadow: 
+      0 12px 24px rgb(var(--color-secondary) / 0.15),
+      inset 0 2px 0 rgb(var(--color-secondary) / 0.1),
+      inset 0 -2px 0 rgb(var(--color-secondary) / 0.15),
+      0 0 0 1px rgb(var(--color-secondary) / 0.3);
+  }
+
+  .cardboard-box-wrapper:hover .lid-content {
+    background: rgb(var(--color-secondary) / 0.3);
+    border-color: rgb(var(--color-secondary) / 0.5);
+  }
+
   /* Box sizes */
   .box-small {
     width: 220px;
@@ -74,19 +89,21 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     height: 160px;
   }
 
-  /* Box Body - flat, spooky pixel style */
+  /* Box Body - theme-aware spooky pixel style */
   .box-body {
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #2a2a2a;
-    border: 4px solid #404040;
+    /* Use secondary color (contrasting) as the box base - lower opacity for subtlety */
+    background: rgb(var(--color-secondary) / 0.15);
+    border: 4px solid rgb(var(--color-secondary) / 0.3);
     box-shadow: 
-      0 8px 16px rgba(0, 0, 0, 0.5),
-      inset 0 2px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(var(--color-primary), 0.2);
+      0 8px 16px rgb(var(--color-secondary) / 0.1),
+      inset 0 2px 0 rgb(var(--color-secondary) / 0.05),
+      inset 0 -2px 0 rgb(var(--color-secondary) / 0.1),
+      0 0 0 1px rgb(var(--color-secondary) / 0.2);
     image-rendering: pixelated;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
 
   /* Heavy pixel grain */
@@ -102,18 +119,18 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
         0deg,
         transparent,
         transparent 2px,
-        rgba(0, 0, 0, 0.15) 2px,
-        rgba(0, 0, 0, 0.15) 4px
+        rgb(var(--color-secondary) / 0.05) 2px,
+        rgb(var(--color-secondary) / 0.05) 4px
       ),
       repeating-linear-gradient(
         90deg,
         transparent,
         transparent 2px,
-        rgba(0, 0, 0, 0.15) 2px,
-        rgba(0, 0, 0, 0.15) 4px
+        rgb(var(--color-secondary) / 0.05) 2px,
+        rgb(var(--color-secondary) / 0.05) 4px
       ),
       url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.5;
+    opacity: 0.4;
     mix-blend-mode: overlay;
     pointer-events: none; /* Allow clicks to pass through */
   }
@@ -132,10 +149,16 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
   .box-title {
     font-size: 1.25rem;
     font-weight: bold;
-    color: rgb(var(--color-primary));
+    color: rgb(var(--color-secondary));
     margin-bottom: 0.5rem;
     font-family: 'Courier New', monospace;
-    text-shadow: 2px 2px 0 rgba(var(--color-secondary), 0.3);
+    /* Strong outline effect for readability on any background */
+    text-shadow: 
+      -1px -1px 0 rgb(var(--color-primary)),
+      1px -1px 0 rgb(var(--color-primary)),
+      -1px 1px 0 rgb(var(--color-primary)),
+      1px 1px 0 rgb(var(--color-primary)),
+      0 0 8px rgb(var(--color-primary));
     line-height: 1.3;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -143,14 +166,18 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
 
   .box-date {
     font-size: 0.75rem;
-    color: rgb(var(--color-primary));
-    opacity: 0.7;
+    color: rgb(var(--color-secondary));
     font-family: 'Courier New', monospace;
     letter-spacing: 0.05em;
     white-space: nowrap;
+    text-shadow: 
+      -1px -1px 0 rgb(var(--color-primary)),
+      1px -1px 0 rgb(var(--color-primary)),
+      -1px 1px 0 rgb(var(--color-primary)),
+      1px 1px 0 rgb(var(--color-primary));
   }
 
-  /* Box Lid - simple flat design */
+  /* Box Lid - theme-aware flat design */
   .box-lid {
     position: absolute;
     width: 100%;
@@ -166,13 +193,15 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
   .lid-content {
     width: 100%;
     height: 100%;
-    background: #3a3a3a;
-    border: 4px solid #505050;
+    /* Lid is slightly different than body */
+    background: rgb(var(--color-secondary) / 0.2);
+    border: 4px solid rgb(var(--color-secondary) / 0.35);
     border-bottom: none;
     box-shadow: 
-      0 -4px 8px rgba(0, 0, 0, 0.4),
-      inset 0 2px 0 rgba(255, 255, 255, 0.1),
-      0 0 0 1px rgba(var(--color-primary), 0.25);
+      0 -4px 8px rgb(var(--color-secondary) / 0.08),
+      inset 0 2px 0 rgb(var(--color-secondary) / 0.1),
+      0 0 0 1px rgb(var(--color-secondary) / 0.15);
+    transition: background 0.3s ease, border-color 0.3s ease;
   }
 
   /* Pixel grain on lid */
@@ -197,7 +226,7 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
     transform: translate(-50%, -50%);
     width: 80%;
     height: 2px;
-    background: rgba(0, 0, 0, 0.4);
+    background: rgb(var(--color-secondary) / 0.3);
   }
 
   /* Hover state - lid lifts */
@@ -221,11 +250,17 @@ const sizeClass = description.length > 150 ? 'box-large' : description.length > 
   }
 
   .box-description p {
-    color: rgb(var(--color-primary));
+    color: rgb(var(--color-secondary));
     font-size: 0.875rem;
     line-height: 1.6;
     text-align: center;
     font-family: 'Courier New', monospace;
+    text-shadow: 
+      -1px -1px 0 rgb(var(--color-primary)),
+      1px -1px 0 rgb(var(--color-primary)),
+      -1px 1px 0 rgb(var(--color-primary)),
+      1px 1px 0 rgb(var(--color-primary)),
+      0 0 6px rgb(var(--color-primary));
   }
 
   /* Dust Canvas */

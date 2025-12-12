@@ -657,5 +657,430 @@ const sortedPosts = [...posts].sort((a, b) => {
         }, 1000);
       });
     });
+
+    // ===== SPECTRAL GHOST TRAIL CURSOR =====
+    setTimeout(() => {
+      const trailContainer = document.getElementById('ghostTrailContainer');
+      if (!trailContainer) return;
+      
+      // Ghost sprite ASCII art (old-school vibes)
+      const ghostSprites = [
+        ' ░░░ \n░░░░░\n░ ░ ░\n░░░░░\n ░ ░ ',
+        ' ▓▓▓ \n▓▓▓▓▓\n▓ ▓ ▓\n▓▓▓▓▓\n ▓ ▓ ',
+        '  ●  \n ███ \n█ █ █\n █ █ ',
+      ];
+      
+      // Simple trailing ghost characters
+      const ghostChars = ['◜', '◝', '◞', '◟', '○', '◌', '◎', '●'];
+      const wispChars = ['~', '≈', '∿', '∾', '≋', '⌇'];
+      const crypticChars = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', '࿊', '࿋'];
+      
+      let mouseX = 0, mouseY = 0;
+      let isMoving = false;
+      let moveTimeout;
+      
+      // Trail of ghosts that follow cursor
+      const numGhosts = 8;
+      const ghosts = [];
+      
+      // Create trailing ghost elements
+      for (let i = 0; i < numGhosts; i++) {
+        const ghost = document.createElement('div');
+        ghost.className = 'trailing-ghost';
+        ghost.innerHTML = `<span class="ghost-body">◉</span>`;
+        ghost.style.setProperty('--delay', i);
+        trailContainer.appendChild(ghost);
+        ghosts.push({
+          el: ghost,
+          x: 0,
+          y: 0,
+          targetX: 0,
+          targetY: 0,
+          ease: 0.15 - (i * 0.012) // Slower follow for each successive ghost
+        });
+      }
+      
+      // Main spectral wisp (the "cursor")
+      const mainWisp = document.createElement('div');
+      mainWisp.className = 'main-wisp';
+      mainWisp.innerHTML = '◈';
+      trailContainer.appendChild(mainWisp);
+      let wispX = 0, wispY = 0;
+      
+      // Animate all ghosts
+      function animate() {
+        // Main wisp follows mouse directly
+        const wispEase = 0.25;
+        wispX += (mouseX - wispX) * wispEase;
+        wispY += (mouseY - wispY) * wispEase;
+        mainWisp.style.left = `${wispX}px`;
+        mainWisp.style.top = `${wispY}px`;
+        
+        // Each ghost follows the one before it
+        ghosts.forEach((ghost, i) => {
+          const target = i === 0 ? { x: wispX, y: wispY } : ghosts[i - 1];
+          ghost.x += (target.x - ghost.x) * ghost.ease;
+          ghost.y += (target.y - ghost.y) * ghost.ease;
+          
+          ghost.el.style.left = `${ghost.x}px`;
+          ghost.el.style.top = `${ghost.y}px`;
+          
+          // Fade out further back in the chain
+          const opacity = 0.7 - (i * 0.08);
+          ghost.el.style.opacity = opacity;
+        });
+        
+        requestAnimationFrame(animate);
+      }
+      animate();
+      
+      // Track mouse
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        isMoving = true;
+        
+        mainWisp.classList.add('active');
+        ghosts.forEach(g => g.el.classList.add('active'));
+        
+        clearTimeout(moveTimeout);
+        moveTimeout = setTimeout(() => {
+          isMoving = false;
+        }, 100);
+        
+        // Spawn ethereal wisps occasionally
+        if (Math.random() > 0.85) {
+          spawnWisp(e.clientX, e.clientY);
+        }
+      });
+      
+      document.addEventListener('mouseleave', () => {
+        mainWisp.classList.remove('active');
+        ghosts.forEach(g => g.el.classList.remove('active'));
+      });
+      
+      // Click - summon spirits
+      document.addEventListener('mousedown', (e) => {
+        mainWisp.classList.add('summoning');
+        summonSpirits(e.clientX, e.clientY);
+        createSummoningCircle(e.clientX, e.clientY);
+      });
+      
+      document.addEventListener('mouseup', () => {
+        mainWisp.classList.remove('summoning');
+      });
+      
+      // Spawn floating wisp
+      function spawnWisp(x, y) {
+        const wisp = document.createElement('span');
+        wisp.className = 'ethereal-wisp';
+        wisp.textContent = wispChars[Math.floor(Math.random() * wispChars.length)];
+        wisp.style.left = `${x + (Math.random() - 0.5) * 30}px`;
+        wisp.style.top = `${y + (Math.random() - 0.5) * 30}px`;
+        wisp.style.setProperty('--drift', `${(Math.random() - 0.5) * 40}px`);
+        trailContainer.appendChild(wisp);
+        setTimeout(() => wisp.remove(), 1200);
+      }
+      
+      // Summon spirits on click
+      function summonSpirits(x, y) {
+        // Burst of cryptic runes
+        for (let i = 0; i < 6; i++) {
+          const spirit = document.createElement('span');
+          spirit.className = 'summoned-spirit';
+          spirit.textContent = crypticChars[Math.floor(Math.random() * crypticChars.length)];
+          
+          const angle = (i / 6) * Math.PI * 2 + Math.random() * 0.5;
+          const distance = 40 + Math.random() * 50;
+          spirit.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+          spirit.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+          spirit.style.left = `${x}px`;
+          spirit.style.top = `${y}px`;
+          spirit.style.animationDelay = `${i * 0.04}s`;
+          
+          trailContainer.appendChild(spirit);
+          setTimeout(() => spirit.remove(), 800);
+        }
+        
+        // Ghost faces float up
+        for (let i = 0; i < 3; i++) {
+          const face = document.createElement('span');
+          face.className = 'ghost-face';
+          face.textContent = ghostChars[Math.floor(Math.random() * ghostChars.length)];
+          face.style.left = `${x + (Math.random() - 0.5) * 60}px`;
+          face.style.top = `${y}px`;
+          face.style.animationDelay = `${i * 0.1}s`;
+          
+          trailContainer.appendChild(face);
+          setTimeout(() => face.remove(), 1000);
+        }
+      }
+      
+      // Summoning circle on click
+      function createSummoningCircle(x, y) {
+        const circle = document.createElement('div');
+        circle.className = 'summoning-circle';
+        circle.style.left = `${x}px`;
+        circle.style.top = `${y}px`;
+        trailContainer.appendChild(circle);
+        setTimeout(() => circle.remove(), 800);
+        
+        // Screen flicker
+        const flicker = document.createElement('div');
+        flicker.className = 'screen-flicker';
+        document.body.appendChild(flicker);
+        setTimeout(() => flicker.remove(), 150);
+      }
+      
+      // Periodic ghost character changes
+      setInterval(() => {
+        ghosts.forEach((ghost, i) => {
+          if (Math.random() > 0.7) {
+            const body = ghost.el.querySelector('.ghost-body');
+            if (body) {
+              body.textContent = ghostChars[Math.floor(Math.random() * ghostChars.length)];
+            }
+          }
+        });
+        // Main wisp flicker
+        if (Math.random() > 0.9) {
+          mainWisp.style.opacity = '0.4';
+          setTimeout(() => mainWisp.style.opacity = '1', 60);
+        }
+      }, 120);
+      
+    }, 100);
   </script>
+
+  <!-- Ghost Trail Container -->
+  <div id="ghostTrailContainer" class="ghost-trail-container"></div>
+
+  <style is:global>
+    /* Hide default cursor */
+    .min-h-screen {
+      cursor: none !important;
+    }
+    
+    .min-h-screen * {
+      cursor: none !important;
+    }
+
+    /* Ghost Trail Container */
+    .ghost-trail-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10000;
+      overflow: hidden;
+    }
+
+    /* Main Wisp - the lead cursor */
+    .main-wisp {
+      position: absolute;
+      font-size: 16px;
+      color: rgb(var(--color-primary));
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      text-shadow: 
+        0 0 8px rgb(var(--color-primary)),
+        0 0 16px rgb(var(--color-primary) / 0.6),
+        0 0 24px rgb(var(--color-primary) / 0.3);
+      animation: wisp-pulse 1.5s ease-in-out infinite;
+    }
+
+    .main-wisp.active {
+      opacity: 1;
+    }
+
+    .main-wisp.summoning {
+      animation: wisp-summon 0.4s ease;
+      font-size: 20px;
+    }
+
+    @keyframes wisp-pulse {
+      0%, 100% { 
+        transform: translate(-50%, -50%) scale(1);
+        filter: brightness(1);
+      }
+      50% { 
+        transform: translate(-50%, -50%) scale(1.2);
+        filter: brightness(1.3);
+      }
+    }
+
+    @keyframes wisp-summon {
+      0% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(2); filter: brightness(2); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Trailing Ghosts */
+    .trailing-ghost {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      font-family: monospace;
+    }
+
+    .trailing-ghost.active {
+      opacity: 0.6;
+    }
+
+    .ghost-body {
+      display: block;
+      font-size: 12px;
+      color: rgb(var(--color-primary));
+      text-shadow: 0 0 6px rgb(var(--color-primary) / 0.8);
+      animation: ghost-bob 2s ease-in-out infinite;
+      animation-delay: calc(var(--delay) * 0.1s);
+    }
+
+    @keyframes ghost-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-2px) rotate(-3deg); }
+      75% { transform: translateY(2px) rotate(3deg); }
+    }
+
+    /* Ethereal Wisps - floating off */
+    .ethereal-wisp {
+      position: absolute;
+      font-size: 10px;
+      color: rgb(var(--color-primary) / 0.7);
+      pointer-events: none;
+      animation: wisp-float 1.2s ease-out forwards;
+      text-shadow: 0 0 4px rgb(var(--color-primary));
+    }
+
+    @keyframes wisp-float {
+      0% { 
+        opacity: 0.7; 
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(calc(-50% + var(--drift)), -50%) translateY(-50px) scale(0.5);
+      }
+    }
+
+    /* Summoned Spirits on click */
+    .summoned-spirit {
+      position: absolute;
+      font-size: 14px;
+      color: rgb(var(--color-primary));
+      pointer-events: none;
+      animation: spirit-burst 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      text-shadow: 0 0 10px rgb(var(--color-primary));
+    }
+
+    @keyframes spirit-burst {
+      0% { 
+        opacity: 1; 
+        transform: translate(-50%, -50%) scale(1.5) rotate(0deg);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.3) rotate(180deg);
+      }
+    }
+
+    /* Ghost Faces floating up */
+    .ghost-face {
+      position: absolute;
+      font-size: 18px;
+      color: rgb(var(--color-primary));
+      pointer-events: none;
+      animation: face-rise 1s ease-out forwards;
+      text-shadow: 0 0 12px rgb(var(--color-primary));
+    }
+
+    @keyframes face-rise {
+      0% { 
+        opacity: 0.9; 
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% { 
+        opacity: 0; 
+        transform: translate(-50%, -50%) translateY(-80px) scale(1.5);
+      }
+    }
+
+    /* Summoning Circle */
+    .summoning-circle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border: 1px solid rgb(var(--color-primary));
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      animation: circle-expand 0.8s ease-out forwards;
+      box-shadow: 
+        0 0 10px rgb(var(--color-primary) / 0.5),
+        inset 0 0 10px rgb(var(--color-primary) / 0.2);
+    }
+
+    .summoning-circle::before {
+      content: '✝';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8px;
+      color: rgb(var(--color-primary) / 0.6);
+      animation: cross-spin 0.8s linear forwards;
+    }
+
+    @keyframes circle-expand {
+      0% { 
+        width: 10px; 
+        height: 10px; 
+        opacity: 1;
+        border-width: 2px;
+      }
+      100% { 
+        width: 120px; 
+        height: 120px; 
+        opacity: 0;
+        border-width: 1px;
+      }
+    }
+
+    @keyframes cross-spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) rotate(360deg) scale(3); opacity: 0; }
+    }
+
+    /* Screen Flicker */
+    .screen-flicker {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      animation: flicker 0.15s steps(3) forwards;
+      background: rgb(var(--color-primary) / 0.03);
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0; }
+      20% { opacity: 1; }
+      40% { opacity: 0; }
+      60% { opacity: 0.5; }
+      80% { opacity: 0; }
+      100% { opacity: 0; }
+    }
+
+    /* Disable on mobile/touch */
+    @media (hover: none) and (pointer: coarse) {
+      .ghost-trail-container {
+        display: none;
+      }
+      
+      .min-h-screen,
+      .min-h-screen * {
+        cursor: auto;
+      }
+    }
+  </style>
 </BaseLayout>

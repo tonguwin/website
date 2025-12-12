@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import HauntedCursor from "../../components/HauntedCursor.astro";
 
 // Blog posts with explicit dates for easy management
 const posts = [
@@ -127,6 +128,7 @@ const sortedPosts = [...posts].sort((a, b) => {
       </div>
     </div>
   </div>
+  <HauntedCursor />
 </BaseLayout>
 
 <style>

@@ -1,0 +1,280 @@
+---
+// Subtle Cursor Component - Modern, spunky cursor for the home page
+---
+
+<div id="subtleCursorContainer" class="subtle-cursor-container">
+  <div id="cursorDot" class="cursor-dot"></div>
+  <div id="cursorRing" class="cursor-ring"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Skip on touch devices
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+    
+    const container = document.getElementById('subtleCursorContainer');
+    const dot = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    if (!container || !dot || !ring) return;
+    
+    let mouseX = 0, mouseY = 0;
+    let prevMouseX = 0, prevMouseY = 0;
+    let dotX = 0, dotY = 0;
+    let ringX = 0, ringY = 0;
+    let rotation = 0;
+    let velocity = 0;
+    let isHoveringInteractive = false;
+    
+    // Animate cursor positions
+    function animate() {
+      // Calculate velocity for dynamic effects
+      const dx = mouseX - prevMouseX;
+      const dy = mouseY - prevMouseY;
+      const speed = Math.sqrt(dx * dx + dy * dy);
+      velocity += (speed - velocity) * 0.3;
+      
+      // Dot follows snappily
+      dotX += (mouseX - dotX) * 0.6;
+      dotY += (mouseY - dotY) * 0.6;
+      dot.style.left = `${dotX}px`;
+      dot.style.top = `${dotY}px`;
+      
+      // Ring follows with tighter lag
+      ringX += (mouseX - ringX) * 0.3;
+      ringY += (mouseY - ringY) * 0.3;
+      
+      // Ring rotates based on movement
+      rotation += velocity * 0.5;
+      
+      // Ring stretches slightly based on velocity
+      const stretch = Math.min(velocity * 0.02, 0.15);
+      const scaleX = 1 + stretch;
+      const scaleY = 1 - stretch * 0.5;
+      
+      ring.style.left = `${ringX}px`;
+      ring.style.top = `${ringY}px`;
+      ring.style.transform = `translate(-50%, -50%) rotate(${rotation}deg) scaleX(${scaleX}) scaleY(${scaleY})`;
+      
+      prevMouseX = mouseX;
+      prevMouseY = mouseY;
+      
+      requestAnimationFrame(animate);
+    }
+    animate();
+    
+    // Track mouse
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.classList.add('visible');
+      ring.classList.add('visible');
+    });
+    
+    document.addEventListener('mouseleave', () => {
+      dot.classList.remove('visible');
+      ring.classList.remove('visible');
+    });
+    
+    // Click effect
+    document.addEventListener('mousedown', (e) => {
+      dot.classList.add('clicking');
+      ring.classList.add('clicking');
+      createClickBurst(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mouseup', () => {
+      dot.classList.remove('clicking');
+      ring.classList.remove('clicking');
+    });
+    
+    // Hover effect on interactive elements
+    const interactiveElements = document.querySelectorAll('a, button, [role="button"], input, textarea, select, [onclick]');
+    
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        isHoveringInteractive = true;
+        dot.classList.add('hovering');
+        ring.classList.add('hovering');
+      });
+      
+      el.addEventListener('mouseleave', () => {
+        isHoveringInteractive = false;
+        dot.classList.remove('hovering');
+        ring.classList.remove('hovering');
+      });
+    });
+    
+    // Create burst on click
+    function createClickBurst(x, y) {
+      // Main ripple
+      const ripple = document.createElement('div');
+      ripple.className = 'click-ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      container.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 400);
+      
+      // Tiny particles
+      for (let i = 0; i < 6; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'click-particle';
+        const angle = (i / 6) * Math.PI * 2;
+        const distance = 20 + Math.random() * 15;
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+        particle.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+        container.appendChild(particle);
+        setTimeout(() => particle.remove(), 400);
+      }
+    }
+  });
+</script>
+
+<style is:global>
+  /* Hide default cursor */
+  body {
+    cursor: none;
+  }
+  
+  body * {
+    cursor: none;
+  }
+
+  .subtle-cursor-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  /* Main dot - the core cursor */
+  .cursor-dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgb(var(--color-secondary));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: 
+      width 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+      height 0.15s cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-radius 0.15s ease,
+      background 0.15s ease,
+      opacity 0.1s ease;
+  }
+
+  .cursor-dot.visible {
+    opacity: 1;
+  }
+
+  .cursor-dot.hovering {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: rgb(var(--color-secondary));
+    mix-blend-mode: difference;
+  }
+
+  .cursor-dot.clicking {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+
+  /* Outer ring - follows with lag + rotation */
+  .cursor-ring {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border: 1.5px solid rgb(var(--color-secondary) / 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: 
+      width 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+      height 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-radius 0.2s ease,
+      border-color 0.15s ease,
+      opacity 0.1s ease;
+  }
+
+  .cursor-ring.visible {
+    opacity: 1;
+  }
+
+  .cursor-ring.hovering {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border-color: rgb(var(--color-secondary));
+    border-width: 2px;
+  }
+
+  .cursor-ring.clicking {
+    width: 20px;
+    height: 20px;
+    border-color: rgb(var(--color-secondary));
+  }
+
+  /* Click ripple */
+  .click-ripple {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid rgb(var(--color-secondary) / 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple-expand 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes ripple-expand {
+    0% {
+      width: 10px;
+      height: 10px;
+      opacity: 1;
+    }
+    100% {
+      width: 60px;
+      height: 60px;
+      opacity: 0;
+    }
+  }
+
+  /* Click particles */
+  .click-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgb(var(--color-secondary));
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: particle-burst 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes particle-burst {
+    0% {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0);
+    }
+  }
+
+  /* Disable on mobile/touch */
+  @media (hover: none) and (pointer: coarse) {
+    .subtle-cursor-container {
+      display: none;
+    }
+    
+    body,
+    body * {
+      cursor: auto;
+    }
+  }
+</style>
+

@@ -1543,6 +1543,11 @@ for (let row = 0; row < 10; row++) {
 
 <script define:vars={{ asciiPatterns }}>
   document.addEventListener('DOMContentLoaded', () => {
+    // Mobile detection for performance optimization
+    const isMobile = window.innerWidth <= 768 || 
+                     ('ontouchstart' in window) || 
+                     (navigator.maxTouchPoints > 0);
+    
     const items = document.querySelectorAll('.gallery-item');
     const modal = document.getElementById('modalOverlay');
     const modalImg = document.getElementById('modalImage');
@@ -1608,7 +1613,9 @@ for (let row = 0; row < 10; row++) {
     });
 
     // Spawn random ASCII in foreground - across ENTIRE viewport
+    // DISABLED on mobile for performance
     function spawnAscii(count = 1) {
+      if (isMobile) return; // Skip on mobile
       for (let i = 0; i < count; i++) {
         const pattern = asciiPatterns[Math.floor(Math.random() * asciiPatterns.length)];
         const pre = document.createElement('pre');
@@ -1623,38 +1630,44 @@ for (let row = 0; row < 10; row++) {
       }
     }
 
-    // Spawn ASCII regularly - more frequently
-    setInterval(() => spawnAscii(Math.random() > 0.3 ? 2 : 1), 1200);
+    // Spawn ASCII regularly - only on desktop
+    if (!isMobile) {
+      setInterval(() => spawnAscii(Math.random() > 0.3 ? 2 : 1), 1200);
+    }
     
-    // Spawn burst on scroll
+    // Spawn burst on scroll - only on desktop
     let scrollTimeout;
     let lastScroll = 0;
-    window.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      const now = Date.now();
-      if (now - lastScroll > 200) {
-        spawnAscii(3);
-        lastScroll = now;
-      }
-      scrollTimeout = setTimeout(() => spawnAscii(2), 100);
-    });
+    if (!isMobile) {
+      window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        const now = Date.now();
+        if (now - lastScroll > 200) {
+          spawnAscii(3);
+          lastScroll = now;
+        }
+        scrollTimeout = setTimeout(() => spawnAscii(2), 100);
+      });
+    }
 
-    // Parallax on scroll
+    // Parallax on scroll - only on desktop for performance
     let ticking = false;
-    window.addEventListener('scroll', () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollY = window.scrollY;
-          items.forEach((item, i) => {
-            const speed = 0.015 + (i % 4) * 0.008;
-            const yOffset = scrollY * speed;
-            item.style.transform = `rotate(var(--rotation)) translateY(${-yOffset}px)`;
+    if (!isMobile) {
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          requestAnimationFrame(() => {
+            const scrollY = window.scrollY;
+            items.forEach((item, i) => {
+              const speed = 0.015 + (i % 4) * 0.008;
+              const yOffset = scrollY * speed;
+              item.style.transform = `rotate(var(--rotation)) translateY(${-yOffset}px)`;
+            });
+            ticking = false;
           });
-          ticking = false;
-        });
-        ticking = true;
-      }
-    });
+          ticking = true;
+        }
+      });
+    }
 
     // Click handlers - for images, books, and videos
     items.forEach((item, i) => {
@@ -1690,6 +1703,9 @@ for (let row = 0; row < 10; row++) {
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
 
     // ===== GLITCHY ASCII FAIRY CURSOR =====
+    // Skip cursor on mobile/touch devices
+    if (isMobile) return;
+    
     const cursor = document.getElementById('fairyCursor');
     const cursorTrail = document.getElementById('cursorTrail');
     if (!cursor || !cursorTrail) return;
@@ -1705,6 +1721,7 @@ for (let row = 0; row < 10; row++) {
     const fairyGlitch1 = cursor.querySelector('.fairy-glitch-1');
     const fairyGlitch2 = cursor.querySelector('.fairy-glitch-2');
     
+    // Update fairy character periodically (reduced frequency for performance)
     setInterval(() => {
       if (fairyCore) {
         fairyCore.textContent = fairyChars[Math.floor(Math.random() * fairyChars.length)];
@@ -1715,7 +1732,7 @@ for (let row = 0; row < 10; row++) {
       if (Math.random() > 0.7 && fairyGlitch2) {
         fairyGlitch2.textContent = glitchChars[Math.floor(Math.random() * glitchChars.length)];
       }
-    }, 100);
+    }, 150); // Slightly slower for better performance
 
     // Smooth cursor follow
     function animateCursor() {
