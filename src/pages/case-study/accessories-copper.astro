@@ -113,8 +113,8 @@ import SubtleCursor from "../../components/SubtleCursor.astro";
                     <p class="scout-card-text">
                       <span class="font-semibold">Design</span> keeps Scout compact while preserving Charlie's intuitive controls.
                     </p>
-                    <p class="scout-card-text scout-card-text-note">
-                      The foundation already exists—Scout extends it.
+                    <p class="scout-card-text">
+                      <span class="font-semibold">Launch Strategy</span> — Start with pre-orders to assess demand, then plan inventory based on actual interest.
                     </p>
                   </div>
                 </div>
@@ -202,7 +202,7 @@ import SubtleCursor from "../../components/SubtleCursor.astro";
           </div>
           
           <div class="mt-12 flex justify-end">
-            <img src="/favicons/todd_big_signature.png" alt="Todd Nguyen Signature" class="h-16 object-contain" />
+            <img src="/favicons/todd_big_signature.png" alt="Todd Nguyen Signature" class="signature-img h-16 object-contain" />
           </div>
       </div>
     </section>
@@ -233,6 +233,17 @@ import SubtleCursor from "../../components/SubtleCursor.astro";
     :root[data-theme="random"][color-scheme="dark"] .highlight {
       background-color: rgb(113 63 18); /* amber-800 for dark mode */
       color: rgb(254 243 199); /* amber-100 for dark mode */
+    }
+
+    /* Signature - invert on dark themes so it's visible */
+    .signature-img {
+      transition: filter 0.3s ease;
+    }
+
+    :root[data-theme="dark"] .signature-img,
+    :root[data-theme="earth-night"] .signature-img,
+    :root[data-theme="random"][color-scheme="dark"] .signature-img {
+      filter: invert(1);
     }
 
     /* Scout Hero Block */

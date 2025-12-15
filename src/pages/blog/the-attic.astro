@@ -50,29 +50,6 @@ const sortedPosts = [...posts].sort((a, b) => {
 ---
 
 <BaseLayout>
-  <!-- Amplitude Experiment: A/B Test for Attic Design -->
-  <script>
-    // Check experiment variant and redirect if in spooky-terminal group
-    function checkAtticExperiment() {
-      if (window.amplitudeExperiment) {
-        const variant = window.amplitudeExperiment.variant('attic-design');
-        console.log('[Attic Experiment] Variant:', variant);
-        
-        if (variant && variant.value === 'spooky-terminal') {
-          // User is in the spooky terminal variant - redirect
-          window.location.replace('/blog/the-attic-test');
-        }
-      }
-    }
-    
-    // Check when experiment is ready
-    if (window.amplitudeExperiment) {
-      checkAtticExperiment();
-    } else {
-      window.addEventListener('experimentReady', checkAtticExperiment);
-    }
-  </script>
-
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
     <div class="max-w-3xl mx-auto">
       <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
