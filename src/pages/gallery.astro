@@ -363,6 +363,8 @@ for (let row = 0; row < 10; row++) {
               >
                 <div class="image-container book-box">
                   <img src={item.src} alt="" loading="lazy" />
+                  <div class="glitch-layer book-glitch-layer-1" style={`background-image: url(${item.src}); background-size: contain; background-position: center; background-repeat: no-repeat;`}></div>
+                  <div class="glitch-layer book-glitch-layer-2" style={`background-image: url(${item.src}); background-size: contain; background-position: center; background-repeat: no-repeat;`}></div>
                   <div class="book-spine"></div>
                   <div class="corner tl"></div>
                   <div class="corner tr"></div>
@@ -796,17 +798,16 @@ for (let row = 0; row < 10; row++) {
   /* ===== BOOK CARDS ===== */
   .book-card .book-box {
     position: relative;
-    background: rgb(var(--color-primary));
+    background: transparent;
   }
 
-  .book-card img {
+  .book-card .book-box img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain !important;
     border-radius: 20px;
-    /* Same monochrome treatment as images */
-    mix-blend-mode: luminosity;
-    filter: contrast(0.9) brightness(0.88);
+    /* Grayscale base */
+    filter: grayscale(1) contrast(0.9) brightness(0.88);
     opacity: 0.75;
     /* Feathered edges like images */
     mask-image: radial-gradient(ellipse 85% 85% at center, black 40%, transparent 95%);
@@ -814,17 +815,60 @@ for (let row = 0; row < 10; row++) {
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
+  /* Theme-colored overlay for books */
+  .book-card .book-box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(var(--color-primary));
+    mix-blend-mode: color;
+    opacity: 0.6;
+    border-radius: 20px;
+    pointer-events: none;
+    /* Match the feathered edges */
+    mask-image: radial-gradient(ellipse 85% 85% at center, black 40%, transparent 95%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 85% at center, black 40%, transparent 95%);
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .book-card:hover .book-box {
     background: transparent;
     box-shadow: 0 10px 40px rgb(var(--color-secondary) / 0.1);
   }
 
-  .book-card:hover img {
-    mix-blend-mode: normal;
+  .book-card:hover .book-box img {
     filter: contrast(1.02) brightness(1) saturate(1.08);
     opacity: 1;
     mask-image: none;
     -webkit-mask-image: none;
+    object-fit: contain !important;
+  }
+
+  .book-card:hover .book-box::after {
+    opacity: 0;
+  }
+
+  /* Book glitch layers */
+  .book-glitch-layer-1 {
+    filter: url(#glitch-r);
+  }
+
+  .book-glitch-layer-2 {
+    filter: url(#glitch-c);
+  }
+
+  .book-card:hover .glitch-layer {
+    mix-blend-mode: screen;
+    animation: digital-glitch 0.4s steps(3) infinite;
+  }
+
+  .book-card:hover .book-glitch-layer-1 {
+    opacity: 0.15;
+  }
+
+  .book-card:hover .book-glitch-layer-2 {
+    opacity: 0.12;
+    animation-delay: 0.15s;
   }
 
   .book-spine {
