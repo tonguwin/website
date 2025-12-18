@@ -12,12 +12,17 @@ const post = {
 ---
 
 <BaseLayout>
+  <!-- VT323 Retro Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
     <div class="max-w-4xl lg:max-w-5xl mx-auto">
       <article class="prose prose-invert max-w-none" data-aos="fade-up" data-aos-duration="1000">
         <div class="bg-primary/5 p-6 sm:p-8 rounded-lg border border-primary/10">
-          <h1 class="text-2xl sm:text-3xl font-bold text-primary mb-4">{post.title}</h1>
-          <div class="text-sm text-primary/60 mb-6">Posted on {post.date}</div>
+          <h1 class="tv-title tv-title-typewriter">WELCOME_</h1>
+          <div class="text-sm text-primary/60 mb-6 font-mono tracking-wider">// {post.date}</div>
           
           <div class="text-primary/80 space-y-4">
             {post.content.split('\n\n').map((paragraph) => (
@@ -109,6 +114,30 @@ const post = {
   </div>
 
   <style>
+    /* TV Title Styles */
+    .tv-title {
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 2.5rem;
+      letter-spacing: 0.2em;
+      color: rgb(var(--color-primary) / 0.85);
+      text-shadow: 
+        0 0 8px rgb(var(--color-primary) / 0.3),
+        0 0 16px rgb(var(--color-primary) / 0.15);
+      margin-bottom: 1rem;
+    }
+
+    /* Typewriter cursor blink */
+    .tv-title-typewriter::after {
+      content: '█';
+      animation: blink 1s step-end infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 0.7; }
+      51%, 100% { opacity: 0; }
+    }
+
     /* Remove stars animation and keep only necessary styles */
     .min-h-screen {
       position: relative;

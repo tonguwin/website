@@ -14,12 +14,16 @@ const post = {
 <BaseLayout>
   <!-- Add meta viewport tag for better mobile scaling -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" slot="head" />
+  <!-- VT323 Retro Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
     <div class="max-w-3xl mx-auto">
       <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
-        <h1 class="text-3xl sm:text-4xl font-bold text-primary hover:text-white transition-colors duration-300">
-          Jumpboy
+        <h1 class="tv-title tv-title-arcade">
+          <span style="animation-delay: 0s">J</span><span style="animation-delay: 0.1s">U</span><span style="animation-delay: 0.2s">M</span><span style="animation-delay: 0.3s">P</span><span style="animation-delay: 0.4s">B</span><span style="animation-delay: 0.5s">O</span><span style="animation-delay: 0.6s">Y</span>
         </h1>
       </div>
 
@@ -92,6 +96,27 @@ const post = {
   </div>
 
   <style>
+    /* TV Title - Arcade Bounce */
+    .tv-title {
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 2.5rem;
+      letter-spacing: 0.15em;
+      color: rgb(var(--color-primary) / 0.85);
+      text-shadow: 
+        0 0 8px rgb(var(--color-primary) / 0.3),
+        0 0 16px rgb(var(--color-primary) / 0.15);
+    }
+
+    .tv-title-arcade span {
+      display: inline-block;
+      animation: arcadeBounce 2s ease-in-out infinite;
+    }
+
+    @keyframes arcadeBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
     .min-h-screen {
       position: relative;
       overflow: hidden;

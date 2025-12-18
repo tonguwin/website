@@ -4,12 +4,17 @@ import HauntedCursor from "../../components/HauntedCursor.astro";
 ---
 
 <BaseLayout>
+  <!-- VT323 Retro Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
     <div class="max-w-4xl mx-auto">
       <article class="prose prose-invert max-w-none">
         <div data-aos="fade-up" data-aos-duration="1000">
-          <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-4 sm:mb-6">
-            2021 Recipe Guide to Home Cooking
+          <h1 class="tv-title tv-title-vhs">
+            <span class="on-air">ON AIR</span> RECIPE GUIDE
           </h1>
           
           <p class="text-sm sm:text-base text-primary/60 mb-8 sm:mb-12 italic border-l-4 border-primary/30 pl-4 py-2">
@@ -482,6 +487,100 @@ import HauntedCursor from "../../components/HauntedCursor.astro";
   </div>
 
   <style>
+    /* TV Title - VHS Style */
+    .tv-title {
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 2.2rem;
+      letter-spacing: 0.15em;
+      color: rgb(var(--color-primary) / 0.85);
+      text-shadow: 
+        0 0 8px rgb(var(--color-primary) / 0.3),
+        0 0 16px rgb(var(--color-primary) / 0.15);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tv-title-vhs {
+      animation: vhsWobble 4s ease-in-out infinite;
+    }
+
+    .on-air {
+      font-size: 0.85rem;
+      color: #ff3333;
+      animation: onAirPulse 1.5s ease-in-out infinite;
+      padding: 0.25rem 0.6rem;
+      background: rgba(255, 50, 50, 0.15);
+      border: 1px solid #ff3333;
+      border-radius: 3px;
+      text-shadow: 0 0 8px #ff3333;
+    }
+
+    @keyframes onAirPulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px #ff3333; }
+      50% { opacity: 0.7; box-shadow: 0 0 4px #ff3333; }
+    }
+
+    @keyframes vhsWobble {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(1px); }
+      75% { transform: translateX(-1px); }
+    }
+
+    /* Override global VT323 for recipe content - use readable font */
+    .min-h-screen p,
+    .min-h-screen li,
+    .min-h-screen span {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+      font-size: 1rem !important;
+      letter-spacing: normal !important;
+      line-height: 1.7 !important;
+    }
+
+    .min-h-screen .prose p,
+    .min-h-screen .prose li {
+      font-size: 1.05rem !important;
+      line-height: 1.75 !important;
+    }
+
+    /* Keep VT323 for section headings */
+    .min-h-screen h2,
+    .min-h-screen h3 {
+      font-family: 'VT323', 'Courier New', monospace !important;
+      letter-spacing: 0.08em;
+    }
+
+    .min-h-screen h2 {
+      font-size: 1.75rem !important;
+    }
+
+    .min-h-screen h3 {
+      font-size: 1.35rem !important;
+    }
+
+    /* Tighter spacing for recipe cards */
+    .space-y-16 {
+      gap: 3rem;
+    }
+
+    .mb-12 {
+      margin-bottom: 2rem;
+    }
+
+    /* Smaller tips boxes */
+    .min-h-screen .bg-primary\/10,
+    .min-h-screen .bg-yellow-500\/10 {
+      padding: 0.75rem 1rem;
+    }
+
+    .min-h-screen .bg-primary\/10 p,
+    .min-h-screen .bg-yellow-500\/10 p,
+    .min-h-screen .bg-primary\/10 li,
+    .min-h-screen .bg-yellow-500\/10 li {
+      font-size: 0.95rem !important;
+    }
+
     /* Smooth link transitions */
     a {
       transition: all 0.3s ease;

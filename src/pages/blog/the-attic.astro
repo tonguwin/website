@@ -50,29 +50,23 @@ const sortedPosts = [...posts].sort((a, b) => {
 ---
 
 <BaseLayout>
+  <!-- VT323 Retro Terminal Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  
   <div class="min-h-screen bg-secondary px-4 sm:px-8 py-8 sm:py-16">
     <div class="max-w-3xl mx-auto">
-      <div class="flex justify-between items-center mb-6 sm:mb-8" data-aos="fade-up" data-aos-duration="1000">
-        <h1 class="attic-title">
-          <span class="attic-letter">T</span>
-          <span class="attic-letter">h</span>
-          <span class="attic-letter">e</span>
-          <span class="attic-space"> </span>
-          <span class="attic-letter">A</span>
-          <span class="attic-letter">t</span>
-          <span class="attic-letter">t</span>
-          <span class="attic-letter">i</span>
-          <span class="attic-letter">c</span>
-        </h1>
-        <button
-          id="sort-toggle"
-          class="flex items-center space-x-2 text-primary/60 hover:text-white transition-colors duration-300"
-        >
-          <span id="sort-text">Newest First</span>
-          <svg class="w-4 h-4 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M7 13l5 5 5-5"/>
-          </svg>
-        </button>
+      <div class="attic-header" data-aos="fade-up" data-aos-duration="1000">
+        <h1 class="attic-title">THE ATTIC</h1>
+        <div class="sort-control">
+          <button id="sort-toggle" class="sort-btn">
+            <span class="sort-bracket">[</span>
+            <span id="sort-text">NEWEST</span>
+            <span class="sort-bracket">]</span>
+            <span class="sort-arrow">▼</span>
+          </button>
+        </div>
       </div>
       
       <div id="posts-container" class="boxes-container">
@@ -223,76 +217,132 @@ const sortedPosts = [...posts].sort((a, b) => {
       }
     }
 
+    /* Dusty grain overlay */
+    .min-h-screen::after {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      right: -50%;
+      bottom: -50%;
+      width: 200%;
+      height: 200%;
+      background: transparent url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>') repeat;
+      opacity: 0.12;
+      z-index: 0;
+      pointer-events: none;
+      animation: grainShift 0.5s steps(1) infinite;
+    }
+
+    @keyframes grainShift {
+      0%, 100% { transform: translate(0, 0); }
+      25% { transform: translate(-2%, -2%); }
+      50% { transform: translate(2%, 2%); }
+      75% { transform: translate(-1%, 1%); }
+    }
+
     /* Ensure content stays above the stars */
     .max-w-3xl {
       position: relative;
       z-index: 1;
     }
 
-    /* Spooky Floating Title */
-    .attic-title {
-      font-size: 3rem;
-      font-weight: bold;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 0.1em;
+    /* Header Container */
+    .attic-header {
       display: flex;
-      cursor: default;
-      filter: drop-shadow(0 0 20px rgba(var(--color-primary), 0.3));
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 3rem;
     }
 
-    .attic-letter {
-      display: inline-block;
-      color: rgb(var(--color-primary));
-      animation: float 3s ease-in-out infinite;
+    /* TV Title Text */
+    .attic-title {
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 4rem;
+      font-weight: normal;
+      letter-spacing: 0.3em;
+      color: rgb(var(--color-primary) / 0.85);
+      text-shadow: 
+        0 0 8px rgb(var(--color-primary) / 0.4),
+        0 0 16px rgb(var(--color-primary) / 0.2),
+        1px 1px 0 rgb(var(--color-primary) / 0.15),
+        -1px -1px 0 rgb(var(--color-primary) / 0.1);
+      margin: 0;
+      animation: tvFlicker 4s ease-in-out infinite, textGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes tvFlicker {
+      0%, 100% { opacity: 1; }
+      92% { opacity: 1; }
+      93% { opacity: 0.85; }
+      94% { opacity: 1; }
+      97% { opacity: 0.9; }
+      98% { opacity: 1; }
+    }
+
+    @keyframes textGlow {
+      0%, 100% { 
+        text-shadow: 
+          0 0 8px rgb(var(--color-primary) / 0.4),
+          0 0 16px rgb(var(--color-primary) / 0.2),
+          1px 1px 0 rgb(var(--color-primary) / 0.15),
+          -1px -1px 0 rgb(var(--color-primary) / 0.1);
+      }
+      50% { 
+        text-shadow: 
+          0 0 12px rgb(var(--color-primary) / 0.5),
+          0 0 24px rgb(var(--color-primary) / 0.25),
+          1px 1px 0 rgb(var(--color-primary) / 0.2),
+          -1px -1px 0 rgb(var(--color-primary) / 0.15);
+      }
+    }
+
+    /* Sort Control */
+    .sort-control {
+      margin-top: 1.5rem;
+    }
+
+    .sort-btn {
+      background: transparent;
+      border: none;
+      font-family: 'VT323', 'Courier New', monospace;
+      font-size: 1.1rem;
+      letter-spacing: 0.2em;
+      color: rgb(var(--color-primary) / 0.6);
+      cursor: pointer;
       transition: all 0.3s ease;
-      text-shadow: 
-        0 0 10px rgba(var(--color-primary), 0.5),
-        0 0 20px rgba(var(--color-primary), 0.3),
-        2px 2px 4px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .attic-letter:nth-child(1) { animation-delay: 0s; }
-    .attic-letter:nth-child(2) { animation-delay: 0.1s; }
-    .attic-letter:nth-child(3) { animation-delay: 0.2s; }
-    .attic-letter:nth-child(5) { animation-delay: 0.3s; }
-    .attic-letter:nth-child(6) { animation-delay: 0.4s; }
-    .attic-letter:nth-child(7) { animation-delay: 0.5s; }
-    .attic-letter:nth-child(8) { animation-delay: 0.6s; }
-    .attic-letter:nth-child(9) { animation-delay: 0.7s; }
-
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px) rotate(0deg);
-      }
-      25% {
-        transform: translateY(-8px) rotate(1deg);
-      }
-      50% {
-        transform: translateY(-4px) rotate(-1deg);
-      }
-      75% {
-        transform: translateY(-10px) rotate(0.5deg);
-      }
+    .sort-btn:hover {
+      color: rgb(var(--color-primary));
+      text-shadow: 0 0 10px rgb(var(--color-primary) / 0.5);
     }
 
-    .attic-letter:hover {
-      transform: translateY(-15px) scale(1.2) rotate(5deg) !important;
-      color: white;
-      text-shadow: 
-        0 0 20px rgba(255, 255, 255, 0.8),
-        0 0 40px rgba(var(--color-primary), 0.6),
-        3px 3px 6px rgba(0, 0, 0, 0.7);
-      filter: drop-shadow(0 0 30px rgba(var(--color-primary), 0.8));
+    .sort-bracket {
+      color: rgb(var(--color-primary) / 0.4);
     }
 
-    .attic-space {
-      width: 0.5em;
+    .sort-btn:hover .sort-bracket {
+      color: rgb(var(--color-primary) / 0.8);
+    }
+
+    .sort-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+
+    .sort-btn.flipped .sort-arrow {
+      transform: rotate(180deg);
     }
 
     /* Mobile adjustments */
     @media (max-width: 640px) {
       .attic-title {
-        font-size: 2rem;
+        font-size: 2.5rem;
+        letter-spacing: 0.2em;
       }
     }
 
@@ -458,14 +508,13 @@ const sortedPosts = [...posts].sort((a, b) => {
     const sortToggle = document.getElementById('sort-toggle');
     const sortText = document.getElementById('sort-text');
     const posts = Array.from(postsContainer.children);
-    const arrow = sortToggle.querySelector('svg');
 
     sortToggle.addEventListener('click', () => {
       isNewestFirst = !isNewestFirst;
       
       // Update UI
-      sortText.textContent = isNewestFirst ? 'Newest First' : 'Oldest First';
-      arrow.style.transform = isNewestFirst ? 'rotate(0deg)' : 'rotate(180deg)';
+      sortText.textContent = isNewestFirst ? 'NEWEST' : 'OLDEST';
+      sortToggle.classList.toggle('flipped', !isNewestFirst);
 
       // Sort posts
       posts.reverse().forEach(post => {
