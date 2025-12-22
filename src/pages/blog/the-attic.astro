@@ -503,6 +503,15 @@ const sortedPosts = [...posts].sort((a, b) => {
   </style>
 
   <script>
+    // Fix for bfcache - reset opacity when navigating back
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        document.body.style.opacity = '1';
+        document.body.style.transition = 'none';
+      }
+    });
+    document.body.style.opacity = '1';
+
     let isNewestFirst = true;
     const postsContainer = document.getElementById('posts-container');
     const sortToggle = document.getElementById('sort-toggle');

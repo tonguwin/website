@@ -577,6 +577,15 @@ const sortedPosts = [...posts].sort((a, b) => {
 </style>
 
 <script>
+  // Fix for bfcache - reset opacity when navigating back
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      document.body.style.opacity = '1';
+      document.body.style.transition = 'none';
+    }
+  });
+  document.body.style.opacity = '1';
+
   // Matrix rain effect
   const canvas = document.getElementById('matrix-canvas') as HTMLCanvasElement;
   const ctx = canvas.getContext('2d');

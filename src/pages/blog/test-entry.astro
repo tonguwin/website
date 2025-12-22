@@ -183,6 +183,15 @@ const post = {
   </style>
 
   <script>
+    // Fix for bfcache - reset opacity when navigating back
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        document.body.style.opacity = '1';
+        document.body.style.transition = 'none';
+      }
+    });
+    document.body.style.opacity = '1';
+
     // Gastly click handler
     const gastly = document.getElementById('gastly');
     if (gastly && gastly.parentElement) {

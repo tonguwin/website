@@ -598,6 +598,15 @@ const features = [
     
     
     <script>
+      // Fix for bfcache - reset opacity when navigating back
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+          document.body.style.opacity = '1';
+          document.body.style.transition = 'none';
+        }
+      });
+      document.body.style.opacity = '1';
+
       document.addEventListener('DOMContentLoaded', () => {
         const asciiBars = document.querySelectorAll('.ascii-bar');
         
