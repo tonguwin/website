@@ -1,0 +1,503 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+---
+
+<html lang="en" class="preload selection:bg-secondary selection:text-primary" data-theme="light">
+  <head>
+    <BaseHead />
+    <title>toon.support</title>
+    <meta name="description" content="a system for thought: headwear & objects" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script is:inline>
+      (function () {
+        const storageKey = 'toon-theme-preference';
+        const root = document.documentElement;
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+        const safeLocalStorage = {
+          get(key) {
+            try { return localStorage.getItem(key); } catch { return null; }
+          },
+          set(key, value) {
+            try { localStorage.setItem(key, value); } catch {}
+          },
+        };
+
+        const generateRandomColors = () => {
+          const palettes = [
+            { bg: '254 243 199', text: '120 53 15', scheme: 'light' },
+            { bg: '254 226 226', text: '127 29 29', scheme: 'light' },
+            { bg: '219 234 254', text: '30 58 138', scheme: 'light' },
+            { bg: '221 214 254', text: '76 29 149', scheme: 'light' },
+            { bg: '209 250 229', text: '6 78 59', scheme: 'light' },
+            { bg: '30 41 59', text: '191 219 254', scheme: 'dark' },
+            { bg: '23 37 84', text: '191 219 254', scheme: 'dark' },
+            { bg: '49 46 129', text: '224 231 255', scheme: 'dark' },
+            { bg: '44 62 80', text: '236 240 241', scheme: 'dark' },
+          ];
+          return palettes[Math.floor(Math.random() * palettes.length)];
+        };
+
+        const applyTheme = (theme) => {
+          if (theme === 'random') {
+            const colors = generateRandomColors();
+            root.style.setProperty('--color-primary', colors.bg);
+            root.style.setProperty('--color-secondary', colors.text);
+            root.setAttribute('color-scheme', colors.scheme);
+            root.setAttribute('data-theme', 'random');
+            root.setAttribute('data-theme-mode', 'random');
+          } else {
+            root.style.removeProperty('--color-primary');
+            root.style.removeProperty('--color-secondary');
+            root.setAttribute('data-theme', theme);
+            root.setAttribute('data-theme-mode', theme);
+          }
+        };
+
+        const getPreferredTheme = () => {
+          const saved = safeLocalStorage.get(storageKey);
+          if (saved && ['light', 'dark', 'random'].includes(saved)) {
+            return saved;
+          }
+          return mediaQuery.matches ? 'dark' : 'light';
+        };
+
+        window.__setToonTheme = (theme) => {
+          if (!['light', 'dark', 'random'].includes(theme)) return;
+          safeLocalStorage.set(storageKey, theme);
+          applyTheme(theme);
+        };
+
+        applyTheme(getPreferredTheme());
+
+        window.addEventListener('load', () => {
+          root.classList.remove('preload');
+        });
+
+        mediaQuery.addEventListener('change', (e) => {
+          if (!safeLocalStorage.get(storageKey)) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      })();
+    </script>
+  </head>
+
+  <body class="bg-primary text-secondary min-h-screen overflow-hidden">
+    <!-- Custom theme toggle for this page (light/dark/random only) -->
+    <div class="fixed top-6 right-6 z-50">
+      <button
+        id="toon-theme-toggle"
+        class="theme-btn"
+        type="button"
+        aria-label="Toggle theme"
+      >
+        <span class="theme-icon theme-icon--sun">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>
+          </svg>
+        </span>
+        <span class="theme-icon theme-icon--moon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 0 1 11.21 3 7 7 0 0 0 12 21a9 9 0 0 0 9-8.21z"></path>
+          </svg>
+        </span>
+        <span class="theme-icon theme-icon--random">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>
+          </svg>
+        </span>
+      </button>
+      <div id="theme-hint" class="theme-hint"></div>
+    </div>
+
+    <!-- Main content -->
+    <main class="min-h-screen flex flex-col items-center justify-center px-6">
+      <!-- Brand name -->
+      <h1 class="brand-name">toon.support</h1>
+
+      <!-- The Cat - Vector Silhouette Style -->
+      <div class="cat-container">
+        <div class="cat-wrapper">
+          <svg
+            id="toon-cat"
+            class="cat-svg"
+            viewBox="0 0 100 100"
+            xmlns="http://www.w3.org/2000/svg"
+            width="160"
+            height="160"
+          >
+            <!-- Cat face silhouette - dark, mysterious, clean vector -->
+            <path 
+              class="cat-silhouette"
+              d="M22 52
+                 L22 40 L32 22 L36 36
+                 Q50 30 64 36
+                 L66 30 L71 28 L76 30 L76 40
+                 L78 52
+                 Q80 64 74 74
+                 Q66 82 50 82
+                 Q34 82 26 74
+                 Q20 64 22 52 Z"
+            />
+            
+            <!-- Eyes - Sleeping (thin lines) -->
+            <g class="cat-eyes-sleeping">
+              <path d="M35 56 Q40 54 45 56" stroke="rgb(var(--color-primary))" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M55 56 Q60 54 65 56" stroke="rgb(var(--color-primary))" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            </g>
+            
+            <!-- Eyes - Awake (sage green circles) -->
+            <g class="cat-eyes-awake">
+              <circle cx="40" cy="54" r="3.5" fill="#87A878" />
+              <circle cx="60" cy="54" r="3.5" fill="#87A878" />
+            </g>
+            
+            <!-- Small nose -->
+            <path class="cat-nose" d="M47 66 L50 63 L53 66 Q50 69 47 66 Z" fill="rgb(var(--color-primary))" />
+          </svg>
+          
+          <!-- Floating Z's -->
+          <div class="zzz-container">
+            <span class="z z1">z</span>
+            <span class="z z2">z</span>
+            <span class="z z3">z</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tagline -->
+      <p class="tagline">a system for thought: headwear & objects</p>
+
+      <!-- Coming soon -->
+      <div class="coming-soon">
+        <span class="blink">▌</span> coming soon <span class="blink">▐</span>
+      </div>
+
+      <!-- Instagram link -->
+      <a 
+        href="https://instagram.com/toon.support" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="instagram-link"
+      >
+        <svg class="instagram-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span>@toon.support</span>
+      </a>
+    </main>
+
+    <style>
+      /* Rorschach inkblot cursor */
+      body {
+        font-family: 'Space Mono', monospace;
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 2 Q8 5 6 6 Q4 7 3 10 Q4 13 6 14 Q8 15 10 18 Q12 15 14 14 Q16 13 17 10 Q16 7 14 6 Q12 5 10 2 Z' fill='%232D2D2D'/%3E%3C/svg%3E") 10 10, auto;
+      }
+
+      /* Dark theme cursor */
+      :root[data-theme="dark"] body,
+      :root[color-scheme="dark"] body {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Cpath d='M10 2 Q8 5 6 6 Q4 7 3 10 Q4 13 6 14 Q8 15 10 18 Q12 15 14 14 Q16 13 17 10 Q16 7 14 6 Q12 5 10 2 Z' fill='%23D0D0D0'/%3E%3C/svg%3E") 10 10, auto;
+      }
+
+      /* Pointer cursor for interactive elements - inkblot with sage eye */
+      a, button, .cat-container {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 Q9 6 7 7 Q4 8 3 12 Q4 16 7 17 Q9 18 12 22 Q15 18 17 17 Q20 16 21 12 Q20 8 17 7 Q15 6 12 2 Z' fill='%232D2D2D'/%3E%3Ccircle cx='12' cy='11' r='3' fill='%2387A878'/%3E%3C/svg%3E") 12 12, pointer;
+      }
+
+      :root[data-theme="dark"] a,
+      :root[data-theme="dark"] button,
+      :root[data-theme="dark"] .cat-container,
+      :root[color-scheme="dark"] a,
+      :root[color-scheme="dark"] button,
+      :root[color-scheme="dark"] .cat-container {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M12 2 Q9 6 7 7 Q4 8 3 12 Q4 16 7 17 Q9 18 12 22 Q15 18 17 17 Q20 16 21 12 Q20 8 17 7 Q15 6 12 2 Z' fill='%23D0D0D0'/%3E%3Ccircle cx='12' cy='11' r='3' fill='%2387A878'/%3E%3C/svg%3E") 12 12, pointer;
+      }
+
+      /* Theme toggle button */
+      .theme-btn {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 1px solid rgb(var(--color-secondary) / 0.2);
+        background: transparent;
+        color: rgb(var(--color-secondary));
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .theme-btn:hover {
+        background: rgb(var(--color-secondary) / 0.05);
+      }
+
+      .theme-icon {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        transform: scale(0.6) rotate(-20deg);
+        transition: opacity 0.35s ease, transform 0.35s ease;
+      }
+
+      .theme-icon svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      :root[data-theme-mode="light"] .theme-icon--sun,
+      :root[data-theme="light"] .theme-icon--sun {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+
+      :root[data-theme-mode="dark"] .theme-icon--moon,
+      :root[data-theme="dark"] .theme-icon--moon {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+
+      :root[data-theme-mode="random"] .theme-icon--random,
+      :root[data-theme="random"] .theme-icon--random {
+        opacity: 1;
+        transform: scale(1) rotate(0deg);
+      }
+
+      .theme-hint {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 8px;
+        white-space: nowrap;
+        font-size: 11px;
+        color: rgb(var(--color-secondary) / 0.5);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      .brand-name {
+        font-size: clamp(2rem, 8vw, 4rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.5rem;
+        opacity: 0.9;
+        text-transform: lowercase;
+      }
+
+      .cat-container {
+        position: relative;
+        margin: 0.5rem 0 1.5rem;
+        cursor: pointer;
+      }
+
+      .cat-wrapper {
+        position: relative;
+        display: inline-block;
+      }
+
+      .cat-svg {
+        transition: transform 0.3s ease;
+        animation: gentleBob 4s ease-in-out infinite;
+      }
+
+      .cat-silhouette {
+        fill: rgb(var(--color-secondary));
+        opacity: 0.9;
+        transition: fill 0.3s ease;
+      }
+
+      /* Subtle bobbing */
+      @keyframes gentleBob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); }
+      }
+
+      /* Subtle shake on hover */
+      .cat-container:hover .cat-svg {
+        animation: gentleShake 0.6s ease-in-out infinite;
+      }
+
+      @keyframes gentleShake {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(-2px, 0); }
+        75% { transform: translate(2px, 0); }
+      }
+
+      /* Eye states */
+      .cat-svg .cat-eyes-sleeping {
+        opacity: 1;
+        transition: opacity 0.2s ease;
+      }
+
+      .cat-svg .cat-eyes-awake {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+
+      .cat-container:hover .cat-svg .cat-eyes-sleeping {
+        opacity: 0;
+      }
+
+      .cat-container:hover .cat-svg .cat-eyes-awake {
+        opacity: 1;
+      }
+
+      /* Z's */
+      .zzz-container {
+        position: absolute;
+        top: 15px;
+        right: -5px;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+
+      .cat-container:hover .zzz-container {
+        opacity: 0;
+      }
+
+      .z {
+        position: absolute;
+        font-family: 'Space Mono', monospace;
+        font-weight: bold;
+        color: rgb(var(--color-secondary) / 0.4);
+        opacity: 0;
+        animation: floatZ 3.5s ease-in-out infinite;
+      }
+
+      .z1 { left: 0; font-size: 12px; animation-delay: 0s; }
+      .z2 { left: 10px; font-size: 15px; animation-delay: 0.7s; }
+      .z3 { left: 22px; font-size: 18px; animation-delay: 1.4s; }
+
+      @keyframes floatZ {
+        0% { opacity: 0; transform: translateY(0) rotate(-5deg); }
+        20% { opacity: 0.5; transform: translateY(-8px) rotate(3deg); }
+        80% { opacity: 0.3; transform: translateY(-25px) rotate(-3deg); }
+        100% { opacity: 0; transform: translateY(-35px) rotate(5deg); }
+      }
+
+      /* Click vanish */
+      .cat-svg.clicked {
+        animation: vanish 0.5s ease forwards;
+        pointer-events: none;
+      }
+
+      @keyframes vanish {
+        0% { transform: scale(1); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0; }
+      }
+
+      .tagline {
+        font-size: clamp(0.75rem, 2.5vw, 1rem);
+        letter-spacing: 0.1em;
+        opacity: 0.5;
+        text-transform: lowercase;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      .coming-soon {
+        font-size: clamp(0.875rem, 3vw, 1.125rem);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        opacity: 0.7;
+        margin-bottom: 1.5rem;
+      }
+
+      .blink {
+        animation: cursorBlink 1s step-end infinite;
+      }
+
+      @keyframes cursorBlink {
+        0%, 50% { opacity: 1; }
+        51%, 100% { opacity: 0; }
+      }
+
+      .instagram-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: clamp(0.875rem, 2vw, 1rem);
+        color: rgb(var(--color-secondary));
+        text-decoration: none;
+        opacity: 0.4;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgb(var(--color-secondary) / 0.15);
+      }
+
+      .instagram-icon {
+        width: 18px;
+        height: 18px;
+        transition: transform 0.3s ease;
+      }
+
+      .instagram-link:hover {
+        opacity: 0.8;
+        border-color: rgb(var(--color-secondary) / 0.4);
+      }
+
+      .instagram-link:hover .instagram-icon {
+        transform: rotate(8deg) scale(1.1);
+      }
+
+      @media (max-width: 640px) {
+        .cat-svg {
+          width: 120px;
+          height: 120px;
+        }
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const catSvg = document.getElementById('toon-cat');
+        const catContainer = document.querySelector('.cat-container');
+        const themeToggle = document.getElementById('toon-theme-toggle');
+        const themeHint = document.getElementById('theme-hint');
+        
+        // Cat click
+        if (catContainer && catSvg) {
+          catContainer.addEventListener('click', () => {
+            catSvg.classList.add('clicked');
+            setTimeout(() => catSvg.classList.remove('clicked'), 500);
+          });
+        }
+
+        // Theme toggle: light -> dark -> random -> light
+        if (themeToggle) {
+          themeToggle.addEventListener('click', () => {
+            const root = document.documentElement;
+            const currentMode = root.getAttribute('data-theme-mode') || 'light';
+            
+            let nextMode;
+            if (currentMode === 'light') {
+              nextMode = 'dark';
+            } else if (currentMode === 'dark') {
+              nextMode = 'random';
+            } else {
+              nextMode = 'light';
+            }
+
+            if (typeof window.__setToonTheme === 'function') {
+              window.__setToonTheme(nextMode);
+            }
+
+            // Show hint for random mode
+            if (themeHint && nextMode === 'random') {
+              themeHint.textContent = 'random dancing!';
+              themeHint.style.opacity = '1';
+              setTimeout(() => themeHint.style.opacity = '0', 2000);
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
