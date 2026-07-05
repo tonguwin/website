@@ -1,47 +1,40 @@
-# Astro & Tailwind CSS Starter Kit
+# todnguyen.com
 
-by https://lexingtonthemes.com
+Todd Nguyen's personal website — portfolio, interactive gallery, and a blog ("The Attic") full of small experiments and games. Built with [Astro](https://astro.build) and Tailwind CSS, originally bootstrapped from the Lexington starter template.
 
-## Template Integrations
-- @astrojs/tailwind - https://docs.astro.build/en/guides/integrations-guide/tailwind/
-- @astrojs/sitemap - https://docs.astro.build/en/guides/integrations-guide/sitemap/
-
-## License
-
-This template is open-source software licensed under the [GPL-3.0 license](https://opensource.org/licenses/GPL-3.0). Feel free to fork, modify, and use it in your projects.
-
-## Template Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
-
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
-
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
+**Live site:** https://todnguyen.com (deployed on Netlify — every push to `main` publishes automatically).
 
 ## Commands
 
-All commands are run from the root of the project, from a terminal:
+| Command           | Action                                       |
+| :---------------- | :------------------------------------------- |
+| `npm install`     | Install dependencies                         |
+| `npm run dev`     | Start local dev server at `localhost:4321`   |
+| `npm run build`   | Build the production site to `./dist/`       |
+| `npm run preview` | Preview the production build locally         |
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `npm install`          | Installs dependencies                            |
-| `npm run dev`          | Starts local dev server at `localhost:3000`      |
-| `npm run build`        | Build your production site to `./dist/`          |
-| `npm run preview`      | Preview your build locally, before deploying     |
-| `npm run astro ...`    | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro --help` | Get help using the Astro CLI                     |
+## Structure
 
-## Want to learn more?
+```
+src/
+├── pages/           # Routes. Files prefixed with _ are drafts and don't build.
+│   ├── index.astro          # Home / landing page
+│   ├── gallery.astro        # Interactive gallery (content driven by public/gallery/)
+│   ├── toon-support.astro   # Support page (intentionally unlinked)
+│   ├── blog/                # "The Attic" — blog posts and interactive experiments
+│   └── case-study/          # Work case studies
+├── layouts/         # BaseLayout (theme system) + RecipesLayout
+├── components/      # Shared components + landing/ page sections
+├── data/            # Small typed data arrays consumed by landing components
+└── styles/          # global.css (Tailwind + theme CSS variables)
 
-Feel free to check Astroäs [documentation](https://docs.astro.build)
+public/
+├── gallery/         # Gallery content — folder name = gallery category
+└── favicons/        # Favicons plus a few misc. images used by case studies
+```
+
+See [CLAUDE.md](CLAUDE.md) for architecture details, conventions, and media-size rules.
+
+## License
+
+Template code licensed under [GPL-3.0](https://opensource.org/licenses/GPL-3.0) (from the original Lexington starter). Site content © Todd Nguyen.
