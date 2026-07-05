@@ -10,7 +10,10 @@
   document.addEventListener('DOMContentLoaded', () => {
     // Skip on touch devices
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
-    
+
+    // Skip for users who prefer reduced motion (CSS below restores the default cursor)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const trailContainer = document.getElementById('ghostTrailContainer');
     if (!trailContainer) return;
     
@@ -52,6 +55,7 @@
     let wispX = 0, wispY = 0;
     
     // Animate all ghosts
+    let rafId;
     function animate() {
       const wispEase = 0.25;
       wispX += (mouseX - wispX) * wispEase;
@@ -71,7 +75,7 @@
         ghost.el.style.opacity = opacity.toString();
       });
       
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     }
     animate();
     
@@ -167,20 +171,35 @@
     }
     
     // Periodic ghost character changes
-    setInterval(() => {
-      ghosts.forEach((ghost) => {
-        if (Math.random() > 0.7) {
-          const body = ghost.el.querySelector('.ghost-body');
-          if (body) {
-            body.textContent = ghostChars[Math.floor(Math.random() * ghostChars.length)];
+    let shimmerInterval;
+    function startShimmer() {
+      shimmerInterval = setInterval(() => {
+        ghosts.forEach((ghost) => {
+          if (Math.random() > 0.7) {
+            const body = ghost.el.querySelector('.ghost-body');
+            if (body) {
+              body.textContent = ghostChars[Math.floor(Math.random() * ghostChars.length)];
+            }
           }
+        });
+        if (Math.random() > 0.9) {
+          mainWisp.style.opacity = '0.4';
+          setTimeout(() => mainWisp.style.opacity = '1', 60);
         }
-      });
-      if (Math.random() > 0.9) {
-        mainWisp.style.opacity = '0.4';
-        setTimeout(() => mainWisp.style.opacity = '1', 60);
+      }, 120);
+    }
+    startShimmer();
+
+    // Pause all animation work while the tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId);
+        clearInterval(shimmerInterval);
+      } else {
+        animate();
+        startShimmer();
       }
-    }, 120);
+    });
   });
 </script>
 
@@ -465,10 +484,26 @@
     .ghost-trail-container {
       display: none;
     }
-    
+
     .min-h-screen,
     .min-h-screen * {
       cursor: auto;
+    }
+  }
+
+  /* Disable for reduced-motion users (JS also skips; this restores the real cursor) */
+  @media (prefers-reduced-motion: reduce) {
+    .ghost-trail-container {
+      display: none;
+    }
+
+    .min-h-screen,
+    .min-h-screen * {
+      cursor: auto !important;
+    }
+
+    .min-h-screen::before {
+      animation: none;
     }
   }
 </style>

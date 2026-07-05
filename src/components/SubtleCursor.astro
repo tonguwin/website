@@ -11,7 +11,10 @@
   document.addEventListener('DOMContentLoaded', () => {
     // Skip on touch devices
     if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
-    
+
+    // Skip for users who prefer reduced motion (CSS below restores the default cursor)
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     const container = document.getElementById('subtleCursorContainer');
     const dot = document.getElementById('cursorDot');
     const ring = document.getElementById('cursorRing');
@@ -26,6 +29,7 @@
     let isHoveringInteractive = false;
     
     // Animate cursor positions
+    let rafId;
     function animate() {
       // Calculate velocity for dynamic effects
       const dx = mouseX - prevMouseX;
@@ -58,9 +62,18 @@
       prevMouseX = mouseX;
       prevMouseY = mouseY;
       
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     }
     animate();
+
+    // Pause the animation loop while the tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        cancelAnimationFrame(rafId);
+      } else {
+        animate();
+      }
+    });
     
     // Track mouse
     document.addEventListener('mousemove', (e) => {
@@ -270,10 +283,22 @@
     .subtle-cursor-container {
       display: none;
     }
-    
+
     body,
     body * {
       cursor: auto;
+    }
+  }
+
+  /* Disable for reduced-motion users (JS also skips; this restores the real cursor) */
+  @media (prefers-reduced-motion: reduce) {
+    .subtle-cursor-container {
+      display: none;
+    }
+
+    body,
+    body * {
+      cursor: auto !important;
     }
   }
 </style>

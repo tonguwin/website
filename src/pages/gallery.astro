@@ -198,6 +198,9 @@ for (let row = 0; row < 10; row++) {
 ---
 
 <BaseLayout title="Gallery">
+  <!-- Space Mono is pulled in via @import in the style block below; warm up the connection early -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <div class="gallery-page" id="galleryPage">
     <!-- Scan lines -->
     <div class="scanlines"></div>
