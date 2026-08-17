@@ -1,352 +1,621 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SubtleCursor from "../../components/SubtleCursor.astro";
+
+const meta = ["Copper", "Charlie · $5,999", "Accessory ecosystem", "3 concept products"];
 ---
 
-<BaseLayout>
-  <div class="min-h-screen bg-primary">
+<BaseLayout title="Accessories Case Study — Copper">
+  <div class="cs-page min-h-screen bg-primary">
     <!-- Hero Section -->
-    <section class="px-8 2xl:max-w-7xl mx-auto py-20">
-      <div class="max-w-4xl mx-auto">
-        <div class="mb-8">
-          <span class="text-secondary text-sm font-medium uppercase tracking-wider">Case Study</span>
-          <h1 class="text-4xl md:text-6xl font-bold text-secondary mt-4 leading-tight">
-            Accessories Case Study
+    <section class="px-8 2xl:max-w-7xl mx-auto pt-20 pb-10">
+      <div class="max-w-4xl mx-auto relative">
+        <!-- scattered decorative flowers -->
+        <span class="flower petal petal-a" aria-hidden="true"></span>
+        <span class="flower petal petal-b" aria-hidden="true"></span>
+        <span class="flower petal petal-c" aria-hidden="true"></span>
+
+        <div data-aos="fade-up" data-aos-duration="1000">
+          <p class="cs-kicker">
+            <span class="flower" aria-hidden="true"></span> for copper
+          </p>
+
+          <h1 class="cs-title text-5xl md:text-7xl font-bold text-secondary mt-4 leading-[0.98] tracking-tight">
+            Accessories Case Study<span class="flower title-flower" aria-hidden="true"></span>
           </h1>
-          <h2 class="text-2xl md:text-3xl font-light text-secondary/80 mt-2">
-            Copper
-          </h2>
+          <p class="cs-subtitle text-lg md:text-2xl font-light text-secondary/70 mt-5 max-w-2xl">
+            Turning add-ons into an ecosystem strategy — three ways to widen the
+            door to a <span class="highlight">$6,000</span> induction range.
+          </p>
+
+          <div class="cs-chips mt-8">
+            {meta.map((m, i) => (
+              <span class={`cs-chip pin tilt-${i % 4}`}>{m}</span>
+            ))}
+          </div>
         </div>
-        
-        <div class="h-0.5 bg-secondary w-24 mb-12"></div>
-       
       </div>
     </section>
 
     <!-- Content Section -->
-    <section class="px-8 2xl:max-w-7xl mx-auto pb-20 -mt-24">
+    <section class="px-8 2xl:max-w-7xl mx-auto pb-20">
       <div class="max-w-4xl mx-auto">
-        <div class="prose prose-lg max-w-none">
-          <div class="bg-secondary/5 p-8 rounded-lg mb-12">
-            <h3 class="text-xl font-semibold text-secondary mb-4">Background</h3>
-            <p class="text-secondary/90 leading-relaxed">
-              Copper makes Charlie, a $6,000 battery-equipped induction range that can operate on standard 120V outlets and continue cooking during power outages. The integrated 5kWh battery allows the range to deliver high-power induction cooking without requiring expensive electrical upgrades, targeting customers who want premium induction performance with plug-and-play installation.
-            </p>
-            <p class="text-secondary/80 leading-relaxed mt-4 italic">
-              Copper's Mission Statement: We make appliances with integrated battery energy storage.
-            </p>
+
+        <!-- Background -->
+        <div class="cs-mark mt-8" data-aos="fade-up">
+          <span class="flower" aria-hidden="true"></span>
+          <span class="cs-mark-text">background</span>
+          <span class="cs-squiggle" aria-hidden="true"></span>
+        </div>
+
+        <div class="cs-note cs-note-lg p-8 mb-24" data-aos="fade-up" data-aos-duration="1000">
+          <p class="text-secondary/90 leading-relaxed text-lg">
+            Copper makes Charlie, a $6,000 battery-equipped induction range that can operate on standard 120V outlets and continue cooking during power outages. The integrated 5kWh battery allows the range to deliver high-power induction cooking without requiring expensive electrical upgrades, targeting customers who want premium induction performance with plug-and-play installation.
+          </p>
+          <p class="cs-mission text-secondary/70 leading-relaxed mt-6 italic">
+            <span class="flower" aria-hidden="true"></span>
+            We make appliances with integrated battery energy storage.
+            <span class="cs-mission-attr">— Copper mission statement</span>
+          </p>
+        </div>
+
+        <!-- The Challenge -->
+        <div class="cs-mark" data-aos="fade-up">
+          <span class="flower" aria-hidden="true"></span>
+          <span class="cs-mark-text">the challenge</span>
+          <span class="cs-squiggle" aria-hidden="true"></span>
+        </div>
+
+        <div class="mb-10" data-aos="fade-up" data-aos-duration="1000">
+          <h3 class="text-2xl font-semibold text-secondary mb-7 leading-snug">
+            Copper faces a customer adoption challenge: <span class="highlight">Charlie's $5,999</span> base price point limits market reach. <span class="highlight">Strategic accessories</span> can solve two critical business problems:
+          </h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-7">
+            <div class="cs-note cs-problem pin tilt-1 p-6">
+              <span class="flower" aria-hidden="true"></span>
+              <h4 class="cs-problem-title">Customer acquisition</h4>
+              <p class="cs-problem-text">Lower-cost entry points let customers experience Copper's brand and technology before committing to Charlie.</p>
+            </div>
+            <div class="cs-note cs-problem pin tilt-2 p-6">
+              <span class="flower" aria-hidden="true"></span>
+              <h4 class="cs-problem-title">Revenue expansion</h4>
+              <p class="cs-problem-text">Create upsell opportunities and recurring touchpoints with existing customers.</p>
+            </div>
           </div>
 
-          <div class="space-y-8">
-            <div>
-                 <h3 class="text-xl font-semibold text-secondary mb-4">Copper faces a customer adoption challenge: <span class="highlight">Charlie's $5,999</span> base price point limits market reach. <span class="highlight">Strategic accessories</span> can solve two critical business problems:</h3>
-                <ul class="list-disc list-inside space-y-2 text-secondary/90 ml-4">
-                  <li>Customer acquisition - Lower-cost entry points let customers experience Copper's brand and technology before committing to Charlie</li>
-                  <li>Revenue expansion - Create upsell opportunities and recurring touchpoints with existing customers</li>
-                </ul>
-                <p class="text-secondary/90 leading-relaxed mt-4">
-                  Rather than standalone accessories, I focused on building an <span class="highlight">integrated ecosystem</span> that reinforces some of Copper's core value propositions: precision cooking and innovation.
+          <p class="text-secondary/90 leading-relaxed text-lg">
+            Rather than standalone accessories, I focused on building an <span class="highlight">integrated ecosystem</span> that reinforces some of Copper's core value propositions: precision cooking and innovation.
+          </p>
+        </div>
+
+        <!-- The Solution: Scout -->
+        <div class="cs-mark mt-20" data-aos="fade-up">
+          <span class="flower" aria-hidden="true"></span>
+          <span class="cs-mark-text">the solution</span>
+          <span class="cs-squiggle" aria-hidden="true"></span>
+        </div>
+
+        <div class="cs-note scout-hero pin tilt-hero p-8 mb-7" data-aos="fade-up" data-aos-duration="1000">
+          <span class="cs-badge">primary pick <span class="flower" aria-hidden="true"></span></span>
+          <div class="flex flex-col lg:flex-row gap-8 items-center mt-4">
+            <div class="flex-1">
+              <p class="cs-eyebrow">Copper</p>
+              <h3 class="text-3xl md:text-4xl font-bold text-secondary mb-1">Charlie Roam — “Scout”</h3>
+              <p class="text-lg text-secondary/70 mb-3">Portable Induction</p>
+              <p class="cs-price">MSRP $200 – $500</p>
+            </div>
+            <div class="flex-1 flex justify-center">
+              <img src="/favicons/scout_asset.png" alt="COPPER Charlie Roam Scout Portable Induction Cooktop" class="w-full max-w-md object-contain rounded-lg" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Scout Value Cards - horizontal scroll on mobile, 4-col on desktop -->
+        <div class="scout-cards-container" data-aos="fade-up" data-aos-duration="1000">
+          <div class="scout-cards">
+            <div class="cs-note scout-card pin tilt-1">
+              <span class="scout-symbol" aria-hidden="true">
+                <svg class="scout-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </span>
+              <h4 class="scout-card-title">Why Customers Want It</h4>
+              <div class="scout-card-content">
+                <p class="scout-card-text">
+                  Scout gives Charlie owners an <span class="font-semibold">extra burner</span> for entertaining, hot pot nights, or camping trips.
                 </p>
-            </div>
-
-            <div class="scout-hero bg-secondary/5 p-8 rounded-lg transition-all duration-200">
-              <div class="flex flex-col lg:flex-row gap-8 items-center">
-                <div class="flex-1">
-                  <div class="mb-4">
-                    <h3 class="text-3xl font-bold text-secondary mb-2">COPPER</h3>
-                    <h4 class="text-2xl font-bold text-secondary mb-2">Charlie Roam - "Scout"</h4>
-                    <p class="text-lg text-secondary/80 mb-2">Portable Induction</p>
-                    <p class="text-lg text-secondary/80 font-semibold">MSRP $200 - $500</p>
-                  </div>
-                </div>
-                <div class="flex-1 flex justify-center">
-                  <img src="/favicons/scout_asset.png" alt="COPPER Charlie Roam Scout Portable Induction Cooktop" class="w-full max-w-md object-contain rounded-lg" />
-                </div>
+                <p class="scout-card-text">
+                  For everyone else, it's a <span class="font-semibold">$200–500 entry</span> into Copper's world—a taste of the premium experience without the $6k commitment.
+                </p>
+                <p class="scout-card-text">
+                  And because it syncs with the Charlie app, the whole <span class="font-semibold">ecosystem feels unified</span>.
+                </p>
               </div>
             </div>
 
-            <!-- Scout Value Cards - Horizontal scroll on mobile, 4-col on desktop -->
-            <div class="scout-cards-container">
-              <div class="scout-cards">
-                <div class="scout-card">
-                  <div class="scout-card-accent"></div>
-                  <h4 class="scout-card-title">Why Customers Want It</h4>
-                  <div class="scout-card-content">
-                    <p class="scout-card-text">
-                      Scout gives Charlie owners an <span class="font-semibold">extra burner</span> for entertaining, hot pot nights, or camping trips.
-                    </p>
-                    <p class="scout-card-text">
-                      For everyone else, it's a <span class="font-semibold">$200–500 entry</span> into Copper's world—a taste of the premium experience without the $6k commitment.
-                    </p>
-                    <p class="scout-card-text">
-                      And because it syncs with the Charlie app, the whole <span class="font-semibold">ecosystem feels unified</span>.
-                    </p>
-                  </div>
-                </div>
-                
-                <div class="scout-card">
-                  <div class="scout-card-accent"></div>
-                  <h4 class="scout-card-title">Why It Makes Sense</h4>
-                  <div class="scout-card-content">
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Premium portable induction is underserved.</span> Current options lack connectivity and battery backup—exactly where Copper excels.
-                    </p>
-                    <p class="scout-card-text">
-                      Scout fills that gap while creating accessible price points for renters, outdoor cooks, and anyone not ready for a full range.
-                    </p>
-                    <p class="scout-card-text">
-                      It plants Copper's flag in portable <span class="font-semibold">without diluting the premium brand</span>.
-                    </p>
-                  </div>
-                </div>
-                
-                <div class="scout-card">
-                  <div class="scout-card-accent"></div>
-                  <h4 class="scout-card-title">How We Build It</h4>
-                  <div class="scout-card-content">
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Engineering</span> reuses Charlie's existing battery tech.
-                    </p>
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Operations</span> benefits from lower manufacturing complexity than a full range.
-                    </p>
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Design</span> keeps Scout compact while preserving Charlie's intuitive controls.
-                    </p>
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Launch Strategy</span> — Start with pre-orders to assess demand, then plan inventory based on actual interest.
-                    </p>
-                  </div>
-                </div>
-                
-                <div class="scout-card">
-                  <div class="scout-card-accent"></div>
-                  <h4 class="scout-card-title">How We Measure Success</h4>
-                  <div class="scout-card-content">
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Market expansion</span> — Track reach into new segments: renters, students, outdoor enthusiasts.
-                    </p>
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Conversion rates</span> — Measure Scout-to-Charlie upgrades against industry gateway benchmarks.
-                    </p>
-                    <p class="scout-card-text">
-                      <span class="font-semibold">Ecosystem stickiness</span> — How many owners actively use both products together.
-                    </p>
-                  </div>
-                </div>
+            <div class="cs-note scout-card pin tilt-2">
+              <span class="scout-symbol" aria-hidden="true">
+                <svg class="scout-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+                </svg>
+              </span>
+              <h4 class="scout-card-title">Why It Makes Sense</h4>
+              <div class="scout-card-content">
+                <p class="scout-card-text">
+                  <span class="font-semibold">Premium portable induction is underserved.</span> Current options lack connectivity and battery backup—exactly where Copper excels.
+                </p>
+                <p class="scout-card-text">
+                  Scout fills that gap while creating accessible price points for renters, outdoor cooks, and anyone not ready for a full range.
+                </p>
+                <p class="scout-card-text">
+                  It plants Copper's flag in portable <span class="font-semibold">without diluting the premium brand</span>.
+                </p>
               </div>
             </div>
 
-            <div class="mt-32">
-                <h3 class="text-xl font-semibold text-secondary mb-4">Copper alternatives that could be added to further create an <span class="highlight">integrated ecosystem</span>. 
-                </h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                  <div class="alt-product-card bg-secondary/5 p-6 rounded-lg transition-all duration-200 hover:bg-secondary/10">
-                    <div class="flex flex-col sm:flex-row gap-4 items-start">
-                      <div class="flex-1">
-                        <h4 class="text-2xl font-bold text-secondary mb-1">Charlie Probe - "Spike"</h4>
-                        <p class="text-lg text-secondary/80 mb-2">Wireless Culinary Thermometer</p>
-                        <p class="text-base text-secondary/80 font-semibold mb-3">MSRP $60 - $100</p>
-                        <p class="text-sm text-secondary/90 leading-relaxed mb-3">
-                          Connects to Charlie ecosystem, monitors food temperature of food in the pan or internal temperatures in the oven.
-                        </p>
-                        <div class="flex gap-4 justify-center items-center">
-                          <img src="/favicons/spike_example.png" alt="Spike Usage Example" class="w-32 h-32 object-contain rounded" />
-                          <img src="/favicons/spike_thermo.png" alt="Spike Thermometer Device" class="w-48 h-48 object-contain rounded" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="alt-product-card bg-secondary/5 p-6 rounded-lg transition-all duration-200 hover:bg-secondary/10">
-                    <div class="flex flex-col sm:flex-row gap-4 items-start">
-                      <div class="flex-1">
-                        <h4 class="text-2xl font-bold text-secondary mb-1">Copper Trivet - "Perch"</h4>
-                        <p class="text-lg text-secondary/80 mb-2">C-Hook Expandable Design</p>
-                        <p class="text-base text-secondary/80 font-semibold mb-3">MSRP $25 - $50</p>
-                        <p class="text-sm text-secondary/90 leading-relaxed mb-3">
-                          Hangs on any oven handle, expands from compact C-hook to full trivet when needed.
-                        </p>
-                        <div class="flex gap-4 justify-center items-center">
-                          <img src="/favicons/perch_above.png" alt="Perch Above View" class="w-48 h-48 object-contain rounded" />
-                          <img src="/favicons/perch_side.png" alt="Perch Side View" class="w-32 h-32 object-contain rounded" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-              <p class="text-secondary/90 leading-relaxed">
-                These alternatives serve important but narrower purposes: <span class="font-semibold">Spike</span> deepens Charlie ecosystem engagement, while <span class="font-semibold">Perch</span> provides universal brand exposure at a lower cost. <span class="font-semibold">Scout</span> uniquely tackles <span class="highlight">both customer acquisition and capacity expansion</span>, delivering the highest business impact.
-              </p>
-              
-          </div>
+            <div class="cs-note scout-card pin tilt-3">
+              <span class="scout-symbol" aria-hidden="true">
+                <svg class="scout-icon" viewBox="0 0 24 24" fill="currentColor">
+                  <g transform="rotate(45 12 12)">
+                    <rect x="5" y="3" width="14" height="6" rx="2"/>
+                    <rect x="10.5" y="8" width="3" height="13" rx="1.5"/>
+                  </g>
+                </svg>
+              </span>
+              <h4 class="scout-card-title">How We Build It</h4>
+              <div class="scout-card-content">
+                <p class="scout-card-text">
+                  <span class="font-semibold">Engineering</span> reuses Charlie's existing battery tech.
+                </p>
+                <p class="scout-card-text">
+                  <span class="font-semibold">Operations</span> benefits from lower manufacturing complexity than a full range.
+                </p>
+                <p class="scout-card-text">
+                  <span class="font-semibold">Design</span> keeps Scout compact while preserving Charlie's intuitive controls.
+                </p>
+                <p class="scout-card-text">
+                  <span class="font-semibold">Launch Strategy</span> — Start with pre-orders to assess demand, then plan inventory based on actual interest.
+                </p>
+              </div>
+            </div>
 
-          <div class="mt-16">
-            <div class="h-0.5 bg-secondary w-24 mb-8"></div>
-            
-            <div class="space-y-6 text-secondary/90 leading-relaxed">
-              <p>
-                <span class="font-semibold">Accessories aren't just add-ons—they're strategic tools</span> that can make or break a premium product's market expansion. For companies like Copper facing adoption barriers with high-priced hero products, thoughtful accessories create multiple pathways into the ecosystem: <span class="font-semibold">gateway products for hesitant buyers, capacity expansion for existing customers, and revenue diversification</span> beyond the main product line.
-              </p>
-              
-              <p>
-                The most successful brands understand that customers don't just buy a single appliance—they buy into <span class="font-semibold">a cooking philosophy, a lifestyle, a connected experience.</span> Smart accessory strategy turns one-time purchasers into <span class="font-semibold">ecosystem fans</span>, transforms price objections into portfolio opportunities, and builds the kind of sticky customer relationships that drive sustainable growth.
-              </p>
-              
-              <p>
-                <span class="highlight">In today's competitive landscape, the companies that win aren't just those with the best hero product, but those who <span class="font-semibold">create the most compelling reasons for customers to stay, explore, and invest deeper into their world.</span></span>
-              </p>
+            <div class="cs-note scout-card pin tilt-0">
+              <span class="scout-symbol" aria-hidden="true">
+                <span class="flower scout-flower"></span>
+              </span>
+              <h4 class="scout-card-title">How We Measure Success</h4>
+              <div class="scout-card-content">
+                <p class="scout-card-text">
+                  <span class="font-semibold">Market expansion</span> — Track reach into new segments: renters, students, outdoor enthusiasts.
+                </p>
+                <p class="scout-card-text">
+                  <span class="font-semibold">Conversion rates</span> — Measure Scout-to-Charlie upgrades against industry gateway benchmarks.
+                </p>
+                <p class="scout-card-text">
+                  <span class="font-semibold">Ecosystem stickiness</span> — How many owners actively use both products together.
+                </p>
+              </div>
             </div>
           </div>
-          
-          <div class="mt-12 flex justify-end">
-            <img src="/favicons/todd_big_signature.png" alt="Todd Nguyen Signature" class="signature-img h-16 object-contain" />
+        </div>
+
+        <!-- Extending the ecosystem -->
+        <div class="cs-mark mt-24" data-aos="fade-up">
+          <span class="flower" aria-hidden="true"></span>
+          <span class="cs-mark-text">extending the ecosystem</span>
+          <span class="cs-squiggle" aria-hidden="true"></span>
+        </div>
+
+        <h3 class="text-2xl font-semibold text-secondary mb-8 leading-snug" data-aos="fade-up">
+          Copper alternatives that could be added to further create an <span class="highlight">integrated ecosystem</span>.
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" data-aos="fade-up" data-aos-duration="1000">
+          <div class="cs-note alt-product-card p-6">
+            <p class="cs-eyebrow">Copper</p>
+            <h4 class="text-2xl font-bold text-secondary mb-1">Charlie Probe — “Spike”</h4>
+            <p class="text-lg text-secondary/70 mb-1">Wireless Culinary Thermometer</p>
+            <p class="cs-price mb-4">MSRP $60 – $100</p>
+            <p class="text-sm text-secondary/90 leading-relaxed mb-4">
+              Connects to Charlie ecosystem, monitors food temperature of food in the pan or internal temperatures in the oven.
+            </p>
+            <div class="flex gap-4 justify-center items-center">
+              <img src="/favicons/spike_example.png" alt="Spike Usage Example" class="w-32 h-32 object-contain rounded" />
+              <img src="/favicons/spike_thermo.png" alt="Spike Thermometer Device" class="w-48 h-48 object-contain rounded" />
+            </div>
           </div>
+
+          <div class="cs-note alt-product-card p-6">
+            <p class="cs-eyebrow">Copper</p>
+            <h4 class="text-2xl font-bold text-secondary mb-1">Copper Trivet — “Perch”</h4>
+            <p class="text-lg text-secondary/70 mb-1">C-Hook Expandable Design</p>
+            <p class="cs-price mb-4">MSRP $25 – $50</p>
+            <p class="text-sm text-secondary/90 leading-relaxed mb-4">
+              Hangs on any oven handle, expands from compact C-hook to full trivet when needed.
+            </p>
+            <div class="flex gap-4 justify-center items-center">
+              <img src="/favicons/perch_above.png" alt="Perch Above View" class="w-48 h-48 object-contain rounded" />
+              <img src="/favicons/perch_side.png" alt="Perch Side View" class="w-32 h-32 object-contain rounded" />
+            </div>
+          </div>
+        </div>
+
+        <p class="text-secondary/90 leading-relaxed text-lg" data-aos="fade-up">
+          These alternatives serve important but narrower purposes: <span class="font-semibold">Spike</span> deepens Charlie ecosystem engagement, while <span class="font-semibold">Perch</span> provides universal brand exposure at a lower cost. <span class="font-semibold">Scout</span> uniquely tackles <span class="highlight">both customer acquisition and capacity expansion</span>, delivering the highest business impact.
+        </p>
+
+        <!-- Closing -->
+        <div class="cs-mark mt-24" data-aos="fade-up">
+          <span class="flower" aria-hidden="true"></span>
+          <span class="cs-mark-text">why accessories matter</span>
+          <span class="cs-squiggle" aria-hidden="true"></span>
+        </div>
+
+        <div class="space-y-6 text-secondary/90 leading-relaxed text-lg" data-aos="fade-up" data-aos-duration="1000">
+          <p>
+            <span class="font-semibold">Accessories aren't just add-ons—they're strategic tools</span> that can make or break a premium product's market expansion. For companies like Copper facing adoption barriers with high-priced hero products, thoughtful accessories create multiple pathways into the ecosystem: <span class="font-semibold">gateway products for hesitant buyers, capacity expansion for existing customers, and revenue diversification</span> beyond the main product line.
+          </p>
+          <p>
+            The most successful brands understand that customers don't just buy a single appliance—they buy into <span class="font-semibold">a cooking philosophy, a lifestyle, a connected experience.</span> Smart accessory strategy turns one-time purchasers into <span class="font-semibold">ecosystem fans</span>, transforms price objections into portfolio opportunities, and builds the kind of sticky customer relationships that drive sustainable growth.
+          </p>
+          <p class="cs-closing-line">
+            <span class="highlight">In today's competitive landscape, the companies that win aren't just those with the best hero product, but those who <span class="font-semibold">create the most compelling reasons for customers to stay, explore, and invest deeper into their world.</span></span>
+          </p>
+        </div>
+
+        <div class="mt-12 flex justify-end items-end gap-2" data-aos="fade-up">
+          <span class="flower sig-flower" aria-hidden="true"></span>
+          <img src="/favicons/todd_big_signature.png" alt="Todd Nguyen Signature" class="signature-img h-16 object-contain" />
+        </div>
       </div>
     </section>
 
     <!-- Navigation -->
     <section class="px-8 2xl:max-w-7xl mx-auto pb-20">
       <div class="max-w-4xl mx-auto">
-        <div class="flex justify-start items-center">
-          <a href="/" class="text-secondary hover:text-secondary/70 transition-colors">
-            ← Back to Home
-          </a>
-        </div>
+        <a href="/" class="cs-back">
+          <span class="cs-back-arrow">←</span> <span>back to home</span>
+          <span class="flower" aria-hidden="true"></span>
+        </a>
       </div>
     </section>
   </div>
 
   <style>
-    .highlight {
-      padding: 0.125rem 0.25rem;
-      border-radius: 0.25rem;
-      background-color: rgb(254 249 195); /* yellow-100 for light mode */
-      color: rgb(19 19 19); /* dark text for light mode */
-      transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+    /* ---- CSS star-flower (from the landing Intro) ---- */
+    .flower {
+      display: inline-block;
+      width: 0.62em;
+      aspect-ratio: 1;
+      vertical-align: -0.05em;
+      background: currentColor;
+      --g: /37.02% 37.02% radial-gradient(currentColor calc(71% - 1px), transparent 71%) no-repeat;
+      -webkit-mask:
+        radial-gradient(100% 100%, #000 calc(30% - 1px), transparent 30%) subtract,
+        99.748% 55.018% var(--g),
+        60.6% 98.863% var(--g),
+        6.804% 75.181% var(--g),
+        12.703% 16.699% var(--g),
+        70.145% 4.238% var(--g);
+      mask:
+        radial-gradient(100% 100%, #000 calc(30% - 1px), transparent 30%) subtract,
+        99.748% 55.018% var(--g),
+        60.6% 98.863% var(--g),
+        6.804% 75.181% var(--g),
+        12.703% 16.699% var(--g),
+        70.145% 4.238% var(--g);
     }
 
+    /* Scattered background flowers */
+    .petal {
+      position: absolute;
+      color: rgb(var(--color-secondary));
+      opacity: 0.08;
+      pointer-events: none;
+      animation: cs-sway 9s ease-in-out infinite;
+    }
+    .petal-a { width: 3.2rem; top: -0.5rem; right: 2rem; animation-delay: 0s; }
+    .petal-b { width: 1.8rem; top: 8.5rem; right: 30%; opacity: 0.06; animation-delay: -3s; }
+    .petal-c { width: 2.4rem; top: 11rem; left: -1.2rem; opacity: 0.07; animation-delay: -5s; }
+
+    @keyframes cs-sway {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50%      { transform: translateY(-8px) rotate(12deg); }
+    }
+
+    /* ---- hero ---- */
+    .cs-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+      color: rgb(var(--color-secondary) / 0.6);
+    }
+    .cs-kicker .flower { width: 0.85rem; color: rgb(var(--color-secondary) / 0.8); }
+
+    .title-flower {
+      width: 0.4em;
+      margin-left: 0.15em;
+      vertical-align: 0.5em;
+      color: rgb(var(--color-secondary) / 0.55);
+      animation: cs-spin 14s linear infinite;
+    }
+    @keyframes cs-spin { to { transform: rotate(360deg); } }
+
+    .cs-subtitle { line-height: 1.4; }
+
+    /* ---- meta chips ---- */
+    .cs-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 0.75rem;
+    }
+    .cs-chip {
+      font-size: 0.85rem;
+      color: rgb(var(--color-secondary) / 0.75);
+      background: rgb(var(--color-secondary) / 0.06);
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      transition: background 0.3s ease, transform 0.3s ease;
+    }
+    .cs-chip:hover {
+      background: rgb(var(--color-secondary) / 0.12);
+      transform: rotate(0deg) translateY(-2px);
+    }
+
+    /* ---- pinned-note tilts ---- */
+    .pin { transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, box-shadow 0.3s ease; }
+    .tilt-0 { transform: rotate(-2.1deg); }
+    .tilt-1 { transform: rotate(1.8deg); }
+    .tilt-2 { transform: rotate(-1.5deg); }
+    .tilt-3 { transform: rotate(2.4deg); }
+    .tilt-hero { transform: rotate(-0.6deg); }
+    .pin:hover { transform: rotate(0deg) translateY(-4px); }
+
+    /* ---- soft note cards ---- */
+    .cs-note {
+      position: relative;
+      background: rgb(var(--color-secondary) / 0.05);
+      border-radius: 1.25rem;
+      box-shadow: 0 10px 30px -18px rgb(0 0 0 / 0.35);
+    }
+    .cs-note:hover {
+      background: rgb(var(--color-secondary) / 0.08);
+      box-shadow: 0 18px 40px -20px rgb(0 0 0 / 0.45);
+    }
+    .cs-note-lg { border-radius: 1.5rem; }
+
+    /* ---- section marks (flower + label + squiggle) ---- */
+    .cs-mark {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .cs-mark .flower {
+      width: 1.1rem;
+      color: rgb(var(--color-secondary) / 0.8);
+      flex-shrink: 0;
+    }
+    .cs-mark-text {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      color: rgb(var(--color-secondary) / 0.85);
+      flex-shrink: 0;
+    }
+    .cs-squiggle {
+      flex: 1;
+      height: 8px;
+      min-width: 2rem;
+      background-color: rgb(var(--color-secondary) / 0.35);
+      -webkit-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='8'%20viewBox='0%200%2024%208'%3E%3Cpath%20d='M0%204%20Q6%200%2012%204%20T24%204'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'/%3E%3C/svg%3E") repeat-x center / 24px 8px;
+      mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='24'%20height='8'%20viewBox='0%200%2024%208'%3E%3Cpath%20d='M0%204%20Q6%200%2012%204%20T24%204'%20fill='none'%20stroke='%23000'%20stroke-width='1.6'%20stroke-linecap='round'/%3E%3C/svg%3E") repeat-x center / 24px 8px;
+    }
+
+    /* ---- background mission line ---- */
+    .cs-mission {
+      position: relative;
+      padding-left: 1.4rem;
+    }
+    .cs-mission .flower {
+      position: absolute;
+      left: 0;
+      top: 0.35em;
+      width: 0.85rem;
+      color: rgb(var(--color-secondary) / 0.5);
+    }
+    .cs-mission-attr {
+      display: block;
+      font-style: normal;
+      font-size: 0.8rem;
+      color: rgb(var(--color-secondary) / 0.45);
+      margin-top: 0.5rem;
+    }
+
+    /* ---- problem cards ---- */
+    .cs-problem .flower {
+      width: 1rem;
+      color: rgb(var(--color-secondary) / 0.65);
+    }
+    .cs-problem-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: rgb(var(--color-secondary));
+      margin: 0.5rem 0 0.4rem;
+    }
+    .cs-problem-text {
+      font-size: 0.92rem;
+      line-height: 1.55;
+      color: rgb(var(--color-secondary) / 0.85);
+    }
+
+    /* ---- eyebrow / price / badge ---- */
+    .cs-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgb(var(--color-secondary) / 0.5);
+      margin-bottom: 0.4rem;
+    }
+    .cs-price {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgb(var(--color-secondary) / 0.85);
+    }
+    .cs-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: rgb(var(--color-primary));
+      background: rgb(var(--color-secondary) / 0.85);
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+    }
+    .cs-badge .flower { width: 0.75rem; }
+
+    /* ---- highlight (amber) ---- */
+    .highlight {
+      padding: 0.125rem 0.25rem;
+      border-radius: 0.35rem;
+      background-color: rgb(254 249 195);
+      color: rgb(19 19 19);
+      transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+    }
     :root[data-theme="dark"] .highlight,
     :root[data-theme="earth-night"] .highlight,
     :root[data-theme="random"][color-scheme="dark"] .highlight {
-      background-color: rgb(113 63 18); /* amber-800 for dark mode */
-      color: rgb(254 243 199); /* amber-100 for dark mode */
+      background-color: rgb(113 63 18);
+      color: rgb(254 243 199);
     }
 
-    /* Signature - invert on dark themes so it's visible */
-    .signature-img {
-      transition: filter 0.3s ease;
+    /* ---- signature ---- */
+    .sig-flower {
+      width: 1rem;
+      color: rgb(var(--color-secondary) / 0.4);
+      margin-bottom: 0.4rem;
     }
-
+    .signature-img { transition: filter 0.3s ease; }
     :root[data-theme="dark"] .signature-img,
     :root[data-theme="earth-night"] .signature-img,
     :root[data-theme="random"][color-scheme="dark"] .signature-img {
       filter: invert(1);
     }
 
-    /* Scout Hero Block */
-    .scout-hero {
+    /* ---- back link ---- */
+    .cs-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: rgb(var(--color-secondary) / 0.7);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    .cs-back:hover { color: rgb(var(--color-secondary)); }
+    .cs-back .flower { width: 0.85rem; opacity: 0.6; }
+    .cs-back-arrow { display: inline-block; transition: transform 0.3s ease; }
+    .cs-back:hover .cs-back-arrow { transform: translateX(-4px); }
+
+    /* ---- alt product cards (kept straight, gentle lift) ---- */
+    .alt-product-card {
       position: relative;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, box-shadow 0.3s ease;
     }
+    .alt-product-card:hover { transform: translateY(-4px); }
 
-    .scout-hero:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+    /* ---- scout hero ---- */
+    .scout-hero { padding: 2rem; }
 
-    /* Scout Cards Container - Horizontal scroll on mobile */
+    /* ---- scout cards ---- */
     .scout-cards-container {
-      margin: 2rem 0 3rem 0;
+      margin: 0 0 3rem 0;
       position: relative;
     }
-
     .scout-cards {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 1.5rem;
     }
+    .scout-card { padding: 1.5rem; }
 
-    /* Individual Card Styling */
-    .scout-card {
+    /* symbol + soft radial halo (echoes the flower's glow) */
+    .scout-symbol {
       position: relative;
-      padding: 1.5rem;
-      padding-left: 1.75rem;
-      background: rgba(var(--color-secondary-rgb, 128, 128, 128), 0.03);
-      border-radius: 0.5rem;
-      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      margin-bottom: 0.5rem;
     }
-
-    .scout-card:hover {
-      background: rgba(var(--color-secondary-rgb, 128, 128, 128), 0.08);
-      transform: translateY(-2px);
-    }
-
-    /* Left accent bar */
-    .scout-card-accent {
+    .scout-symbol::before {
+      content: "";
       position: absolute;
-      left: 0;
-      top: 1rem;
-      bottom: 1rem;
-      width: 3px;
-      background: rgb(var(--color-secondary));
-      border-radius: 2px;
-      opacity: 0.4;
-      transition: opacity 0.3s ease, height 0.3s ease;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgb(var(--color-secondary) / 0.22) 0%,
+        rgb(var(--color-secondary) / 0.07) 48%,
+        transparent 74%
+      );
+      transition: background 0.3s ease, transform 0.3s ease;
     }
-
-    .scout-card:hover .scout-card-accent {
-      opacity: 0.8;
+    .scout-icon,
+    .scout-flower {
+      position: relative;
+      z-index: 1;
+      width: 1rem;
+      height: 1rem;
+      color: rgb(var(--color-secondary) / 0.7);
     }
-
+    .scout-flower { display: block; }
+    .scout-card:hover .scout-symbol::before {
+      background: radial-gradient(
+        circle at 50% 50%,
+        rgb(var(--color-secondary) / 0.24) 0%,
+        rgb(var(--color-secondary) / 0.08) 45%,
+        transparent 72%
+      );
+      transform: scale(1.08);
+    }
+    .scout-card:hover .scout-icon,
+    .scout-card:hover .scout-flower { color: rgb(var(--color-secondary) / 0.95); }
     .scout-card-title {
-      font-size: 0.95rem;
-      font-weight: 600;
+      font-size: 0.98rem;
+      font-weight: 700;
       color: rgb(var(--color-secondary));
       margin-bottom: 0.75rem;
-      letter-spacing: 0.01em;
     }
-
     .scout-card-content {
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
     }
-
     .scout-card-text {
       font-size: 0.875rem;
       line-height: 1.55;
-      color: rgb(var(--color-secondary));
-      opacity: 0.95;
-    }
-
-    .scout-card-text-note {
-      margin-top: 0.25rem;
-      font-style: italic;
-      opacity: 0.8;
-    }
-
-    /* Alt product cards (Spike, Perch) */
-    .alt-product-card {
-      position: relative;
-    }
-
-    .alt-product-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      color: rgb(var(--color-secondary) / 0.92);
     }
 
     /* Tablet: 2x2 grid */
     @media (max-width: 1024px) {
       .scout-cards {
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 1.25rem;
       }
     }
 
-    /* Mobile: Horizontal scroll */
+    /* Mobile: horizontal scroll */
     @media (max-width: 640px) {
+      .petal-a, .petal-b, .petal-c { display: none; }
+
       .scout-cards-container {
         margin-left: -2rem;
         margin-right: -2rem;
@@ -357,33 +626,22 @@ import SubtleCursor from "../../components/SubtleCursor.astro";
         scrollbar-width: none;
         -ms-overflow-style: none;
       }
-
-      .scout-cards-container::-webkit-scrollbar {
-        display: none;
-      }
-
+      .scout-cards-container::-webkit-scrollbar { display: none; }
       .scout-cards {
         display: flex;
         gap: 1rem;
-        padding-bottom: 0.5rem;
+        padding: 0.5rem 0;
       }
-
       .scout-card {
         min-width: 280px;
         flex-shrink: 0;
       }
+      .scout-card:last-child { margin-right: 2rem; }
+    }
 
-      .scout-card:last-child {
-        margin-right: 2rem;
-      }
-
-      .scout-card-title {
-        font-size: 0.9rem;
-      }
-
-      .scout-card-text {
-        font-size: 0.8rem;
-      }
+    /* ---- reduced motion ---- */
+    @media (prefers-reduced-motion: reduce) {
+      .petal, .title-flower { animation: none; }
     }
   </style>
   <SubtleCursor />
