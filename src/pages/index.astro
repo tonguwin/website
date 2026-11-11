@@ -57,12 +57,19 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
       .btns a::before, .btns button::before { content: "  "; white-space: pre; }
       .btns a:hover::before, .btns a:focus-visible::before, .btns button:hover::before, .btns button:focus-visible::before { content: "> "; }
       .btns a:hover, .btns button:hover, .btns a:focus-visible, .btns button:focus-visible { color: #fff; outline: none; }
+      .tag { max-width: 40ch; text-wrap: balance; line-height: 1.45; }
+      .tag b { font-weight: inherit; color: #fff; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-underline-offset: .2em; }
+      /* The classic site's star (landing/Intro.astro): a disk with five bites out of it. */
+      .star { display: inline-block; width: 1.05em; aspect-ratio: 1; margin-left: .25em; vertical-align: -.2em; background: currentColor;
+        --g: /37.02% 37.02% radial-gradient(currentColor calc(71% - 1px), transparent 71%) no-repeat;
+        mask: radial-gradient(100% 100%, #000 calc(30% - 1px), transparent 30%) subtract, 99.748% 55.018% var(--g), 60.6% 98.863% var(--g), 6.804% 75.181% var(--g), 12.703% 16.699% var(--g), 70.145% 4.238% var(--g); }
       .hide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       @media (max-width: 600px) {
         .box { gap: 18px; }
         .name { font-size: clamp(12px, 3.7vw, 15px); }
         .sub { font-size: 15px; line-height: 1.5; }
         .note { font-size: 14px; }
+        .tag { max-width: none; }
         .btns a, .btns button { font-size: 18px; padding: 12px 0; }
       }
       /* Ways off the island: an iris closing for /classic, a CRT switching off for the attic. */
@@ -110,7 +117,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <section class="screen" id="loading" aria-live="polite">
       <div class="box">
         <pre class="name" aria-hidden="true" data-name></pre>
-        <p class="sub">Product Manager</p>
+        <p class="sub tag">Product manager at <b>BAGGU</b>, crafting and optimizing seamless e-commerce for a growing brand and its community<span class="star" aria-hidden="true"></span></p>
         <pre class="bar" id="bar">[                              ]   0%</pre>
         <p class="note" id="note">loading the island…</p>
         <div class="btns" id="fail" hidden>
