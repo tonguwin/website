@@ -58,7 +58,9 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
       .btns a:hover::before, .btns a:focus-visible::before, .btns button:hover::before, .btns button:focus-visible::before { content: "> "; }
       .btns a:hover, .btns button:hover, .btns a:focus-visible, .btns button:focus-visible { color: #fff; outline: none; }
       .tag { max-width: 40ch; text-wrap: balance; line-height: 1.45; }
-      .tag b { font-weight: inherit; color: #fff; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-underline-offset: .2em; }
+      .tag a { color: #fff; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-decoration-thickness: 1px; text-underline-offset: .2em; transition: text-decoration-color .15s, background-color .1s, color .1s; }
+      .tag a:hover, .tag a:focus-visible { text-decoration-color: #fff; text-decoration-thickness: 2px; outline: none; }
+      .tag a:active { background: #efe8d6; color: #000; text-decoration-color: transparent; }
       /* The classic site's star (landing/Intro.astro): a disk with five bites out of it. */
       .star { display: inline-block; width: 1.05em; aspect-ratio: 1; margin-left: .25em; vertical-align: -.2em; background: currentColor;
         --g: /37.02% 37.02% radial-gradient(currentColor calc(71% - 1px), transparent 71%) no-repeat;
@@ -117,7 +119,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <section class="screen" id="loading" aria-live="polite">
       <div class="box">
         <pre class="name" aria-hidden="true" data-name></pre>
-        <p class="sub tag">Product manager at <b>BAGGU</b>, crafting and optimizing seamless e-commerce for a growing brand and its community<span class="star" aria-hidden="true"></span></p>
+        <p class="sub tag">Product manager at <a href="https://baggu.com" target="_blank" rel="noopener noreferrer">BAGGU</a>, crafting and optimizing seamless e-commerce for a growing brand and its community<span class="star" aria-hidden="true"></span></p>
         <pre class="bar" id="bar">[                              ]   0%</pre>
         <p class="note" id="note">loading the island…</p>
         <div class="btns" id="fail" hidden>
