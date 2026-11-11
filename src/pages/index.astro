@@ -57,6 +57,13 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
       .btns a:hover::before, .btns a:focus-visible::before, .btns button:hover::before, .btns button:focus-visible::before { content: "> "; }
       .btns a:hover, .btns button:hover, .btns a:focus-visible, .btns button:focus-visible { color: #fff; outline: none; }
       .hide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      @media (max-width: 600px) {
+        .box { gap: 18px; }
+        .name { font-size: clamp(12px, 3.7vw, 15px); }
+        .sub { font-size: 15px; line-height: 1.5; }
+        .note { font-size: 14px; }
+        .btns a, .btns button { font-size: 18px; padding: 12px 0; }
+      }
       @media (prefers-reduced-motion: reduce) { .screen { transition: none; } }
     </style>
   </head>
@@ -79,7 +86,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
       <div class="box">
         <pre class="name" aria-hidden="true" data-name></pre>
         <p class="sub" id="phone-title">best on a computer</p>
-        <p class="sub">This little island works on phones, but it's built for a bigger screen and a keyboard. It's a big-ish download, so Wi-Fi helps.</p>
+        <p class="sub">This little island works on phones, but it's built for a bigger screen and a keyboard. It takes a little longer to load the first time.</p>
         <div class="btns">
           <button type="button" id="go">continue anyway</button>
           <a href="/classic">classic site</a>
