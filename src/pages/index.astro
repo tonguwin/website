@@ -1,21 +1,227 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/landing/Hero.astro";
-import Intro from "../components/landing/Intro.astro";
-import Projects from "../components/landing/Projects.astro";
-import Testimonials from "../components/landing/Testimonials.astro";
-import FeaturedWork from "../components/landing/FeaturedWork.astro";
-import SubtleCursor from "../components/SubtleCursor.astro";
-
+// The front door: Explore mode, a small Godot game (exported into
+// public/play/ from the toon-godot-website project). This page is only the
+// shell: an ASCII loading screen in the start screen's style, a short note for
+// phones, and the engine start-up. The previous homepage lives at /classic.
+const title = "Todd Nguyen";
+const description =
+  "A floating island of things I've made. Walk around to find my product work at BAGGU, ShipHawk, TEDx and Netflix, plus recipes, photos and books, or visit the classic site.";
+const url = "https://todnguyen.com/";
+const image = "https://todnguyen.com/og.jpg";
+// Real sizes of the game files, so the loading bar can count up honestly.
+import { statSync } from "node:fs";
+const size = (f: string) => { try { return statSync(`public/play/${f}`).size; } catch { return 0; } };
+const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("toon.pck") };
 ---
 
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={url} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+    <link rel="preload" href="/play/toon.wasm" as="fetch" type="application/wasm" crossorigin />
+    <style is:inline>
+      html, body { margin: 0; height: 100%; background: #000; color: #efe8d6; overflow: hidden; }
+      body { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; -webkit-font-smoothing: antialiased; }
+      #canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+      #canvas:focus { outline: none; }
+      .screen { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; text-align: left; z-index: 2; background: #000; transition: opacity .5s; }
+      .screen[hidden] { display: none; }
+      .screen.fade { opacity: 0; pointer-events: none; }
+      .box { width: min(560px, 100%); display: grid; gap: 14px; }
+      .name { margin: 0; font-size: clamp(11px, 2.4vw, 15px); line-height: 1.05; white-space: pre; color: #fff; font-weight: 700; }
+      .sub { margin: 0; font-size: 13px; opacity: .72; }
+      .bar { margin: 6px 0 0; font-size: clamp(12px, 3.4vw, 16px); white-space: pre; }
+      .note { margin: 0; font-size: 12px; opacity: .55; min-height: 1.4em; }
+      .btns { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 6px; }
+      .btns a, .btns button { font: inherit; font-size: 16px; color: #efe8d6; background: none; border: 0; padding: 8px 0; cursor: pointer; text-decoration: none; }
+      .btns a::before, .btns button::before { content: "  "; white-space: pre; }
+      .btns a:hover::before, .btns a:focus-visible::before, .btns button:hover::before, .btns button:focus-visible::before { content: "> "; }
+      .btns a:hover, .btns button:hover, .btns a:focus-visible, .btns button:focus-visible { color: #fff; outline: none; }
+      .hide { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+      @media (prefers-reduced-motion: reduce) { .screen { transition: none; } }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" tabindex="0" aria-label="Explore mode: a floating island you can walk around">Your browser can't show the game.</canvas>
 
-<BaseLayout>
-  <Hero />
-  <Intro />
+    <!-- For screen readers, search engines, and anyone without JavaScript. -->
+    <div class="hide">
+      <h1>Todd Nguyen</h1>
+      <p>{description}</p>
+      <nav aria-label="Site">
+        <a href="/classic">Classic site</a>
+        <a href="/gallery">Gallery</a>
+        <a href="/blog/the-attic">The attic (blog)</a>
+        <a href="/blog/cooking-guide">Cooking guide</a>
+      </nav>
+    </div>
 
-  <Projects />
-  {/*<Testimonials />*/}
-  <FeaturedWork />
-  <SubtleCursor />
-</BaseLayout>
+    <section class="screen" id="phone" hidden aria-labelledby="phone-title">
+      <div class="box">
+        <pre class="name" aria-hidden="true" data-name></pre>
+        <p class="sub" id="phone-title">best on a computer</p>
+        <p class="sub">This little island works on phones, but it's built for a bigger screen and a keyboard. It's a big-ish download, so Wi-Fi helps.</p>
+        <div class="btns">
+          <button type="button" id="go">continue anyway</button>
+          <a href="/classic">classic site</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="loading" aria-live="polite">
+      <div class="box">
+        <pre class="name" aria-hidden="true" data-name></pre>
+        <p class="sub">a floating island of things I've made</p>
+        <pre class="bar" id="bar">[                              ]   0%</pre>
+        <p class="note" id="note">loading the island…</p>
+        <div class="btns" id="fail" hidden>
+          <a href="/classic">visit the classic site</a>
+          <button type="button" onclick="location.reload()">try again</button>
+        </div>
+      </div>
+    </section>
+
+    <noscript>
+      <section class="screen"><div class="box"><p class="sub">The island needs JavaScript. <a href="/classic" style="color:#fff">Visit the classic site</a>.</p></div></section>
+    </noscript>
+
+    <script is:inline define:vars={{ sizes }}>window.TOON_SIZES = sizes;</script>
+    <script is:inline src="/play/toon.js"></script>
+    <script is:inline>
+      (function () {
+        // The name in block letters, drawn from the same characters as the game.
+        var L = {
+          T: ["#####", "  #  ", "  #  ", "  #  ", "  #  "],
+          O: [" ### ", "#   #", "#   #", "#   #", " ### "],
+          D: ["#### ", "#   #", "#   #", "#   #", "#### "],
+          N: ["#   #", "##  #", "# # #", "#  ##", "#   #"],
+          G: [" ####", "#    ", "# ###", "#   #", " ### "],
+          U: ["#   #", "#   #", "#   #", "#   #", " ### "],
+          Y: ["#   #", " # # ", "  #  ", "  #  ", "  #  "],
+          E: ["#####", "#    ", "#### ", "#    ", "#####"],
+        };
+        function word(w) {
+          var rows = [];
+          for (var r = 0; r < 5; r++) rows.push(w.split("").map(function (c) { return L[c][r]; }).join(" "));
+          return rows;
+        }
+        var NAME = word("TODD").concat([""], word("NGUYEN"));
+        var FLICK = "01<>/\\|=+*#%@$&?";
+        var RAMP = ".:-=+*x%@#";
+        var names = document.querySelectorAll("[data-name]");
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        function drawName() {
+          var out = NAME.map(function (row) {
+            return row.replace(/#/g, function () {
+              var r = Math.random();
+              return r < 0.06 && !reduce ? FLICK[(Math.random() * FLICK.length) | 0] : (r < 0.5 ? "@" : "#");
+            });
+          }).join("\n");
+          for (var i = 0; i < names.length; i++) names[i].textContent = out;
+        }
+        drawName();
+        var nameTimer = setInterval(drawName, 120);
+
+        var bar = document.getElementById("bar");
+        var note = document.getElementById("note");
+        var shown = 0;
+        function drawBar(k) {
+          var w = 30, n = Math.round(k * w), s = "";
+          for (var i = 0; i < w; i++) {
+            if (i < n) s += i === n - 1 && k < 1 ? RAMP[(Math.random() * RAMP.length) | 0] : "#";
+            else s += Math.random() < 0.04 && !reduce ? FLICK[(Math.random() * FLICK.length) | 0] : " ";
+          }
+          var pct = String(Math.round(k * 100));
+          bar.textContent = "[" + s + "] " + "   ".slice(pct.length) + pct + "%";
+        }
+
+        function fail(msg) {
+          clearInterval(nameTimer);
+          note.textContent = msg;
+          note.style.opacity = 0.9;
+          document.getElementById("fail").hidden = false;
+        }
+
+        function start() {
+          document.getElementById("phone").hidden = true;
+          var loading = document.getElementById("loading");
+          loading.hidden = false;
+          if (typeof Engine === "undefined") {
+            fail("The island couldn't load. Check your connection and try again.");
+            return;
+          }
+          var missing = Engine.getMissingFeatures({ threads: false });
+          if (missing.length) {
+            fail("This browser can't run the island (" + missing.join(", ") + ").");
+            return;
+          }
+          var engine = new Engine({
+            args: [],
+            canvasResizePolicy: 2,
+            ensureCrossOriginIsolationHeaders: false,
+            executable: "/play/toon",
+            fileSizes: window.TOON_SIZES || {},
+            focusCanvas: true,
+            gdextensionLibs: [],
+            experimentalVK: false,
+            emscriptenPoolSize: 8,
+            godotPoolSize: 4,
+          });
+          var tick = setInterval(function () { drawBar(shown); }, 120);
+          engine.startGame({
+            onProgress: function (current, total) {
+              if (total > 0) shown = Math.min(1, current / total);
+              if (shown >= 1) note.textContent = "waking the island…";
+            },
+          }).then(function () {
+            shown = 1;
+            drawBar(1);
+            clearInterval(tick);
+            clearInterval(nameTimer);
+            loading.classList.add("fade");
+            setTimeout(function () { loading.hidden = true; }, 600);
+          }, function (err) {
+            clearInterval(tick);
+            fail("Something went wrong loading the island. " + (err && err.message ? err.message : ""));
+          });
+        }
+
+        // Phones get a short note first (once per visit), so nobody downloads
+        // the game by accident on a small screen.
+        var small = Math.min(window.screen.width, window.screen.height) < 820;
+        var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        var seen = false;
+        try { seen = sessionStorage.getItem("island-ok") === "1"; } catch (e) {}
+        if (small && coarse && !seen) {
+          document.getElementById("loading").hidden = true;
+          document.getElementById("phone").hidden = false;
+          document.getElementById("go").addEventListener("click", function () {
+            try { sessionStorage.setItem("island-ok", "1"); } catch (e) {}
+            start();
+          });
+        } else {
+          start();
+        }
+      })();
+    </script>
+  </body>
+</html>

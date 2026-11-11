@@ -16,7 +16,8 @@ Netlify builds and publishes **production** automatically on every push to `main
 
 | Route | File | Notes |
 |---|---|---|
-| `/` | `src/pages/index.astro` | Landing: Hero, Intro, Projects, FeaturedWork (Testimonials exists but is commented out) |
+| `/` | `src/pages/index.astro` | Explore mode: the Godot island game (standalone page, no BaseLayout). See "Explore mode" below |
+| `/classic` | `src/pages/classic.astro` | The previous landing page: Hero, Intro, Projects, FeaturedWork (Testimonials exists but is commented out) |
 | `/gallery` | `src/pages/gallery.astro` | Interactive gallery; content comes from `public/gallery/` folders (see below) |
 | `/toon-support` | `src/pages/toon-support.astro` | Intentionally unlinked — shared by URL only. Do not "clean up" as dead code |
 | `/blog/the-attic` | `src/pages/blog/the-attic.astro` | Blog index (terminal UI); links to all posts |
@@ -37,6 +38,12 @@ Netlify builds and publishes **production** automatically on every push to `main
 
 ### Pages own their chrome
 There is **no shared nav/header**. Each page implements its own back/home link (Gastly sprite on blog pages, Larvitar footer on gallery, inline links elsewhere). Blog pages import `HauntedCursor`; the landing page and case studies import `SubtleCursor`. Both cursors skip touch devices and `prefers-reduced-motion`, and pause their loops when the tab is hidden — preserve that if you touch them.
+
+### Explore mode (the homepage game)
+- Source lives in a separate local Godot 4 project: `~/toon-godot-website` (no git remote). This repo only holds the web export.
+- `public/play/` holds the export: `toon.js`, `toon.wasm` (~40 MB), `toon.pck`, two audio worklets. Re-export from Godot (`--export-release "Web"`, no-threads build) and copy those five files over; don't hand-edit them.
+- `src/pages/index.astro` is the shell: ASCII loading screen (progress from real file sizes read at build time), a once-per-visit note on phones with "continue anyway" / "classic site", share-card meta (`public/og.jpg`), and hidden links for crawlers and screen readers.
+- Links out of the game go to `/classic`, `/blog/the-attic`, `/blog/cooking-guide`, and a mailto. Pages that used to link "home" to the old landing now link to `/classic` (gallery, case study); the blog's `/` links intentionally land on the game.
 
 ### Gallery is folder-driven
 `src/pages/gallery.astro` reads `public/gallery/{jpg,png,mp4,books}/` with `readdirSync` **at build time**:
