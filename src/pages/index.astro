@@ -3,9 +3,24 @@
 // public/play/ from the toon-godot-website project). This page is only the
 // shell: an ASCII loading screen in the start screen's style, a short note for
 // phones, and the engine start-up. The previous homepage lives at /classic.
-const title = "Todd Nguyen";
+const title = "Todd Nguyen · Product Manager at BAGGU";
 const description =
-  "A floating island of things I've made. Walk around to find my product work at BAGGU, ShipHawk, TEDx and Netflix, plus recipes, photos and books, or visit the classic site.";
+  "Todd Nguyen, product manager at BAGGU. Explore a little island of my work at BAGGU, ShipHawk, TEDx and Netflix, plus recipes, photos and a blog.";
+// Tells search engines who this site is about (shown as a profile-style result).
+const person = {
+  "@context": "https://schema.org",
+  "@graph": [
+    { "@type": "WebSite", "name": "Todd Nguyen", "url": "https://todnguyen.com/" },
+    {
+      "@type": "Person",
+      "name": "Todd Nguyen",
+      "url": "https://todnguyen.com/",
+      "jobTitle": "Product Manager",
+      "worksFor": { "@type": "Organization", "name": "BAGGU", "url": "https://www.baggu.com/" },
+      "sameAs": ["https://www.linkedin.com/in/toddtnguyen/", "https://github.com/tonguwin"],
+    },
+  ],
+};
 const url = "https://todnguyen.com/";
 const image = "https://todnguyen.com/og.jpg";
 // Real sizes of the game files, so the loading bar can count up honestly.
@@ -35,6 +50,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <meta name="theme-color" content="#000000" />
+    <script type="application/ld+json" set:html={JSON.stringify(person)} />
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
@@ -97,12 +113,22 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <!-- For screen readers, search engines, and anyone without JavaScript. -->
     <div class="hide">
       <h1>Todd Nguyen</h1>
-      <p>{description}</p>
+      <p>Product manager at BAGGU, crafting and optimizing seamless e-commerce for a growing brand and its community. This site is a little floating island you can walk around; each stop tells part of the story.</p>
+      <h2>BAGGU</h2>
+      <p>Product Manager at BAGGU (2023 to now). I manage a team of three and oversee product setup and software development across all sales channels, focused on operational efficiency and streamlined workflows.</p>
+      <h2>ShipHawk</h2>
+      <p>I turned Zendesk support tickets into a product signal, piped through Fivetran into a Looker dashboard, so the ShipHawk product team could see where customers struggled and prioritise fixes by impact.</p>
+      <h2>TEDx</h2>
+      <p>As a TEDx Co-Director, I coordinated a 10-team organisation to host 2 virtual TEDx conferences with 80,000+ views.</p>
+      <h2>Netflix</h2>
+      <p>For the Netflix Watch Party project, I led user research on what gets in the way when people watch together, and presented a social viewing feature to the Netflix product team.</p>
       <nav aria-label="Site">
         <a href="/classic">Classic site</a>
         <a href="/gallery">Gallery</a>
         <a href="/blog/the-attic">The attic (blog)</a>
         <a href="/blog/cooking-guide">Cooking guide</a>
+        <a href="https://www.linkedin.com/in/toddtnguyen/">LinkedIn</a>
+        <a href="https://github.com/tonguwin">GitHub</a>
       </nav>
     </div>
 

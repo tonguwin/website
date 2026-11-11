@@ -19,10 +19,6 @@ import ThemeToggle from "../ThemeToggle.astro";
     </svg> */}
 
  
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Todd Nguyen - Product Manager</title>
   <style>
     @keyframes wiggle {
       0% { transform: translate3d(0, 0, 0); }
@@ -73,9 +69,10 @@ import ThemeToggle from "../ThemeToggle.astro";
       animation: subtleGlitch 0.3s ease-in-out;
     }
   </style>
-</head>
 
-  <svg viewBox="0 0 600 100" xmlns="http://www.w3.org/2000/svg" id="name-svg">
+
+  <h1 class="sr-only">Todd Nguyen, Product Manager at BAGGU</h1>
+  <svg viewBox="0 0 600 100" xmlns="http://www.w3.org/2000/svg" id="name-svg" aria-hidden="true">
     <text id="letter1" x="115" y="95">T</text>
     <text id="letter2" x="138" y="95">O</text>
     <text id="letter3" x="170" y="95">D</text>

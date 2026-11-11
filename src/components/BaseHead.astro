@@ -1,5 +1,15 @@
 ---
 import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = "Todd Nguyen · Product Manager at BAGGU",
+  description = "Todd Nguyen is a product manager at BAGGU, crafting and optimizing seamless e-commerce for a growing brand and its community.",
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <meta charset="utf-8" />
@@ -7,8 +17,16 @@ import "../styles/global.css";
 <meta charset="UTF-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="author" content="Michael Andreuzza" />
-<meta name="your keywords" content="Add ypour keywords here" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="author" content="Todd Nguyen" />
+<link rel="canonical" href={canonical} />
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content="https://todnguyen.com/og.jpg" />
+<meta name="twitter:card" content="summary_large_image" />
 <!-- Favicon guidelines generated with https://favicon.io/ -->
 <link
   rel="apple-touch-icon"
