@@ -83,7 +83,8 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
       .leave.crt .tube, .leave.crt .dot { display: block; }
       .leave .tube { position: absolute; inset: 0; }
       .leave .lines { position: absolute; inset: 0; opacity: 0; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .4) 0 1px, transparent 1px 3px); }
-      .leave .cmd { position: absolute; left: max(24px, env(safe-area-inset-left)); bottom: max(22px, env(safe-area-inset-bottom)); margin: 0; font-size: clamp(15px, 2vw, 20px); color: #efe8d6; text-shadow: 0 0 6px rgba(239, 232, 214, .6); white-space: pre; }
+      @font-face { font-family: "Chromatoon"; src: url("/fonts/chromatoon-pixels-bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+      .leave .cmd { position: absolute; left: max(24px, env(safe-area-inset-left)); bottom: max(22px, env(safe-area-inset-bottom)); margin: 0; font-family: "Chromatoon", ui-monospace, monospace; font-weight: 700; font-size: clamp(20px, 2.4vw, 28px); letter-spacing: .04em; color: #efe8d6; text-shadow: 0 0 6px rgba(239, 232, 214, .6); white-space: pre; }
       .leave .dot { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, #fff 0 30%, rgba(255, 255, 255, .5) 45%, transparent 70%); }
       .leave.fade { background: #000; opacity: 0; }
       @media (prefers-reduced-motion: reduce) { .screen { transition: none; } }
@@ -281,7 +282,8 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
             document.head.appendChild(l);
           } catch (e) {}
         }
-        window.toonPrefetch = function () { Object.keys(KIND).forEach(prefetch); };
+        function font() { try { document.fonts.load('700 24px "Chromatoon"'); } catch (e) {} }
+        window.toonPrefetch = function () { Object.keys(KIND).forEach(prefetch); font(); };
 
         function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
 
@@ -290,6 +292,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
           var kind = reduce ? "fade" : (KIND[url] || "fade");
           leaving = KIND[url] || "fade";
           prefetch(url);
+          font();
           try { sessionStorage.setItem("toon-arrive", JSON.stringify({ k: leaving, t: Date.now() })); } catch (e) {}
           ov.className = "leave " + kind;
           ov.hidden = false;
