@@ -1,0 +1,107 @@
+---
+// The second half of leaving the island (see toonLeave in index.astro):
+// /classic opens with a cartoon iris, the attic switches on like an old CRT.
+// It only plays when the island has just sent you here, so a normal visit
+// sees nothing. Place it first inside the page so the black cover is up
+// before anything else paints. index.astro also uses it (auto={false}) to
+// play the way back when the browser restores the island from its cache.
+interface Props {
+  kind: "iris" | "crt";
+  auto?: boolean;
+}
+const { kind, auto = true } = Astro.props;
+---
+
+<div id="arrive" class="arrive" hidden aria-hidden="true"><div class="hole"><div class="lines"></div></div></div>
+
+<style is:inline>
+  .arrive { position: fixed; inset: 0; z-index: 2147483000; pointer-events: none; overflow: hidden; }
+  .arrive[hidden] { display: none; }
+  .arrive .hole { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: translate(-50%, -50%); box-shadow: 0 0 0 200vmax #000; }
+  .arrive.iris .hole { border-radius: 50%; }
+  .arrive .lines { position: absolute; inset: 0; opacity: 0; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.38) 0 1px, transparent 1px 3px); }
+</style>
+
+<script is:inline define:vars={{ kind, auto }}>
+  var el = document.getElementById("arrive");
+  var hole = el.firstElementChild;
+  var lines = hole.firstElementChild;
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function cover(k) {
+    el.className = "arrive " + k;
+    el.hidden = false;
+  }
+
+  function play(k) {
+    k = k || kind;
+    cover(k);
+    var W = window.innerWidth, H = window.innerHeight;
+    var D = Math.ceil(Math.hypot(W, H)) + 40;
+    var anims = [];
+    try {
+      if (reduce) {
+        anims.push(el.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: "ease-out", fill: "both" }));
+      } else if (k === "iris") {
+        // Opens to a small circle, holds a beat, then swings wide.
+        var s = Math.round(Math.min(W, H) * 0.16);
+        anims.push(hole.animate([
+          { width: "0px", height: "0px" },
+          { width: s + "px", height: s + "px", offset: 0.22, easing: "linear" },
+          { width: s + "px", height: s + "px", offset: 0.42, easing: "cubic-bezier(.45,0,.2,1)" },
+          { width: D + "px", height: D + "px" },
+        ], { duration: 950, delay: 120, fill: "both" }));
+      } else {
+        // A dot, then a bright line, then the picture, still warm and lined.
+        var glow = "0 0 16px 5px rgba(255,255,255,.85), 0 0 0 200vmax #000";
+        var none = "0 0 0 0 rgba(255,255,255,0), 0 0 0 200vmax #000";
+        anims.push(hole.animate([
+          { width: "3px", height: "3px", background: "#fff", boxShadow: glow },
+          { width: "8px", height: "3px", background: "#fff", boxShadow: glow, offset: 0.12, easing: "cubic-bezier(.7,0,.3,1)" },
+          { width: "100%", height: "3px", background: "#fff", boxShadow: glow, offset: 0.38, easing: "cubic-bezier(.6,0,.2,1)" },
+          { width: "100%", height: "100%", background: "rgba(255,255,255,.5)", boxShadow: none, offset: 0.66 },
+          { width: "100%", height: "100%", background: "rgba(255,255,255,0)", boxShadow: none },
+        ], { duration: 1000, delay: 140, fill: "both" }));
+        anims.push(lines.animate([
+          { opacity: 0.7 }, { opacity: 0.7, offset: 0.55 }, { opacity: 0.35, offset: 0.68 },
+          { opacity: 0.6, offset: 0.74 }, { opacity: 0.2, offset: 0.86 }, { opacity: 0 },
+        ], { duration: 1300, delay: 140, fill: "both" }));
+      }
+    } catch (e) {
+      el.hidden = true;
+      return;
+    }
+    Promise.all(anims.map(function (a) { return a.finished; })).then(function () {
+      el.hidden = true;
+      anims.forEach(function (a) { a.cancel(); });
+    }, function () { el.hidden = true; });
+  }
+  window.toonArrive = play;
+
+  if (auto) {
+    var go = false;
+    try {
+      var f = JSON.parse(sessionStorage.getItem("toon-arrive") || "null");
+      sessionStorage.removeItem("toon-arrive");
+      go = !!f && f.k === kind && Date.now() - f.t < 10000;
+    } catch (e) {}
+    if (go) {
+      cover(kind);
+      var started = false;
+      var start = function () {
+        if (started) return;
+        started = true;
+        play(kind);
+      };
+      var ready = function () {
+        // Give web fonts a moment so the page doesn't reflow mid-reveal.
+        if (document.fonts && document.fonts.ready) document.fonts.ready.then(start);
+        setTimeout(start, 450);
+      };
+      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready);
+      else ready();
+      // Never leave the page covered, whatever happens to the animation.
+      setTimeout(function () { el.hidden = true; }, 3500);
+    }
+  }
+</script>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CardboardBox from "../../components/CardboardBox.astro";
+import Arrive from "../../components/Arrive.astro";
 
 // Blog posts with explicit dates for easy management
 const posts = [
@@ -50,6 +51,7 @@ const sortedPosts = [...posts].sort((a, b) => {
 ---
 
 <BaseLayout>
+  <Arrive kind="crt" />
   <!-- VT323 Retro Terminal Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

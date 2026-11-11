@@ -10,6 +10,7 @@ const url = "https://todnguyen.com/";
 const image = "https://todnguyen.com/og.jpg";
 // Real sizes of the game files, so the loading bar can count up honestly.
 import { statSync } from "node:fs";
+import Arrive from "../components/Arrive.astro";
 const size = (f: string) => { try { return statSync(`public/play/${f}`).size; } catch { return 0; } };
 const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("toon.pck") };
 ---
@@ -64,6 +65,18 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
         .note { font-size: 14px; }
         .btns a, .btns button { font-size: 18px; padding: 12px 0; }
       }
+      /* Ways off the island: an iris closing for /classic, a CRT switching off for the attic. */
+      .leave { position: fixed; inset: 0; z-index: 10; pointer-events: none; overflow: hidden; }
+      .leave[hidden] { display: none; }
+      .leave > * { display: none; }
+      .leave .iris { position: absolute; left: 50%; top: 50%; width: 0; height: 0; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 0 200vmax #000; }
+      .leave.iris .iris { display: block; }
+      .leave.crt .tube, .leave.crt .dot { display: block; }
+      .leave .tube { position: absolute; inset: 0; }
+      .leave .lines { position: absolute; inset: 0; opacity: 0; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .4) 0 1px, transparent 1px 3px); }
+      .leave .cmd { position: absolute; left: max(24px, env(safe-area-inset-left)); bottom: max(22px, env(safe-area-inset-bottom)); margin: 0; font-size: clamp(15px, 2vw, 20px); color: #efe8d6; text-shadow: 0 0 6px rgba(239, 232, 214, .6); white-space: pre; }
+      .leave .dot { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, #fff 0 30%, rgba(255, 255, 255, .5) 45%, transparent 70%); }
+      .leave.fade { background: #000; opacity: 0; }
       @media (prefers-reduced-motion: reduce) { .screen { transition: none; } }
     </style>
   </head>
@@ -110,6 +123,13 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <noscript>
       <section class="screen"><div class="box"><p class="sub">The island needs JavaScript. <a href="/classic" style="color:#fff">Visit the classic site</a>.</p></div></section>
     </noscript>
+
+    <div class="leave" id="leave" hidden aria-hidden="true">
+      <div class="iris"></div>
+      <div class="tube"><div class="lines"></div><pre class="cmd"></pre></div>
+      <div class="dot"></div>
+    </div>
+    <Arrive kind="iris" auto={false} />
 
     <script is:inline define:vars={{ sizes }}>window.TOON_SIZES = sizes;</script>
     <script is:inline src="/play/toon.js"></script>
@@ -205,6 +225,7 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
             clearInterval(tick);
             clearInterval(nameTimer);
             loading.classList.add("fade");
+            setTimeout(function () { if (window.toonPrefetch) window.toonPrefetch(); }, 3000);
             setTimeout(function () { loading.hidden = true; }, 600);
           }, function (err) {
             clearInterval(tick);
@@ -228,6 +249,115 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
         } else {
           start();
         }
+      })();
+
+      // Leaving the island for /classic or the attic plays its own way out,
+      // and the page it opens plays the matching way in (components/Arrive).
+      // The game calls this too (Game.gd _open).
+      (function () {
+        var KIND = { "/classic": "iris", "/blog/the-attic": "crt" };
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var ov = document.getElementById("leave");
+        var iris = ov.querySelector(".iris"), tube = ov.querySelector(".tube");
+        var lines = ov.querySelector(".lines"), cmd = ov.querySelector(".cmd"), dot = ov.querySelector(".dot");
+        var canvas = document.getElementById("canvas");
+        var anims = [], timers = [], leaving = null;
+
+        function prefetch(url) {
+          try {
+            if (document.querySelector('link[rel="prefetch"][href="' + url + '"]')) return;
+            var l = document.createElement("link");
+            l.rel = "prefetch";
+            l.href = url;
+            document.head.appendChild(l);
+          } catch (e) {}
+        }
+        window.toonPrefetch = function () { Object.keys(KIND).forEach(prefetch); };
+
+        function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+        window.toonLeave = function (url) {
+          if (leaving) return;
+          var kind = reduce ? "fade" : (KIND[url] || "fade");
+          leaving = KIND[url] || "fade";
+          prefetch(url);
+          try { sessionStorage.setItem("toon-arrive", JSON.stringify({ k: leaving, t: Date.now() })); } catch (e) {}
+          ov.className = "leave " + kind;
+          ov.hidden = false;
+          var W = window.innerWidth, H = window.innerHeight;
+          var total;
+          try {
+            if (kind === "iris") {
+              // Closes in on the island, holds on a small circle, then shuts.
+              var D = Math.ceil(Math.hypot(W, H)) + 40, s = Math.round(Math.min(W, H) * 0.16);
+              total = 1050;
+              anims.push(iris.animate([
+                { width: D + "px", height: D + "px", easing: "cubic-bezier(.6,0,.4,1)" },
+                { width: s + "px", height: s + "px", offset: 0.55 },
+                { width: s + "px", height: s + "px", offset: 0.78, easing: "cubic-bezier(.7,0,1,1)" },
+                { width: "0px", height: "0px" },
+              ], { duration: total, fill: "forwards" }));
+            } else if (kind === "crt") {
+              // Scanlines come up and a prompt types, then the picture
+              // squeezes to a bright line, then a dot that fades.
+              var text = "> cd ~/the-attic", t0 = Date.now();
+              cmd.textContent = "_";
+              var type = setInterval(function () {
+                var i = Math.min(text.length, Math.ceil((Date.now() - t0) / 26));
+                cmd.textContent = text.slice(0, i) + (i < text.length ? "_" : "");
+                if (i >= text.length) clearInterval(type);
+              }, 16);
+              timers.push(type);
+              anims.push(lines.animate([{ opacity: 0 }, { opacity: 0.75 }], { duration: 300, fill: "forwards" }));
+              var squeeze = [
+                { transform: "scale(1, 1)", filter: "brightness(1)" },
+                { transform: "scale(1, 1)", filter: "brightness(1.15)", offset: 0.12, easing: "cubic-bezier(.6,0,.85,.5)" },
+                { transform: "scale(1, .006)", filter: "brightness(2.8)", offset: 0.58, easing: "cubic-bezier(.5,0,.9,.5)" },
+                { transform: "scale(0, .006)", filter: "brightness(3.5)" },
+              ];
+              var opts = { duration: 520, delay: 560, fill: "forwards" };
+              anims.push(canvas.animate(squeeze, opts), tube.animate(squeeze, opts));
+              anims.push(dot.animate([
+                { opacity: 0, transform: "scale(1.4)" },
+                { opacity: 1, transform: "scale(1)", offset: 0.25 },
+                { opacity: 0, transform: "scale(.3)" },
+              ], { duration: 420, delay: 1000, fill: "forwards" }));
+              total = 1420;
+            } else {
+              total = reduce ? 220 : 400;
+              anims.push(ov.animate([{ opacity: 0 }, { opacity: 1 }], { duration: total, fill: "forwards" }));
+            }
+          } catch (e) {
+            total = 0;
+          }
+          later(function () { window.location.href = url; }, total + 60);
+        };
+
+        // Coming back with the back button can restore this page as it was
+        // left, mid-exit. Clear the exit and play the way back in.
+        window.addEventListener("pageshow", function (e) {
+          if (!leaving) return;
+          var was = leaving;
+          leaving = null;
+          timers.forEach(function (t) { clearTimeout(t); clearInterval(t); });
+          timers = [];
+          anims.forEach(function (a) { a.cancel(); });
+          anims = [];
+          ov.hidden = true;
+          cmd.textContent = "";
+          try { sessionStorage.removeItem("toon-arrive"); } catch (err) {}
+          if (e.persisted && window.toonArrive && was !== "fade") window.toonArrive(was);
+          if (canvas.focus) canvas.focus();
+        });
+
+        // Plain links to the classic site (phone note, error box) leave the same way.
+        document.querySelectorAll('a[href="/classic"]').forEach(function (a) {
+          a.addEventListener("click", function (e) {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+            e.preventDefault();
+            window.toonLeave("/classic");
+          });
+        });
       })();
     </script>
   </body>
