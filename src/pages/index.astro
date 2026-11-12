@@ -169,6 +169,38 @@ const sizes = { "/play/toon.wasm": size("toon.wasm"), "/play/toon.pck": size("to
     <Arrive kind="iris" auto={false} />
 
     <script is:inline define:vars={{ sizes }}>window.TOON_SIZES = sizes;</script>
+    <script is:inline>
+      // Phones: Godot only wakes the browser's audio on mouse and key input,
+      // and taps on the game never count as either, so the island stayed
+      // silent. Keep hold of the audio the game makes and wake it on the first
+      // tap (touchend is what iOS accepts), playing one silent sample as iOS needs.
+      (function () {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        var ctxs = [];
+        var Kept = class extends AC {
+          constructor(o) { super(o); ctxs.push(this); }
+        };
+        window.AudioContext = Kept;
+        if (window.webkitAudioContext) window.webkitAudioContext = Kept;
+        function wake() {
+          for (var i = 0; i < ctxs.length; i++) {
+            var c = ctxs[i];
+            if (c.state === "running") continue;
+            try {
+              c.resume();
+              var s = c.createBufferSource();
+              s.buffer = c.createBuffer(1, 1, 22050);
+              s.connect(c.destination);
+              s.start(0);
+            } catch (e) {}
+          }
+        }
+        ["touchend", "pointerup", "click", "keydown"].forEach(function (t) {
+          window.addEventListener(t, wake, { capture: true, passive: true });
+        });
+      })();
+    </script>
     <script is:inline src="/play/toon.js"></script>
     <script is:inline>
       (function () {
